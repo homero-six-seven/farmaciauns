@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-surface-variant":"#45464c","on-secondary-container":"#596372","error-container":"#ffdad6","primary-fixed-dim":"#c0c6db","on-tertiary-fixed":"#261906","on-error":"#ffffff","on-primary-fixed-variant":"#404758","on-tertiary-container":"#968065","surface":"#f9f9ff","on-primary-container":"#7d8497","on-secondary":"#ffffff","secondary-container":"#d6e0f1","tertiary-fixed-dim":"#dcc2a4","primary-container":"#141b2b","on-tertiary-fixed-variant":"#55442d","primary-fixed":"#dce2f7","surface-dim":"#d3daea","surface-bright":"#f9f9ff","primary":"#000000","surface-tint":"#575e70","surface-container":"#e7eefe","on-primary-fixed":"#141b2b","secondary-fixed-dim":"#bdc7d8","error":"#ba1a1a","tertiary-container":"#261906","on-primary":"#ffffff","background":"#f9f9ff","surface-container-highest":"#dce2f3","on-secondary-fixed-variant":"#3e4755","surface-container-low":"#f0f3ff","tertiary":"#000000","outline":"#76777d","inverse-on-surface":"#ebf1ff","surface-variant":"#dce2f3","on-surface":"#151c27","secondary":"#555f6d","on-secondary-fixed":"#121c28","on-background":"#151c27","tertiary-fixed":"#f9debf","secondary-fixed":"#d9e3f4","inverse-primary":"#c0c6db","surface-container-lowest":"#ffffff","on-error-container":"#93000a","on-tertiary":"#ffffff","inverse-surface":"#2a313d","surface-container-high":"#e2e8f8","outline-variant":"#c6c6cd"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"gutter":"1.5rem","space-xl":"2rem","margin":"2rem","space-xs":"0.25rem","space-sm":"0.5rem","space-lg":"1.5rem","space-md":"1rem"},"fontFamily":{"headline-lg":["Inter"],"label-sm":["Inter"],"headline-sm":["Inter"],"body-md":["Inter"],"headline-md":["Inter"],"label-lg":["Inter"],"label-md":["Inter"],"body-sm":["Inter"],"body-lg":["Inter"],"display-lg":["Inter"]},"fontSize":{"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"600"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"700"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between select-none"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center justify-between bg-surface-container-low"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-primary text-[20px]">local_hospital</span><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase">SALA MÉDICA</span></div><span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded-lg bg-surface-container-highest text-on-surface-variant font-mono">v1.0</span></div><div class="px-space-md py-space-sm"><div class="px-space-sm py-space-xs font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">GESTIÓN CLÍNICA</div></div><nav class="flex flex-col gap-space-xs px-space-sm" data-active-classes="bg-primary text-on-primary font-label-md"><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="inicio" href="#"><span class="material-symbols-outlined text-[18px]">dashboard</span><span>Inicio</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="listado-de-medicos" href="#"><span class="material-symbols-outlined text-[18px]">stethoscope</span><span>Listado de médicos</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="alta-de-medico" href="#"><span class="material-symbols-outlined text-[18px]">person_add</span><span>Alta de médico</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="listado-de-personal-adm" href="#"><span class="material-symbols-outlined text-[18px]">badge</span><span>Listado de personal adm.</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="alta-de-personal-adm" href="#"><span class="material-symbols-outlined text-[18px]">group_add</span><span>Alta de personal adm.</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="busqueda-de-pacientes" href="#"><span class="material-symbols-outlined text-[18px]">person_search</span><span>Búsqueda de pacientes</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="listado-de-enfermeras" href="#"><span class="material-symbols-outlined text-[18px]">medical_services</span><span>Listado de enfermeras</span></a></nav></div><div class="p-space-md bg-surface-container-low"><div class="flex items-center justify-between mb-space-xs"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-mono">TERMINAL NODE</span><span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface"><span class="w-2 h-2 rounded-full bg-primary"></span>ACTIVO</span></div><div class="font-body-sm text-body-sm text-on-surface-variant font-mono">Sistema Sala Médica v1.0</div></div></aside><div class="pl-64 flex flex-col min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Sala Médica v1.0</span><span class="font-label-sm text-label-sm px-space-sm py-0.5 rounded-lg bg-primary text-on-primary font-mono font-semibold uppercase tracking-wider">PANEL CENTRAL</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-md"><div class="flex flex-col text-right"><span class="font-label-lg text-label-lg text-on-surface leading-tight">Administrador General</span><div class="flex justify-end mt-0.5"><span class="font-label-sm text-label-sm px-space-xs py-0 rounded bg-surface-container-high text-on-surface-variant uppercase font-mono">ADMINISTRADOR</span></div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div><div class="h-6 w-px bg-surface-container-high"></div><button class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface hover:text-on-surface transition-colors font-label-md text-label-md" type="button"><span class="material-symbols-outlined text-[16px]">logout</span><span>Cerrar sesión</span></button></div></header><main class="flex-1 pt-16 bg-surface px-space-lg py-space-lg"><div class="flex flex-col w-full">
+<!-- BREADCRUMB & METADATA -->
+<div class="flex items-center justify-between pb-space-md">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant font-mono uppercase tracking-wider">
+<span>MÓDULO ADMINISTRATIVO</span>
+<span class="text-secondary">/</span>
+<span>PERSONAL DE GESTIÓN</span>
+<span class="text-secondary">/</span>
+<span class="text-on-surface font-semibold">LISTADO DE PERSONAL ADMINISTRATIVO</span>
+</div>
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-secondary font-mono">
+<span>REF: NÓM-ADM-2026</span>
+<span>•</span>
+<span>SYS_CHECK: OK</span>
+</div>
+</div>
+<!-- ENCABEZADO DE PÁGINA -->
+<div class="bg-surface-container-lowest p-space-lg shadow-sm mb-space-lg flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[24px] text-primary">badge</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Listado de personal administrativo</h1>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Nómina institucional del personal de admisiones, recepción y secretaría.
+      </p>
+</div>
+<div class="flex items-center">
+<button class="flex items-center gap-space-xs px-space-md py-2 bg-primary text-on-primary font-label-md text-label-md hover:bg-neutral-800 transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>+ Nuevo administrativo</span>
+</button>
+</div>
+</div>
+<!-- DISPOSICIÓN PRINCIPAL: DOS COLUMNAS -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg mb-space-xl">
+<!-- COLUMNA IZQUIERDA / CENTRAL: TABLA DE PERSONAL (8 cols) -->
+<div class="lg:col-span-8 flex flex-col bg-surface-container-lowest shadow-sm">
+<!-- HEADER INTERNO TABLA -->
+<div class="px-space-lg py-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-sm text-headline-sm text-on-surface">Nómina General</span>
+<span class="px-space-xs py-0.5 bg-surface-container-high text-on-surface-variant font-mono font-label-sm text-label-sm">5 REGISTROS</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-mono uppercase">ORDENADO: APELLIDO (ASC)</span>
+</div>
+<!-- TABLA DE DATOS -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/60 text-secondary font-label-sm text-label-sm font-mono uppercase">
+<th class="py-2.5 px-space-md w-12 text-center" scope="col">SEL</th>
+<th class="py-2.5 px-space-md" scope="col">Apellido y nombre</th>
+<th class="py-2.5 px-space-md" scope="col">DNI</th>
+<th class="py-2.5 px-space-md" scope="col">Email</th>
+<th class="py-2.5 px-space-md text-right" scope="col">Estado</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 text-on-surface font-body-md text-body-md">
+<!-- FILA 1: Álvarez, Patricia -->
+<tr class="hover:bg-surface-container-low/50 transition-colors cursor-pointer" onclick="selectRow(1)">
+<td class="py-3 px-space-md text-center">
+<input class="accent-primary cursor-pointer w-4 h-4" id="radio-1" name="personal_sel" type="radio"/>
+</td>
+<td class="py-3 px-space-md font-medium text-on-surface">
+                Álvarez, Patricia
+              </td>
+<td class="py-3 px-space-md font-mono text-secondary text-body-sm">
+                33.412.980
+              </td>
+<td class="py-3 px-space-md text-on-surface-variant text-body-sm font-mono">
+                palvarez@salamedica.com
+              </td>
+<td class="py-3 px-space-md text-right">
+<span class="inline-flex items-center px-2 py-0.5 text-label-sm font-label-sm font-mono uppercase bg-surface-container-high text-on-surface">
+                  Activo
+                </span>
+</td>
+</tr>
+<!-- FILA 2: Gómez, Fernando -->
+<tr class="hover:bg-surface-container-low/50 transition-colors cursor-pointer" onclick="selectRow(2)">
+<td class="py-3 px-space-md text-center">
+<input class="accent-primary cursor-pointer w-4 h-4" id="radio-2" name="personal_sel" type="radio"/>
+</td>
+<td class="py-3 px-space-md font-medium text-on-surface">
+                Gómez, Fernando
+              </td>
+<td class="py-3 px-space-md font-mono text-secondary text-body-sm">
+                31.789.204
+              </td>
+<td class="py-3 px-space-md text-on-surface-variant text-body-sm font-mono">
+                fgomez@salamedica.com
+              </td>
+<td class="py-3 px-space-md text-right">
+<span class="inline-flex items-center px-2 py-0.5 text-label-sm font-label-sm font-mono uppercase bg-surface-container-high text-on-surface">
+                  Activo
+                </span>
+</td>
+</tr>
+<!-- FILA 3: Pérez, Valeria (SELECCIONADA POR DEFECTO) -->
+<tr class="bg-surface-container-high/80 transition-colors cursor-pointer" onclick="selectRow(3)">
+<td class="py-3 px-space-md text-center">
+<input checked="" class="accent-primary cursor-pointer w-4 h-4" id="radio-3" name="personal_sel" type="radio"/>
+</td>
+<td class="py-3 px-space-md font-semibold text-on-surface flex items-center gap-space-xs">
+<span>Pérez, Valeria</span>
+<span class="material-symbols-outlined text-[16px] text-primary">arrow_right_alt</span>
+</td>
+<td class="py-3 px-space-md font-mono font-medium text-on-surface text-body-sm">
+                35.120.482
+              </td>
+<td class="py-3 px-space-md text-on-surface text-body-sm font-mono">
+                vperez@salamedica.com
+              </td>
+<td class="py-3 px-space-md text-right">
+<span class="inline-flex items-center px-2 py-0.5 text-label-sm font-label-sm font-mono uppercase bg-primary text-on-primary">
+                  Activo
+                </span>
+</td>
+</tr>
+<!-- FILA 4: Romero, Martín -->
+<tr class="hover:bg-surface-container-low/50 transition-colors cursor-pointer" onclick="selectRow(4)">
+<td class="py-3 px-space-md text-center">
+<input class="accent-primary cursor-pointer w-4 h-4" id="radio-4" name="personal_sel" type="radio"/>
+</td>
+<td class="py-3 px-space-md font-medium text-secondary">
+                Romero, Martín
+              </td>
+<td class="py-3 px-space-md font-mono text-secondary text-body-sm">
+                29.845.612
+              </td>
+<td class="py-3 px-space-md text-secondary text-body-sm font-mono">
+                mromero@salamedica.com
+              </td>
+<td class="py-3 px-space-md text-right">
+<span class="inline-flex items-center px-2 py-0.5 text-label-sm font-label-sm font-mono uppercase bg-surface-container text-secondary">
+                  Inactivo
+                </span>
+</td>
+</tr>
+<!-- FILA 5: Torres, Camila -->
+<tr class="hover:bg-surface-container-low/50 transition-colors cursor-pointer" onclick="selectRow(5)">
+<td class="py-3 px-space-md text-center">
+<input class="accent-primary cursor-pointer w-4 h-4" id="radio-5" name="personal_sel" type="radio"/>
+</td>
+<td class="py-3 px-space-md font-medium text-on-surface">
+                Torres, Camila
+              </td>
+<td class="py-3 px-space-md font-mono text-secondary text-body-sm">
+                36.901.345
+              </td>
+<td class="py-3 px-space-md text-on-surface-variant text-body-sm font-mono">
+                ctorres@salamedica.com
+              </td>
+<td class="py-3 px-space-md text-right">
+<span class="inline-flex items-center px-2 py-0.5 text-label-sm font-label-sm font-mono uppercase bg-surface-container-high text-on-surface">
+                  Activo
+                </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- PAGINACIÓN / INDICADOR INFERIOR SUTIL -->
+<div class="px-space-lg py-space-sm bg-surface-container-low flex items-center justify-between mt-auto">
+<span class="font-body-sm text-body-sm text-secondary font-mono">
+          Mostrando 1-5 de 5 registros • Pág. 1 de 1
+        </span>
+<div class="flex items-center gap-space-xs font-mono font-label-sm text-label-sm">
+<span class="px-2 py-1 text-on-surface font-semibold bg-surface-container-lowest">1</span>
+</div>
+</div>
+</div>
+<!-- COLUMNA DERECHA: PANEL DETALLE DEL PERSONAL SELECCIONADO (4 cols) -->
+<div class="lg:col-span-4 flex flex-col bg-surface-container-lowest shadow-sm">
+<!-- HEADER DEL PANEL DETALLE -->
+<div class="p-space-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">person</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Detalle del personal</h2>
+</div>
+<span class="px-2.5 py-0.5 bg-primary text-on-primary font-label-sm text-label-sm font-mono uppercase font-semibold">
+          ACTIVO
+        </span>
+</div>
+<!-- CONTENIDO FICHA TÉCNICA -->
+<div class="p-space-lg flex flex-col gap-space-lg">
+<!-- AVATAR & HEADER IDENTIFICATORIO -->
+<div class="flex items-center gap-space-md pb-space-md bg-surface-container-lowest">
+<div class="w-14 h-14 bg-primary text-on-primary flex items-center justify-center font-headline-md text-headline-md font-mono tracking-tighter shadow-sm">
+            VP
+          </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-md text-headline-md text-on-surface truncate">Valeria Pérez</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Personal administrativo</span>
+<span class="font-mono text-label-sm text-label-sm text-secondary mt-0.5">ID: ADM-0428</span>
+</div>
+</div>
+<!-- CAMPOS FICHA TÉCNICA LIMPIA -->
+<div class="grid grid-cols-1 gap-space-sm bg-surface-container-low p-space-md">
+<div class="flex justify-between items-baseline py-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-mono">Nombre</span>
+<span class="font-body-md text-body-md font-medium text-on-surface">Valeria</span>
+</div>
+<div class="flex justify-between items-baseline py-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-mono">Apellido</span>
+<span class="font-body-md text-body-md font-medium text-on-surface">Pérez</span>
+</div>
+<div class="flex justify-between items-baseline py-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-mono">DNI</span>
+<span class="font-body-md text-body-md font-mono font-medium text-on-surface">35.120.482</span>
+</div>
+<div class="flex justify-between items-baseline py-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-mono">Email</span>
+<span class="font-body-md text-body-md font-mono text-on-surface truncate max-w-[190px]">vperez@salamedica.com</span>
+</div>
+<div class="flex justify-between items-baseline py-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-mono">Teléfono</span>
+<span class="font-body-md text-body-md font-mono text-on-surface">+54 11 4872-9010</span>
+</div>
+<div class="flex justify-between items-baseline py-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-mono">Estado</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Activo</span>
+</div>
+</div>
+<!-- INFORMACIÓN INSTITUCIONAL COMPLEMENTARIA (SOLO LECTURA) -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-mono tracking-wider">
+            ASIGNACIÓN OPERATIVA
+          </span>
+<div class="p-space-md bg-surface-container-low flex flex-col gap-space-xs font-mono text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">meeting_room</span>
+<span class="font-medium text-on-surface">Área:</span>
+<span>Admisión Central - Box 02</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+<span class="font-medium text-on-surface">Horario:</span>
+<span>Matutino (07:00 - 15:00)</span>
+</div>
+<div class="flex items-center gap-space-xs mt-1 pt-1 bg-surface-container-high/40 px-space-xs py-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
+<span class="text-secondary text-label-sm">Perfil de accesos: Nivel II Clínico</span>
+</div>
+</div>
+</div>
+</div>
+<!-- FOOTER DEL PANEL -->
+<div class="p-space-md bg-surface-container-low mt-auto flex items-center justify-between text-secondary font-mono font-label-sm text-label-sm">
+<span>ÚLTIMA MODIFICACIÓN</span>
+<span>14/01/2026 - 08:30</span>
+</div>
+</div>
+</div>
+<!-- RECUADRO APARTE: CASO ALTERNATIVO ESTADO VACÍO (SIN REGISTROS) -->
+<div class="w-full flex flex-col bg-surface-container-lowest p-space-lg shadow-sm">
+<div class="flex items-center justify-between pb-space-sm mb-space-md bg-surface-container-low px-space-md py-space-xs">
+<div class="flex items-center gap-space-xs font-mono font-label-sm text-label-sm text-on-surface font-semibold tracking-wider">
+<span class="material-symbols-outlined text-[16px] text-primary">info</span>
+<span>CASO ALTERNATIVO: ESTADO VACÍO (SIN REGISTROS)</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-mono uppercase">VISTA DE REFERENCIA</span>
+</div>
+<!-- TARJETA EMPTY STATE -->
+<div class="flex flex-col items-center justify-center p-space-xl bg-surface-container-low text-center">
+<div class="w-12 h-12 bg-surface-container-high flex items-center justify-center text-secondary mb-space-md">
+<span class="material-symbols-outlined text-[28px]">group_off</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">
+        No hay personal administrativo registrado
+      </h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mb-space-lg">
+        No se encontraron agentes dados de alta en el sistema. Utilizá el botón 'Nuevo administrativo' para registrar al primer integrante del equipo.
+      </p>
+<button class="flex items-center gap-space-xs px-space-lg py-2 bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors shadow-sm font-semibold" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>+ Registrar personal administrativo</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  function selectRow(id) {
+    const radio = document.getElementById('radio-' + id);
+    if (radio) {
+      radio.checked = true;
+    }
+  }
+</script></main><footer class="w-full bg-surface-container-low py-space-md px-space-lg mt-auto"><div class="flex flex-col md:flex-row items-center justify-between gap-space-xs text-on-surface-variant"><span class="font-body-sm text-body-sm">© 2026 Sala Médica. Todos los derechos reservados.</span><span class="font-label-sm text-label-sm uppercase tracking-wider font-mono">ACCESO RESTRINGIDO A PERSONAL AUTORIZADO.</span></div></footer></div></body></html>

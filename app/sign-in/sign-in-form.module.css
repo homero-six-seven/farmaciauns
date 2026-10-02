@@ -1,0 +1,596 @@
+.page {
+  --surface: #f9f9ff;
+  --surface-low: #f0f3ff;
+  --on-surface: #151c27;
+  --on-surface-variant: #45464c;
+  --secondary: #555f6d;
+  --outline: #76777d;
+  --primary: #000000;
+  --error-container: #e2e8f8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--surface);
+  color: var(--on-surface);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.header,
+.footer {
+  width: min(100% - 4rem, 1440px);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header {
+  padding-block: 1.5rem;
+}
+
+.brand,
+.terminal,
+.cardBrand,
+.footerDetails,
+.footerLinks {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  gap: 0.5rem;
+}
+
+.brandIcon,
+.cardBrandIcon {
+  display: grid;
+  place-items: center;
+  color: white;
+  background: var(--primary);
+  border-radius: 0.5rem;
+}
+
+.brandIcon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.brandName {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+
+.terminal {
+  gap: 0.25rem;
+  color: var(--on-surface-variant);
+  font-size: 0.75rem;
+}
+
+.terminalDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--outline);
+}
+
+.main {
+  width: min(100% - 4rem, 1440px);
+  margin-inline: auto;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 2rem;
+}
+
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-block: 2rem;
+}
+
+.card {
+  width: min(100%, 430px);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgb(21 28 39 / 10%);
+}
+
+.card.registrationCard {
+  width: min(100%, 896px);
+  padding: 0;
+  overflow: hidden;
+}
+
+.registrationTopbar {
+  width: min(100%, 896px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: var(--on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.registrationTopbar p {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.registrationTopbar a {
+  margin-left: 0.375rem;
+  color: var(--on-surface);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.registrationHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 2rem;
+  background: rgb(240 243 255 / 65%);
+}
+
+.registrationHeaderTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.registrationHeaderTitle > div > span {
+  color: var(--on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.registrationHeaderTitle h1 {
+  margin: 0.25rem 0 0;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.registrationHeader > p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.registrationBadge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.25rem;
+  background: #e2e8f8;
+  color: var(--on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.registrationBadge svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.registrationBody {
+  padding: 2rem;
+}
+
+.registrationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 1.5rem;
+  row-gap: 1rem;
+}
+
+.registrationColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.registrationColumn .field > label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.registrationColumn .field > label b {
+  color: var(--primary);
+}
+
+.registrationColumn .field > label small {
+  color: var(--on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 400;
+}
+
+.registrationColumn .field > input,
+.registrationColumn .passwordInput > input {
+  border: 0;
+  border-radius: 0.25rem;
+  background: var(--surface-low);
+}
+
+.registrationActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.registrationActions .submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: auto;
+  min-width: 13.75rem;
+  min-height: 2.75rem;
+  margin: 0;
+  padding-inline: 1.5rem;
+  border-radius: 0.25rem;
+}
+
+.registrationDisclaimer {
+  max-width: 32rem;
+  margin: 1rem 0 0;
+  color: var(--on-surface-variant);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  text-align: center;
+}
+
+.cardBrand {
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.cardBrandIcon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.intro {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.intro h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: var(--error-container);
+  box-shadow: 0 1px 3px rgb(21 28 39 / 10%);
+}
+
+.errorIcon {
+  flex: none;
+  color: var(--primary);
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+}
+
+.errorBanner strong {
+  display: block;
+  margin-bottom: 0.125rem;
+  color: var(--primary);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  text-transform: uppercase;
+}
+
+.errorBanner p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.field label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.field input {
+  width: 100%;
+  height: 2.5rem;
+  padding-inline: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  outline: none;
+  background: #ffffff;
+  color: var(--on-surface);
+  font: inherit;
+  font-size: 0.875rem;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.field input::placeholder {
+  color: var(--outline);
+}
+
+.field input:focus {
+  background: var(--surface-low);
+}
+
+.field input.inputError {
+  border-color: #ba1a1a;
+}
+
+.passwordInput {
+  position: relative;
+}
+
+.passwordInput input {
+  padding-right: 3rem;
+}
+
+.visibilityButton {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  padding-inline: 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--outline);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.visibilityButton:hover {
+  color: var(--on-surface);
+}
+
+.forgotPassword {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -0.5rem;
+}
+
+.forgotPassword a {
+  color: var(--secondary);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.forgotPassword a:hover {
+  color: var(--primary);
+}
+
+.submitButton {
+  min-height: 2.5rem;
+  margin-top: 0.25rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgb(21 28 39 / 10%);
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #2a313d;
+}
+
+.submitButton:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.submitButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.registerPrompt {
+  margin: 1.5rem 0 0;
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-align: center;
+}
+
+.registerPrompt a {
+  margin-left: 0.25rem;
+  color: var(--on-surface);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.retryLink {
+  display: block;
+  margin-top: 1rem;
+  color: var(--secondary);
+  font-size: 0.75rem;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.verificationPrompt {
+  margin: 0 0 0.5rem;
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-align: center;
+}
+
+.formError {
+  margin: 0;
+  color: #93000a;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.successNotice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #edf6ee;
+  color: #245b2a;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.secondaryButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.secondaryButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.fieldHelp {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.nameFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.footer {
+  gap: 0.5rem;
+  padding-block: 1rem;
+  color: var(--on-surface-variant);
+  font-size: 0.75rem;
+}
+
+.footerDetails,
+.footerLinks {
+  gap: 1rem;
+}
+
+.footerLinks span {
+  color: inherit;
+}
+
+@media (max-width: 720px) {
+  .registrationGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .header,
+  .footer,
+  .main {
+    width: min(100% - 2rem, 1440px);
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .nameFields {
+    grid-template-columns: 1fr;
+  }
+
+  .registrationTopbar,
+  .registrationHeaderTitle,
+  .registrationActions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .registrationHeader,
+  .registrationBody {
+    padding: 1.5rem;
+  }
+
+  .registrationGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .registrationActions .submitButton {
+    width: 100%;
+  }
+
+  .footer,
+  .footerDetails {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footerDetails {
+    gap: 0.5rem;
+  }
+}

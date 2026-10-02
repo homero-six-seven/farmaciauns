@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Farmacia UNS
 
-## Getting Started
+Aplicación web de Farmacia UNS desarrollada con Next.js App Router, React y TypeScript.
 
-First, run the development server:
+## Requisitos
+
+- Node.js 20 o superior
+- pnpm 10
+
+## Preparar el proyecto
+
+Clona el repositorio, instala las dependencias y crea el archivo local de variables de entorno:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <URL_DEL_REPOSITORIO>
+cd farmaciauns
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copia `.env.example` como `.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+Copy-Item .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+En macOS o Linux:
 
-## Learn More
+```bash
+cp .env.example .env.local
+```
 
-To learn more about Next.js, take a look at the following resources:
+Completa las variables de `.env.local` con las credenciales de los servicios cuando estén disponibles:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Variable | Descripción |
+| --- | --- |
+| `DATABASE_URL` | URL de conexión PostgreSQL de Neon. Se usa para conectar con la base de datos y ejecutar operaciones como `prisma db push`. |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clave pública de Clerk para la autenticación. |
+| `CLERK_SECRET_KEY` | Clave secreta de Clerk. Solo debe utilizarse en el servidor. |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`.env.local` contiene credenciales y no debe compartirse ni subirse al repositorio. Git lo excluye; `.env.example` contiene únicamente los nombres de las variables.
 
-## Deploy on Vercel
+## Ejecutar en desarrollo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Abre [http://localhost:3000](http://localhost:3000).
+
+## Prisma
+
+El schema de la base de datos está en `prisma/schema.prisma`. `pnpm install` genera automáticamente el cliente Prisma en `generated/prisma`. También se genera antes de cada build:
+
+```bash
+pnpm build
+```
+
+Para validar el schema o regenerar el cliente manualmente:
+
+```bash
+pnpm exec prisma validate --schema prisma/schema.prisma
+pnpm exec prisma generate --schema prisma/schema.prisma
+```
+
+Las operaciones que acceden a Neon, como `prisma db push`, requieren que `DATABASE_URL` esté configurada con una URL válida.
+
+## Validaciones
+
+```bash
+pnpm exec prisma validate --schema prisma/schema.prisma
+pnpm exec tsc --noEmit
+pnpm lint
+```

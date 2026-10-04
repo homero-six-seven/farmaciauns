@@ -10,6 +10,10 @@ Copia `.env.example` como `.env.local`:
 Copy-Item .env.example .env.local
 ```
 
+```bash
+cp .env.example .env
+```
+
 ## Prisma
 
 El schema de la base de datos está en `prisma/schema.prisma`. `pnpm install` genera automáticamente el cliente Prisma en `generated/prisma`. También se genera antes de cada build.
@@ -40,3 +44,8 @@ await requireRole(["admin"]);
 Un usuario sin rol válido o sin permiso es enviado a la pantalla de acceso
 denegado. El helper también acepta los valores actuales
 `ADMINISTRADOR` y `ADMINISTRATIVO` como `admin`.
+
+Un administrador puede crear una invitación de personal mediante
+`POST /api/admin/invitations` con `{ "email": "...", "role": "medico" }` o
+`{ "email": "...", "role": "enfermera" }`. Clerk envía el email y la persona
+define su contraseña desde el enlace recibido.

@@ -40,3 +40,8 @@ await requireRole(["admin"]);
 Un usuario sin rol válido o sin permiso es enviado a la pantalla de acceso
 denegado. El helper también acepta los valores actuales
 `ADMINISTRADOR` y `ADMINISTRATIVO` como `admin`.
+
+Un administrador puede crear una invitación de personal mediante
+`POST /api/admin/invitations` con `{ "email": "...", "role": "medico" }` o
+`{ "email": "...", "role": "enfermera" }`. Clerk envía el email y la persona
+define su contraseña desde el enlace recibido.

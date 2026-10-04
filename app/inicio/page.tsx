@@ -1,10 +1,34 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { getPrisma } from "../../lib/prisma";
 import styles from "./inicio.module.css";
 
 export default async function InicioPage() {
   await auth.protect();
   const user = await currentUser();
+
+  const clerkRole = (user?.publicMetadata?.role as string | undefined)?.toLowerCase();
+  if (clerkRole === "admin" || clerkRole === "administrador") {
+    redirect("/admin");
+  }
+
+  const prisma = getPrisma();
+  const dbUser = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { clerkId: user?.id },
+        ...(user?.emailAddresses?.[0]?.emailAddress
+          ? [{ email: user.emailAddresses[0].emailAddress.toLowerCase() }]
+          : []),
+      ],
+    },
+  });
+
+  if (dbUser?.role === "ADMINISTRADOR") {
+    redirect("/admin");
+  }
+
   const displayName =
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
 

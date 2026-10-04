@@ -1,0 +1,241 @@
+.page {
+  --surface: #f9f9ff;
+  --surface-low: #f0f3ff;
+  --surface-high: #e2e8f8;
+  --surface-white: #ffffff;
+  --on-surface: #151c27;
+  --on-surface-variant: #45464c;
+  --secondary: #555f6d;
+  --outline: #c6c6cd;
+  --primary: #000000;
+  min-height: 100vh;
+  background: var(--surface);
+  color: var(--on-surface);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.header {
+  position: fixed;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 1.5rem;
+  background: var(--surface-white);
+  box-shadow: 0 1px 8px rgb(0 0 0 / 4%);
+}
+
+.brand,
+.account,
+.brandIcon {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.brandIcon {
+  width: 2rem;
+  height: 2rem;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--surface-white);
+}
+
+.brandIcon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.account {
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 4rem auto 0 0;
+  width: 16rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem 0.5rem;
+  background: var(--surface-white);
+  box-shadow: 0 1px 8px rgb(0 0 0 / 4%);
+}
+
+.sidebarLabel {
+  margin: 0 0 0.5rem;
+  padding-inline: 0.75rem;
+  color: var(--secondary);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.activeNav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #141b2b;
+  color: var(--surface-white);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.activeNav svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.sidebarFooter {
+  margin: 0;
+  padding: 0.75rem;
+  border-top: 1px solid var(--surface-high);
+  color: var(--secondary);
+  font-size: 0.6875rem;
+}
+
+.main {
+  max-width: 1440px;
+  min-height: 100vh;
+  margin-inline: auto;
+  padding: 6rem 2rem 2rem 18rem;
+}
+
+.welcome {
+  padding-block: 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.welcome h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.welcome > p:last-child {
+  margin: 0.75rem 0 0;
+  color: var(--on-surface-variant);
+  font-size: 1rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  min-height: 13rem;
+  padding: 1.5rem;
+  border: 1px solid var(--surface-high);
+  border-radius: 0.75rem;
+  background: var(--surface-white);
+  box-shadow: 0 2px 8px rgb(21 28 39 / 4%);
+}
+
+.cardIcon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 0.625rem;
+  background: var(--surface-low);
+  color: var(--on-surface);
+}
+
+.cardIcon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.card h2 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-low);
+  color: var(--secondary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    width: 4.25rem;
+    align-items: center;
+  }
+
+  .sidebarLabel,
+  .sidebarFooter {
+    display: none;
+  }
+
+  .activeNav {
+    width: 2.75rem;
+    justify-content: center;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .main {
+    padding-inline: 5.25rem 1rem;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding-inline: 1rem;
+  }
+
+  .account > span {
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .main {
+    padding-inline: 5rem 1rem;
+  }
+}

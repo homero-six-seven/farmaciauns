@@ -10,6 +10,10 @@ Copia `.env.example` como `.env.local`:
 Copy-Item .env.example .env.local
 ```
 
+```bash
+cp .env.example .env
+```
+
 ## Prisma
 
 El schema de la base de datos está en `prisma/schema.prisma`. `pnpm install` genera automáticamente el cliente Prisma en `generated/prisma`. También se genera antes de cada build.

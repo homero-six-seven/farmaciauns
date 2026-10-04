@@ -1,9 +1,11 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { requireRole, roles } from "@/lib/authorization";
 import styles from "./inicio.module.css";
 
 export default async function InicioPage() {
   await auth.protect();
+  await requireRole(roles);
   const user = await currentUser();
   const displayName =
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;

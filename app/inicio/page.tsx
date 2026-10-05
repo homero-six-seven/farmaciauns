@@ -1,6 +1,8 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { requireRole, roles } from "@/lib/authorization";
+import { getPrisma } from "@/lib/prisma";
 import styles from "./inicio.module.css";
 
 export default async function InicioPage() {

@@ -18,9 +18,25 @@ export interface CreateMedicoState {
     password?: string;
     general?: string;
   };
+  // Valores ingresados, para no vaciar el formulario cuando hay errores (sin la contraseña)
+  values?: Record<string, string>;
 }
 
 export async function createMedicoAction(
+  prevState: CreateMedicoState,
+  formData: FormData
+): Promise<CreateMedicoState> {
+  const result = await createMedico(prevState, formData);
+  if (result.success) return result;
+
+  const values: Record<string, string> = {};
+  for (const campo of ["nombre", "apellido", "dni", "matricula", "especialidad", "telefono", "email"]) {
+    values[campo] = formData.get(campo)?.toString() ?? "";
+  }
+  return { ...result, values };
+}
+
+async function createMedico(
   _prevState: CreateMedicoState,
   formData: FormData
 ): Promise<CreateMedicoState> {
@@ -77,34 +93,23 @@ export async function createMedicoAction(
     errors.especialidad = "Seleccione una especialidad válida";
   }
 
-  // Si ya hay errores de formato / obligatorios, retornar temprano
-  if (Object.keys(errors).length > 0) {
-    return { success: false, errors };
-  }
-
   const prisma = getPrisma();
 
+  // Los duplicados se informan aunque haya errores en otros campos;
+  // solo se consulta por los campos que pasaron su propia validación.
+
   // Validar duplicidad de DNI en la base de datos (CA2)
-  const existingDni = await prisma.user.findFirst({
-    where: { dni },
-  });
-  if (existingDni) {
+  if (!errors.dni && (await prisma.user.findFirst({ where: { dni } }))) {
     errors.dni = "El DNI ya está registrado en la base central";
   }
 
   // Validar duplicidad de Email en la base de datos (CA3)
-  const existingEmail = await prisma.user.findFirst({
-    where: { email },
-  });
-  if (existingEmail) {
+  if (!errors.email && (await prisma.user.findFirst({ where: { email } }))) {
     errors.email = "El email ya está registrado";
   }
 
   // Validar duplicidad de Matrícula
-  const existingMatricula = await prisma.user.findFirst({
-    where: { matricula },
-  });
-  if (existingMatricula) {
+  if (!errors.matricula && (await prisma.user.findFirst({ where: { matricula } }))) {
     errors.matricula = "La matrícula ya está registrada";
   }
 
@@ -138,7 +143,25 @@ export async function createMedicoAction(
         errors: { email: "El email ya está registrado en el servicio de autenticación" },
       };
     }
-    // Si es otro error de Clerk, lo registramos pero continuamos si es entorno local/offline
+    const code = clerkErr?.errors?.[0]?.code || "";
+    if (code.startsWith("form_password")) {
+      return {
+        success: false,
+        errors: {
+          password:
+            code === "form_password_pwned"
+              ? "Esa contraseña no es segura (aparece en filtraciones). Elegí otra."
+              : "La contraseña no cumple los requisitos de seguridad",
+        },
+      };
+    }
+    // Sin cuenta en Clerk el médico no podría iniciar sesión: no se crea el registro
+    return {
+      success: false,
+      errors: {
+        general: "No se pudo crear la cuenta del médico. Intente nuevamente.",
+      },
+    };
   }
 
   try {

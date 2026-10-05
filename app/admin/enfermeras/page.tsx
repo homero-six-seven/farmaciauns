@@ -21,5 +21,11 @@ export default async function EnfermerasPage() {
     isActive: e.isActive,
   }));
 
+  // El orden de la base depende de su collation (los acentos pueden quedar al final)
+  enfermeras.sort((a, b) =>
+    (a.lastName ?? "").localeCompare(b.lastName ?? "", "es", { sensitivity: "base" }) ||
+    (a.firstName ?? "").localeCompare(b.firstName ?? "", "es", { sensitivity: "base" }),
+  );
+
   return <EnfermerasClient enfermeras={enfermeras} />;
 }

@@ -23,5 +23,11 @@ export default async function MedicosPage() {
     isActive: m.isActive,
   }));
 
+  // El orden de la base depende de su collation (los acentos pueden quedar al final)
+  medicos.sort((a, b) =>
+    (a.lastName ?? "").localeCompare(b.lastName ?? "", "es", { sensitivity: "base" }) ||
+    (a.firstName ?? "").localeCompare(b.firstName ?? "", "es", { sensitivity: "base" }),
+  );
+
   return <MedicosClient initialMedicos={medicos} />;
 }

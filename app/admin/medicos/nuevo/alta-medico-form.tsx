@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { createMedicoAction, type CreateMedicoState } from "./actions";
 
 const initialState: CreateMedicoState = {
@@ -19,6 +19,26 @@ export function AltaMedicoForm() {
       router.push(`/admin/medicos/${state.doctorId}/confirmacion`);
     }
   }, [state, router]);
+
+  // Los errores quedan arriba del formulario y el botón abajo: llevar la vista al resumen
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (state.errors) {
+      errorSummaryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [state]);
+
+  const fieldLabels: Record<string, string> = {
+    nombre: "Nombre",
+    apellido: "Apellido",
+    dni: "DNI",
+    matricula: "Matrícula",
+    especialidad: "Especialidad",
+    telefono: "Teléfono",
+    email: "Email",
+    password: "Contraseña",
+  };
+  const fieldErrors = Object.entries(state.errors ?? {}).filter(([campo]) => campo !== "general");
 
   return (
     <div className="flex flex-col gap-space-lg w-full">
@@ -58,10 +78,27 @@ export function AltaMedicoForm() {
         </div>
       </div>
 
-      {state.errors?.general && (
-        <div className="p-space-md bg-error-container/40 border border-error text-error rounded-lg flex items-center gap-space-sm font-label-md">
+      {state.errors && (
+        <div
+          ref={errorSummaryRef}
+          role="alert"
+          className="p-space-md bg-error-container/40 border border-error text-error rounded-lg flex items-start gap-space-sm font-label-md"
+        >
           <span className="material-symbols-outlined text-[20px]">error</span>
-          <span>{state.errors.general}</span>
+          <div className="flex flex-col gap-1">
+            <span className="font-semibold">
+              {state.errors.general ?? "No se registró el médico. Revisá los siguientes campos:"}
+            </span>
+            {fieldErrors.length > 0 && (
+              <ul className="list-disc pl-5">
+                {fieldErrors.map(([campo, mensaje]) => (
+                  <li key={campo}>
+                    {fieldLabels[campo] ?? campo}: {mensaje}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       )}
 
@@ -107,9 +144,9 @@ export function AltaMedicoForm() {
                     <input
                       id="nombre"
                       name="nombre"
+                      defaultValue={state.values?.nombre ?? ""}
                       type="text"
                       placeholder="Ej. Lucas Alejandro"
-                      defaultValue=""
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
                         state.errors?.nombre
                           ? "bg-error-container/30 border-error focus:ring-1 focus:ring-error"
@@ -152,6 +189,7 @@ export function AltaMedicoForm() {
                     <input
                       id="dni"
                       name="dni"
+                      defaultValue={state.values?.dni ?? ""}
                       type="text"
                       placeholder="Ej. 34892110"
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
@@ -193,7 +231,8 @@ export function AltaMedicoForm() {
                     <select
                       id="especialidad"
                       name="especialidad"
-                      defaultValue=""
+                      key={state.values?.especialidad ?? ""}
+                      defaultValue={state.values?.especialidad ?? ""}
                       className={`w-full h-10 px-3 pr-9 font-body-md text-body-md rounded-lg focus:outline-none appearance-none cursor-pointer transition-all border ${
                         state.errors?.especialidad
                           ? "bg-error-container/30 border-error focus:ring-1 focus:ring-error"
@@ -246,6 +285,7 @@ export function AltaMedicoForm() {
                     <input
                       id="email"
                       name="email"
+                      defaultValue={state.values?.email ?? ""}
                       type="email"
                       placeholder="doctor@salamedica.org.ar"
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
@@ -290,6 +330,7 @@ export function AltaMedicoForm() {
                     <input
                       id="apellido"
                       name="apellido"
+                      defaultValue={state.values?.apellido ?? ""}
                       type="text"
                       placeholder="Ej. Rossi"
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
@@ -332,6 +373,7 @@ export function AltaMedicoForm() {
                     <input
                       id="matricula"
                       name="matricula"
+                      defaultValue={state.values?.matricula ?? ""}
                       type="text"
                       placeholder="Ej. MN 149832"
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
@@ -373,6 +415,7 @@ export function AltaMedicoForm() {
                     <input
                       id="telefono"
                       name="telefono"
+                      defaultValue={state.values?.telefono ?? ""}
                       type="tel"
                       placeholder="+54 11 4980-2210"
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${

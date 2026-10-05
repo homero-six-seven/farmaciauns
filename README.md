@@ -49,3 +49,23 @@ Un administrador puede crear una invitación de personal mediante
 `POST /api/admin/invitations` con `{ "email": "...", "role": "medico" }` o
 `{ "email": "...", "role": "enfermera" }`. Clerk envía el email y la persona
 define su contraseña desde el enlace recibido.
+
+## 🔐 Usuarios y Credenciales de Prueba
+
+Para probar las diferentes funcionalidades y permisos de la aplicación según el rol, se han creado los siguientes usuarios desde el Dashboard de Clerk. 
+
+> **Nota:** Todos los usuarios comparten la misma contraseña de acceso para facilitar la evaluación del proyecto.
+
+| Rol | Correo Electrónico (Email) | Contraseña |
+| :--- | :--- | :--- |
+| **Administrador** | `admin@example.com` | `0ef2af58d1c9bfe6` |
+| **Enfermera** | `enfermera@example.com` | `0ef2af58d1c9bfe6` |
+| **Paciente** | `paciente@example.com` | `0ef2af58d1c9bfe6` |
+| **Medico** | `medico@example.com` | `0ef2af58d1c9bfe6` |
+
+---
+
+### 🚀 Cómo probar los roles en el entorno local
+
+1. Inicia sesión en la aplicación utilizando cualquiera de las credenciales de la tabla.
+2. Cada usuario tiene asignado su correspondiente `role` en sus metadatos públicos (`publicMetadata`), lo que redirige y habilita los permisos específicos dentro del sistema (panel de administración, registro/atención de pacientes o consulta de turnos).

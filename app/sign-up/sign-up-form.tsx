@@ -292,13 +292,15 @@ export function SignUpForm() {
                       <div className={styles.field}>
                         <label htmlFor="dni">
                           <span>DNI <b>*</b></span>
-                          <small>Sin puntos</small>
+                          <small>Sin puntos · mínimo 7 dígitos</small>
                         </label>
                         <input
                           autoComplete="off"
                           id="dni"
                           inputMode="numeric"
-                          onChange={(event) => setDni(event.target.value)}
+                          minLength={7}
+                          maxLength={8}
+                          onChange={(event) => setDni(event.target.value.replace(/\D/g, ""))}
                           placeholder="Ej. 38450912"
                           required
                           value={dni}
@@ -393,7 +395,7 @@ export function SignUpForm() {
                         <input
                           autoComplete="tel"
                           id="phone"
-                          onChange={(event) => setPhone(event.target.value)}
+                          onChange={(event) => setPhone(event.target.value.replace(/[^\d+\s()-]/g, ""))}
                           placeholder="Ej. 11 4589 2200"
                           required
                           type="tel"

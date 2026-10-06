@@ -25,6 +25,12 @@
 .DS_Store
 *.pem
 
+# sdd / skill registry
+.atl/
+
+# documentation (local-only)
+/docs/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

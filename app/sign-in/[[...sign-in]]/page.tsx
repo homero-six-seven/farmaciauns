@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { SignInForm } from "../sign-in-form";
 
 export default async function SignInPage({
@@ -7,6 +9,13 @@ export default async function SignInPage({
   params: Promise<{ "sign-in"?: string[] }>;
   searchParams: Promise<{ reason?: string }>;
 }) {
+  // Si ya hay una sesión activa (ej. tras navegar "atrás" con el navegador),
+  // redirigir a /inicio en vez de mostrar el form: evita el error al re-login.
+  const { userId } = await auth();
+  if (userId) {
+    redirect("/inicio");
+  }
+
   const { "sign-in": segments } = await params;
   const { reason } = await searchParams;
   const errorMessages: Record<string, string> = {

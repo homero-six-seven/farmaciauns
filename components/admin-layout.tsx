@@ -20,7 +20,7 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-surface">
-      <aside className="flex w-64 shrink-0 flex-col gap-6 bg-surface-container-lowest p-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+      <aside className="flex max-h-screen w-64 shrink-0 flex-col gap-6 overflow-y-auto bg-surface-container-lowest p-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
         <h2 className="px-2 text-xs font-semibold uppercase tracking-wider text-secondary">
           Módulo administrativo
         </h2>

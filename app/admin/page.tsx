@@ -16,17 +16,17 @@ export default function AdminDashboardPage() {
     },
     {
       title: "Listado de personal administrativo",
-      href: "/prototipos/pantalla_23_listado_de_personal_administrativo",
+      href: "/admin/personal",
       icon: "badge",
     },
     {
       title: "Alta de personal administrativo",
-      href: "/prototipos/pantalla_16_alta_de_personal_administrativo",
+      href: "/admin/personal/nuevo",
       icon: "group_add",
     },
     {
       title: "Búsqueda de pacientes",
-      href: "/prototipos/pantalla_21_b_squeda_de_pacientes_administrador",
+      href: "/pacientes",
       icon: "person_search",
     },
     {

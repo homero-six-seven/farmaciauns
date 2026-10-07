@@ -38,12 +38,19 @@ const NAV_ITEMS: NavItem[] = [
  */
 export function SidebarNav() {
   const pathname = usePathname();
+  const activeItem = NAV_ITEMS.filter(
+    (item) =>
+      pathname === item.href ||
+      (item.href !== "/inicio" &&
+        item.href !== "/admin/medicos" &&
+        pathname.startsWith(`${item.href}/`)),
+  ).sort((a, b) => b.href.length - a.href.length)[0];
 
   return (
     <nav className="flex flex-col gap-1">
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
-        const isActive = pathname === item.href;
+        const isActive = activeItem?.href === item.href;
         return (
           <Link
             key={item.href}

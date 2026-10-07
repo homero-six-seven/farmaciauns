@@ -18,6 +18,8 @@ export default async function SignInPage({
       "Tus credenciales se validaron, pero no se pudo iniciar la sesión. Volvé a intentarlo.",
     "compromised-password":
       "Por seguridad, Clerk bloqueó esta contraseña porque fue detectada en una filtración. Usá “¿Olvidaste tu contraseña?” para restablecerla.",
+    "inactive-account":
+      "Tu cuenta no está activa. Contactá a un administrador para solicitar acceso.",
   };
 
   return (

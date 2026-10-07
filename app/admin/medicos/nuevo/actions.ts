@@ -22,6 +22,29 @@ export interface CreateMedicoState {
   values?: Record<string, string>;
 }
 
+function getClerkErrorDetails(error: unknown): {
+  message: string;
+  code: string;
+  nestedMessage: string;
+} {
+  if (!error || typeof error !== "object") {
+    return { message: "", code: "", nestedMessage: "" };
+  }
+
+  const details = error as {
+    message?: unknown;
+    errors?: Array<{ message?: unknown; code?: unknown }>;
+  };
+  const firstError = details.errors?.[0];
+
+  return {
+    message: typeof details.message === "string" ? details.message : "",
+    code: typeof firstError?.code === "string" ? firstError.code : "",
+    nestedMessage:
+      typeof firstError?.message === "string" ? firstError.message : "",
+  };
+}
+
 export async function createMedicoAction(
   prevState: CreateMedicoState,
   formData: FormData
@@ -133,17 +156,17 @@ async function createMedico(
       },
     });
     clerkId = clerkUser.id;
-  } catch (clerkErr: any) {
+  } catch (clerkErr: unknown) {
     // Si Clerk reporta que el email ya existe o error de contraseña
-    console.warn("Clerk user creation note:", clerkErr?.message);
-    const msg = clerkErr?.errors?.[0]?.message || clerkErr?.message || "";
+    const { code, message, nestedMessage } = getClerkErrorDetails(clerkErr);
+    console.warn("Clerk user creation note:", message);
+    const msg = nestedMessage || message;
     if (msg.toLowerCase().includes("email") || msg.toLowerCase().includes("taken") || msg.toLowerCase().includes("exists")) {
       return {
         success: false,
         errors: { email: "El email ya está registrado en el servicio de autenticación" },
       };
     }
-    const code = clerkErr?.errors?.[0]?.code || "";
     if (code.startsWith("form_password")) {
       return {
         success: false,
@@ -184,7 +207,7 @@ async function createMedico(
       success: true,
       doctorId: doctor.id,
     };
-  } catch (dbErr: any) {
+  } catch (dbErr: unknown) {
     console.error("DB create doctor error:", dbErr);
     return {
       success: false,

@@ -1,5 +1,4 @@
 import { UserButton, SignOutButton } from "@clerk/nextjs";
-import Link from "next/link";
 import { getCurrentAdmin } from "../../lib/auth";
 import { AdminNav } from "./admin-nav";
 

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "pnpm dlx tsx prisma/seed.ts",
+    "seed": "prisma db seed",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "@next/env": "^16.3.8",
     "@prisma/adapter-neon": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "lucide-react": "^1.52.0",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
@@ -29,7 +31,11 @@
     "eslint-config-next": "16.3.8",
     "prisma": "7.10.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.14.0",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
 }

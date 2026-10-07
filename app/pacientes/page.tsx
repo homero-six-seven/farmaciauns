@@ -17,14 +17,16 @@ export default async function PacientesPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
-  await requireRole(["admin", "medico"]);
+  const role = await requireRole(["admin", "medico"]);
 
   const { q } = await searchParams;
   const query = (q ?? "").trim();
 
   const repo = getUserRepository();
   const pacientes = (
-    query ? repo.searchByNameOrDni(query) : repo.listByRole("PACIENTE")
+    await (query
+      ? repo.searchByNameOrDni(query)
+      : repo.listByRole("PACIENTE"))
   ).map(toUsuarioPublico);
 
   return (
@@ -125,7 +127,10 @@ export default async function PacientesPage({
             </div>
           </div>
         ) : (
-          <ListadoUsuarios usuarios={pacientes} />
+          <ListadoUsuarios
+            usuarios={pacientes}
+            puedeEliminar={role === "admin"}
+          />
         )}
     </div>
   );

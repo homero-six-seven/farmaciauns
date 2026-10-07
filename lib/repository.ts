@@ -1,15 +1,16 @@
 /**
  * Capa de acceso a datos de usuarios.
  *
- * Define la interfaz `UserRepository` y una implementación EN MEMORIA
- * (`InMemoryUserRepository`) porque `DATABASE_URL` está vacía (no hay Neon
- * disponible todavía). Ver docs/CAMBIOS-US-GRUPO1.md → "Hardcodeos" y
- * "Migración a Prisma/Neon".
+ * Define la interfaz `UserRepository` (async) con dos implementaciones:
+ * - `PrismaUserRepository` (`lib/prisma-user-repository.ts`) → persistente
+ *   contra Neon/PostgreSQL, elegida cuando `DATABASE_URL` está seteada.
+ * - `InMemoryUserRepository` → fallback en memoria (demos sin DB).
  */
 
 import { randomUUID } from "node:crypto";
 import type { Role, Usuario } from "./domain/usuario";
 import { normalizarDni } from "./domain/usuario";
+import { PrismaUserRepository } from "./prisma-user-repository";
 
 /** Datos necesarios para crear un usuario. */
 export interface NuevoUsuarioInput {
@@ -27,13 +28,15 @@ export interface NuevoUsuarioInput {
 }
 
 export interface UserRepository {
-  create(input: NuevoUsuarioInput): Usuario;
-  findById(id: string): Usuario | undefined;
-  findByDni(dni: string): Usuario | undefined;
-  findByEmail(email: string): Usuario | undefined;
-  listByRole(role: Role): Usuario[];
+  create(input: NuevoUsuarioInput): Promise<Usuario>;
+  findById(id: string): Promise<Usuario | undefined>;
+  findByDni(dni: string): Promise<Usuario | undefined>;
+  findByEmail(email: string): Promise<Usuario | undefined>;
+  listByRole(role: Role): Promise<Usuario[]>;
   /** Busca PACIENTES por nombre, apellido o DNI (case-insensitive). */
-  searchByNameOrDni(query: string): Usuario[];
+  searchByNameOrDni(query: string): Promise<Usuario[]>;
+  /** Soft delete: marca al usuario como inactivo (`active=false`). No borra la fila. */
+  deactivate(id: string): Promise<void>;
 }
 
 /** Implementación en memoria. El array vive en el singleton de `getUserRepository`. */
@@ -44,7 +47,7 @@ export class InMemoryUserRepository implements UserRepository {
     this.usuarios = semilla.map((u) => ({ ...u }));
   }
 
-  create(input: NuevoUsuarioInput): Usuario {
+  async create(input: NuevoUsuarioInput): Promise<Usuario> {
     const ahora = new Date();
     const usuario: Usuario = {
       id: randomUUID(),
@@ -67,23 +70,23 @@ export class InMemoryUserRepository implements UserRepository {
     return usuario;
   }
 
-  findById(id: string): Usuario | undefined {
+  async findById(id: string): Promise<Usuario | undefined> {
     return this.usuarios.find((u) => u.id === id);
   }
 
-  findByDni(dni: string): Usuario | undefined {
+  async findByDni(dni: string): Promise<Usuario | undefined> {
     const n = normalizarDni(dni);
     return this.usuarios.find((u) => u.dni === n);
   }
 
-  findByEmail(email: string): Usuario | undefined {
+  async findByEmail(email: string): Promise<Usuario | undefined> {
     const e = email.trim().toLowerCase();
     return this.usuarios.find(
       (u) => u.email?.trim().toLowerCase() === e,
     );
   }
 
-  listByRole(role: Role): Usuario[] {
+  async listByRole(role: Role): Promise<Usuario[]> {
     return this.usuarios
       .filter((u) => u.role === role)
       .slice()
@@ -92,7 +95,7 @@ export class InMemoryUserRepository implements UserRepository {
       );
   }
 
-  searchByNameOrDni(query: string): Usuario[] {
+  async searchByNameOrDni(query: string): Promise<Usuario[]> {
     const q = query.trim().toLowerCase();
     if (q === "") {
       return [];
@@ -115,6 +118,13 @@ export class InMemoryUserRepository implements UserRepository {
         (a.lastName ?? "").localeCompare(b.lastName ?? "", "es"),
       );
   }
+
+  async deactivate(id: string): Promise<void> {
+    const usuario = this.usuarios.find((u) => u.id === id);
+    if (usuario) {
+      usuario.active = false;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -128,7 +138,7 @@ function fecha(anio: number, mes: number, dia: number): Date {
   return new Date(anio, mes - 1, dia);
 }
 
-const pacientesSemilla: Usuario[] = [
+export const pacientesSemilla: Usuario[] = [
   {
     id: "pac-gomez-maria",
     clerkId: null,
@@ -212,7 +222,7 @@ const pacientesSemilla: Usuario[] = [
 // de estado). Las enfermeras son 3 activas, sin especialidad (`null`).
 // ---------------------------------------------------------------------------
 
-const medicosSemilla: Usuario[] = [
+export const medicosSemilla: Usuario[] = [
   {
     id: "med-fernandez-ana",
     clerkId: null,
@@ -279,7 +289,7 @@ const medicosSemilla: Usuario[] = [
   },
 ];
 
-const enfermerasSemilla: Usuario[] = [
+export const enfermerasSemilla: Usuario[] = [
   {
     id: "enf-martinez-laura",
     clerkId: null,
@@ -335,28 +345,28 @@ const enfermerasSemilla: Usuario[] = [
 // ---------------------------------------------------------------------------
 
 const globalForRepo = globalThis as typeof globalThis & {
-  __farmaciaunsUserRepository?: InMemoryUserRepository;
+  __farmaciaunsUserRepository?: UserRepository;
 };
 
 /**
- * Devuelve el repositorio de usuarios (singleton en memoria).
+ * Devuelve el repositorio de usuarios (singleton).
  *
  * Usa `globalThis` (mismo patrón que `lib/prisma.ts`) para que la MISMA
  * instancia se comparta entre server components y server actions dentro de
  * un mismo proceso.
  *
- * MIGRACIÓN A PRISMA/NEON: cuando `DATABASE_URL` esté disponible, reemplazar
- * el cuerpo por una implementación `PrismaUserRepository` que hable con el
- * cliente generado (`generated/prisma/client`). La interfaz `UserRepository`
- * se mantiene, así que las server actions y páginas no cambian.
+ * - Con `DATABASE_URL` seteada → `PrismaUserRepository` (persistente, Neon).
+ * - Sin `DATABASE_URL` → `InMemoryUserRepository` con la semilla demo.
  */
 export function getUserRepository(): UserRepository {
   if (!globalForRepo.__farmaciaunsUserRepository) {
-    globalForRepo.__farmaciaunsUserRepository = new InMemoryUserRepository([
-      ...pacientesSemilla,
-      ...medicosSemilla,
-      ...enfermerasSemilla,
-    ]);
+    globalForRepo.__farmaciaunsUserRepository = process.env.DATABASE_URL?.trim()
+      ? new PrismaUserRepository()
+      : new InMemoryUserRepository([
+          ...pacientesSemilla,
+          ...medicosSemilla,
+          ...enfermerasSemilla,
+        ]);
   }
   return globalForRepo.__farmaciaunsUserRepository;
 }

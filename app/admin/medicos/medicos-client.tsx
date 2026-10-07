@@ -1,0 +1,495 @@
+"use client";
+
+import Link from "next/link";
+import { useState, useMemo } from "react";
+
+export interface MedicoItem {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  dni: string | null;
+  email: string;
+  phone: string | null;
+  matricula: string | null;
+  especialidad: "CLINICA_MEDICA" | "PEDIATRIA" | "TRAUMATOLOGIA" | null;
+  isActive: boolean;
+}
+
+interface MedicosClientProps {
+  initialMedicos: MedicoItem[];
+}
+
+function formatDni(dni: string | null | undefined): string {
+  if (!dni) return "S/D";
+  const clean = dni.replace(/\D/g, "");
+  if (clean.length === 8) {
+    return `${clean.slice(0, 2)}.${clean.slice(2, 5)}.${clean.slice(5)}`;
+  }
+  if (clean.length === 7) {
+    return `${clean.slice(0, 1)}.${clean.slice(1, 4)}.${clean.slice(4)}`;
+  }
+  return dni;
+}
+
+function especialidadLabel(esp: MedicoItem["especialidad"]): string {
+  switch (esp) {
+    case "CLINICA_MEDICA":
+      return "Clínica médica";
+    case "PEDIATRIA":
+      return "Pediatría";
+    case "TRAUMATOLOGIA":
+      return "Traumatología";
+    default:
+      return "General";
+  }
+}
+
+export function MedicosClient({ initialMedicos }: MedicosClientProps) {
+  const [filtroEspecialidad, setFiltroEspecialidad] = useState("todas");
+  const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [selectedId, setSelectedId] = useState<string | null>(
+    initialMedicos[0]?.id ?? null
+  );
+
+  const filtered = useMemo(() => {
+    return initialMedicos.filter((m) => {
+      // Filtro especialidad
+      if (filtroEspecialidad === "clinica" && m.especialidad !== "CLINICA_MEDICA") {
+        return false;
+      }
+      if (filtroEspecialidad === "pediatria" && m.especialidad !== "PEDIATRIA") {
+        return false;
+      }
+      if (filtroEspecialidad === "traumatologia" && m.especialidad !== "TRAUMATOLOGIA") {
+        return false;
+      }
+
+      // Filtro estado
+      if (filtroEstado === "activo" && !m.isActive) {
+        return false;
+      }
+      if (filtroEstado === "inactivo" && m.isActive) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [initialMedicos, filtroEspecialidad, filtroEstado]);
+
+  const selectedMedico = useMemo(() => {
+    const found = filtered.find((m) => m.id === selectedId);
+    return found || filtered[0] || null;
+  }, [filtered, selectedId]);
+
+  const resetFilters = () => {
+    setFiltroEspecialidad("todas");
+    setFiltroEstado("todos");
+  };
+
+  return (
+    <div className="flex flex-col gap-space-lg w-full">
+      {/* Top Breadcrumb & Metadata */}
+      <div className="flex items-center justify-between">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm tracking-widest uppercase"
+        >
+          <span className="hover:text-on-surface transition-colors cursor-pointer">
+            MÓDULO CLÍNICO
+          </span>
+          <span className="text-secondary select-none">/</span>
+          <span className="hover:text-on-surface transition-colors cursor-pointer">
+            CUERPO MÉDICO
+          </span>
+          <span className="text-secondary select-none">/</span>
+          <span className="text-on-surface font-semibold">NÓMINA GENERAL</span>
+        </nav>
+        <div className="flex items-center gap-space-sm bg-surface-container-high px-space-sm py-1 rounded">
+          <span className="w-2 h-2 rounded-full bg-primary inline-block"></span>
+          <span className="font-label-sm text-label-sm text-on-surface uppercase tracking-wider font-semibold">
+            Base de datos sincronizada
+          </span>
+        </div>
+      </div>
+
+      {/* Page Header Area */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md">
+        <div className="flex flex-col gap-0.5">
+          <h1 className="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">
+            Listado de médicos
+          </h1>
+          <p className="font-body-md text-body-md text-secondary">
+            Cuerpo facultativo y profesionales matriculados en Sala Médica
+          </p>
+        </div>
+        <Link
+          href="/admin/medicos/nuevo"
+          className="inline-flex items-center gap-space-xs bg-primary text-on-primary px-space-md py-2 rounded shadow-sm hover:bg-on-surface transition-all active:scale-[0.98]"
+        >
+          <span className="material-symbols-outlined text-[18px]">add</span>
+          <span className="font-label-md text-label-md">Nuevo médico</span>
+        </Link>
+      </div>
+
+      {/* Filter Bar */}
+      <section className="bg-surface-container-lowest p-space-md rounded shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+        <div className="flex flex-wrap items-center gap-space-lg w-full md:w-auto">
+          {/* Especialidad Selector */}
+          <div className="flex flex-col gap-1 min-w-[200px]">
+            <label
+              htmlFor="filtro-especialidad"
+              className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold"
+            >
+              Especialidad
+            </label>
+            <div className="relative w-full">
+              <select
+                id="filtro-especialidad"
+                value={filtroEspecialidad}
+                onChange={(e) => setFiltroEspecialidad(e.target.value)}
+                className="w-full appearance-none bg-surface text-on-surface font-body-md text-body-md py-2 pl-3 pr-8 rounded focus:outline-none focus:bg-surface-container transition-colors cursor-pointer border border-outline-variant/40"
+              >
+                <option value="todas">Todas</option>
+                <option value="clinica">Clínica médica</option>
+                <option value="pediatria">Pediatría</option>
+                <option value="traumatologia">Traumatología</option>
+              </select>
+              <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-[18px]">
+                expand_more
+              </span>
+            </div>
+          </div>
+
+          {/* Estado Selector */}
+          <div className="flex flex-col gap-1 min-w-[180px]">
+            <label
+              htmlFor="filtro-estado"
+              className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold"
+            >
+              Estado
+            </label>
+            <div className="relative w-full">
+              <select
+                id="filtro-estado"
+                value={filtroEstado}
+                onChange={(e) => setFiltroEstado(e.target.value)}
+                className="w-full appearance-none bg-surface text-on-surface font-body-md text-body-md py-2 pl-3 pr-8 rounded focus:outline-none focus:bg-surface-container transition-colors cursor-pointer border border-outline-variant/40"
+              >
+                <option value="todos">Todos</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+              <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-[18px]">
+                expand_more
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Counter Metric Tag */}
+        <div className="flex items-center gap-space-xs bg-surface-container py-1.5 px-space-md rounded">
+          <span className="material-symbols-outlined text-[16px] text-secondary">group</span>
+          <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface font-semibold">
+            Total: <span className="font-bold">{filtered.length}</span> profesionales registrados
+          </span>
+        </div>
+      </section>
+
+      {/* Main Workplace: Table + Detail Panel */}
+      {filtered.length === 0 ? (
+        /* Empty State exactly matching pantalla_20 */
+        <div className="w-full bg-surface-container-lowest rounded shadow-sm overflow-hidden p-space-xl flex flex-col items-center justify-center text-center min-h-[420px]">
+          <div className="relative mb-space-md">
+            <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+              <span className="material-symbols-outlined text-[32px]">filter_list_off</span>
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-surface-container-high border-2 border-surface-container-lowest flex items-center justify-center">
+              <span className="material-symbols-outlined text-on-surface-variant text-[14px]">
+                search_off
+              </span>
+            </div>
+          </div>
+
+          <h2 className="font-headline-sm text-headline-sm text-on-surface tracking-tight mb-space-xs font-bold">
+            No hay médicos que coincidan con el filtro
+          </h2>
+          <p className="font-body-md text-body-md text-secondary max-w-md mx-auto mb-space-lg">
+            Probá modificando los criterios de especialidad o estado para visualizar otros profesionales.
+          </p>
+
+          <div className="flex items-center gap-2 mb-space-lg flex-wrap justify-center">
+            <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">
+              Criterios activos:
+            </span>
+            {filtroEspecialidad !== "todas" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-label-sm">
+                <span className="material-symbols-outlined text-[13px] text-secondary">label</span>
+                Especialidad:{" "}
+                {filtroEspecialidad === "clinica"
+                  ? "Clínica médica"
+                  : filtroEspecialidad === "pediatria"
+                  ? "Pediatría"
+                  : "Traumatología"}
+              </span>
+            )}
+            {filtroEstado !== "todos" && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-label-sm">
+                <span className="material-symbols-outlined text-[13px] text-secondary">
+                  toggle_off
+                </span>
+                Estado: {filtroEstado === "activo" ? "Activo" : "Inactivo"}
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="inline-flex items-center gap-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface px-space-md py-2 rounded font-label-md text-label-md font-semibold transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[18px]">restart_alt</span>
+            <span>Limpiar filtros</span>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+          {/* Columna Izquierda: Tabla */}
+          <div className="lg:col-span-8 flex flex-col bg-surface-container-lowest rounded shadow-sm overflow-hidden">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full border-collapse text-left text-sm">
+                <thead>
+                  <tr className="bg-surface-container text-xs uppercase tracking-wider text-on-surface-variant">
+                    <th className="w-12 px-4 py-2.5 text-center">SEL</th>
+                    <th className="px-4 py-2.5">Apellido y nombre</th>
+                    <th className="px-4 py-2.5">DNI</th>
+                    <th className="px-4 py-2.5">Especialidad</th>
+                    <th className="px-4 py-2.5">Email</th>
+                    <th className="px-4 py-2.5 text-right">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((m) => {
+                    const isSelected = selectedMedico?.id === m.id;
+                    return (
+                      <tr
+                        key={m.id}
+                        onClick={() => setSelectedId(m.id)}
+                        className={`cursor-pointer transition-colors ${
+                          isSelected
+                            ? "bg-surface-container-high/70"
+                            : "hover:bg-surface-container-low"
+                        }`}
+                      >
+                        <td className="px-4 py-3 text-center">
+                          <input
+                            type="radio"
+                            name="medico-seleccionado"
+                            readOnly
+                            checked={isSelected}
+                            className="h-4 w-4 accent-black"
+                            aria-label={`Seleccionar a ${m.lastName}, ${m.firstName}`}
+                          />
+                        </td>
+                        <td className="px-4 py-3 font-medium text-on-surface">
+                          {m.lastName}, {m.firstName}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-on-surface-variant">
+                          {formatDni(m.dni)}
+                        </td>
+                        <td className="px-4 py-3 text-on-surface-variant">
+                          {especialidadLabel(m.especialidad)}
+                        </td>
+                        <td className="max-w-[200px] truncate px-4 py-3 font-mono text-xs text-on-surface-variant">
+                          {m.email}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span
+                            className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
+                              m.isActive
+                                ? "bg-primary text-on-primary"
+                                : "bg-surface-container-high text-on-surface-variant"
+                            }`}
+                          >
+                            {m.isActive ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="border-t border-surface-container-high bg-surface-container-low px-4 py-2 text-xs text-on-surface-variant">
+              {filtered.length} registro{filtered.length === 1 ? "" : "s"}
+            </div>
+          </div>
+
+          {/* Columna Derecha: Panel de Ficha Técnica */}
+          {selectedMedico && (
+            <div className="lg:col-span-4 flex flex-col bg-surface-container-lowest rounded shadow-sm overflow-hidden sticky top-20">
+              <div className="p-space-lg bg-surface-container-low flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold">
+                    Ficha de Profesional
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider font-semibold ${
+                      selectedMedico.isActive
+                        ? "bg-primary text-on-primary"
+                        : "bg-surface-container-high text-secondary"
+                    }`}
+                  >
+                    {selectedMedico.isActive ? "Activo" : "Inactivo"}
+                  </span>
+                </div>
+                <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">
+                  Detalle del médico
+                </h2>
+                <p className="font-body-sm text-body-sm text-secondary leading-relaxed">
+                  Información institucional y de contacto del profesional seleccionado.
+                </p>
+              </div>
+
+              <div className="p-space-lg flex flex-col gap-space-lg">
+                {/* Identity Summary Box */}
+                <div className="flex items-center gap-space-md p-space-md bg-surface-container-low rounded">
+                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary font-headline-md text-headline-md font-bold select-none">
+                    {(selectedMedico.firstName?.[0] || "") +
+                      (selectedMedico.lastName?.[0] || "")}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold truncate">
+                      Dr. {selectedMedico.firstName} {selectedMedico.lastName}
+                    </span>
+                    <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-medium">
+                      {especialidadLabel(selectedMedico.especialidad)} • Planta permanente
+                    </span>
+                  </div>
+                </div>
+
+                {/* Structured Specifications Grid */}
+                <div className="flex flex-col gap-space-md">
+                  <div className="grid grid-cols-2 gap-space-sm">
+                    <div className="flex flex-col bg-surface-container-low p-space-sm rounded">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Nombre
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-medium mt-0.5">
+                        {selectedMedico.firstName || "—"}
+                      </span>
+                    </div>
+                    <div className="flex flex-col bg-surface-container-low p-space-sm rounded">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Apellido
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-medium mt-0.5">
+                        {selectedMedico.lastName || "—"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-space-sm bg-surface-container-low rounded">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Documento Nacional (DNI)
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-mono font-medium mt-0.5">
+                        {formatDni(selectedMedico.dni)}
+                      </span>
+                    </div>
+                    <span className="material-symbols-outlined text-secondary text-[20px]">
+                      badge
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-space-sm bg-surface-container-low rounded">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Matrícula Habilitante
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-mono font-medium mt-0.5">
+                        {selectedMedico.matricula || "MN —"}
+                      </span>
+                    </div>
+                    <span className="material-symbols-outlined text-secondary text-[20px]">
+                      verified
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-space-sm bg-surface-container-low rounded">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Especialidad
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-medium mt-0.5">
+                        {especialidadLabel(selectedMedico.especialidad)}
+                      </span>
+                    </div>
+                    <span className="material-symbols-outlined text-secondary text-[20px]">
+                      stethoscope
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-space-sm bg-surface-container-low rounded">
+                    <div className="flex flex-col min-w-0 pr-2">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Correo Institucional
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-medium truncate mt-0.5">
+                        {selectedMedico.email}
+                      </span>
+                    </div>
+                    <span className="material-symbols-outlined text-secondary text-[20px] shrink-0">
+                      mail
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-space-sm bg-surface-container-low rounded">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Teléfono de Contacto
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-mono font-medium mt-0.5">
+                        {selectedMedico.phone || "—"}
+                      </span>
+                    </div>
+                    <span className="material-symbols-outlined text-secondary text-[20px]">
+                      call
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-space-sm bg-surface-container-low rounded">
+                    <div className="flex flex-col">
+                      <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
+                        Estado de Habilitación
+                      </span>
+                      <span className="font-body-md text-body-md text-on-surface font-medium mt-0.5">
+                        {selectedMedico.isActive
+                          ? "Activo en guardia y consultorios"
+                          : "Inactivo / Licencia"}
+                      </span>
+                    </div>
+                    <div
+                      className={`w-3 h-3 rounded-full ${
+                        selectedMedico.isActive
+                          ? "bg-primary ring-4 ring-surface-container-high"
+                          : "bg-secondary"
+                      }`}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="pt-space-xs text-center">
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest font-mono">
+                    REGISTRO AUDITADO #MED-{selectedMedico.dni?.slice(-5) || "00000"} • SOLO LECTURA
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

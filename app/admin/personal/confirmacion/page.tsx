@@ -15,7 +15,7 @@ export default async function ConfirmacionPersonalAdministrativoPage({
   await requireRole(["admin"]);
 
   const { id } = await searchParams;
-  const usuario = id ? getUserRepository().findById(id) : undefined;
+  const usuario = id ? await getUserRepository().findById(id) : undefined;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col">

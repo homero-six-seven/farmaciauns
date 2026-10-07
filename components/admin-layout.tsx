@@ -1,66 +1,69 @@
-import Link from "next/link";
-import {
-  BriefcaseMedical,
-  IdCard,
-  Stethoscope,
-  UserPlus,
-  UserSearch,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import type { ReactNode } from "react";
-import { SignOutButton } from "./sign-out-button";
-
-type NavItem = { href: string; label: string; icon: LucideIcon };
-
-const NAV_ITEMS: NavItem[] = [
-  { href: "/admin/medicos", label: "Listado de médicos", icon: Stethoscope },
-  { href: "/admin/medicos/nuevo", label: "Alta de médico", icon: UserPlus },
-  { href: "/admin/personal", label: "Listado de personal adm.", icon: IdCard },
-  { href: "/admin/personal/nuevo", label: "Alta de personal adm.", icon: UserPlus },
-  { href: "/admin/enfermeras", label: "Listado de enfermeras", icon: BriefcaseMedical },
-  { href: "/admin/enfermeras/nuevo", label: "Alta de enfermeras", icon: UserPlus },
-  { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
-];
-
-const LINK_CLASS =
-  "flex items-center gap-3 rounded px-3 py-2 text-sm text-on-surface transition-colors hover:bg-surface-container-high";
+import { SidebarNav } from "./sidebar-nav";
 
 /**
- * Layout del módulo administrativo (server component; solo renderiza `children`
- * + navegación con `Link`).
+ * Layout del módulo administrativo (server component).
  *
- *  - Sidebar izquierdo: navegación vertical del módulo.
- *  - Columna derecha: barra superior (nombre + "Cerrar sesión" sin lógica real)
- *    y `<main>` scrolleable con el contenido.
+ *  - Sidebar izquierdo: navegación vertical del módulo, con el MISMO estilo
+ *    visual que la página de inicio (`/inicio`): fondo blanco, ítem activo en
+ *    píldora navy y hover suave.
+ *  - Columna derecha: barra superior con la cuenta del usuario (nombre +
+ *    `UserButton` de Clerk, que despliega un panel para cerrar sesión) —
+ *    mismo formato que `/inicio`.
  */
-export function AdminLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex min-h-screen bg-surface">
-      <aside className="flex w-64 shrink-0 flex-col gap-6 border-r border-surface-container-high bg-surface-container-low p-4">
-        <h2 className="px-2 text-sm font-semibold uppercase tracking-wider text-on-surface">
-          Módulo administrativo
-        </h2>
-        <nav className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.href} href={item.href} className={LINK_CLASS}>
-                <Icon className="h-4 w-4 shrink-0" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
+export async function AdminLayout({ children }: { children: ReactNode }) {
+  const user = await currentUser();
+  const displayName =
+    user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-surface-container-high bg-surface-container-lowest px-6">
-          <span className="text-sm font-medium text-on-surface">
-            Administrador
+  return (
+    <div className="min-h-screen bg-surface text-on-surface">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-12 items-center justify-between border-b border-surface-container-high bg-surface-container-lowest px-5">
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded bg-black text-white">
+            <span className="material-symbols-outlined text-[17px]">local_hospital</span>
           </span>
-          <SignOutButton />
-        </header>
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          <span className="text-xs font-bold uppercase tracking-tight">Sala Médica</span>
+        </div>
+        <div className="flex items-center gap-3">
+          {displayName && (
+            <div className="hidden text-right sm:block">
+              <p className="text-xs font-semibold text-on-surface">{displayName}</p>
+              <span className="text-[10px] font-bold uppercase tracking-wide text-on-surface-variant">
+                Administrador
+              </span>
+            </div>
+          )}
+          <UserButton />
+          <span className="h-6 w-px bg-outline-variant" aria-hidden="true" />
+          <SignOutButton redirectUrl="/sign-in">
+            <button
+              type="button"
+              className="hidden rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container sm:block"
+            >
+              Cerrar sesión
+            </button>
+          </SignOutButton>
+        </div>
+      </header>
+
+      <div className="flex min-h-screen pt-12">
+        <aside className="flex max-h-[calc(100vh-3rem)] w-52 shrink-0 flex-col justify-between overflow-y-auto border-r border-surface-container-high bg-surface-container-lowest px-2 py-3">
+          <div>
+            <h2 className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-secondary">
+              Gestión Clínica
+            </h2>
+            <SidebarNav />
+          </div>
+          <p className="border-t border-surface-container-high px-2 pt-3 text-[10px] text-secondary">
+            Sistema Sala Médica v1.0
+          </p>
+        </aside>
+
+        <main className="min-w-0 flex-1 overflow-y-auto p-5 lg:p-6">{children}</main>
       </div>
     </div>
   );

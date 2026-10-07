@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "db:seed": "pnpm dlx tsx prisma/seed.ts",
+    "seed": "prisma db seed",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -29,7 +31,11 @@
     "eslint-config-next": "16.3.8",
     "prisma": "7.10.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.14.0",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
 }

@@ -13,8 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function ListadoPersonalAdministrativoPage() {
   await requireRole(["admin"]);
 
-  const personal = getUserRepository()
-    .listByRole("ADMINISTRATIVO")
+  const personal = (await getUserRepository().listByRole("ADMINISTRATIVO"))
     .map(toUsuarioPublico);
 
   return (

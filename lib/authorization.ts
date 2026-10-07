@@ -1,5 +1,6 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { getPrisma } from "@/lib/prisma";
 
 export const roles = ["admin", "enfermera", "medico", "paciente"] as const;
 
@@ -25,12 +26,16 @@ export async function requireRole(allowedRoles: readonly Role[]) {
     redirect("/sign-in");
   }
 
-  // El rol vive en Clerk `publicMetadata` (ver endpoint de invitaciones).
-  // Se lee directo del backend de Clerk para no depender de la tabla User.
-  const user = await (await clerkClient()).users.getUser(userId);
-  const publicMetadata = user.publicMetadata as Record<string, unknown> | undefined;
-  const rawRole = publicMetadata?.role;
-  const role = normalizeRole(typeof rawRole === "string" ? rawRole : null);
+  const user = await getPrisma().user.findUnique({
+    where: { clerkId: userId },
+    select: { role: true, isActive: true },
+  });
+
+  if (user && !user.isActive) {
+    redirect("/sign-in/error?reason=inactive-account");
+  }
+
+  const role = normalizeRole(String(user?.role));
 
   if (!role || !allowedRoles.includes(role)) {
     redirect("/prototipos/pantalla_6_acceso_denegado");

@@ -15,13 +15,26 @@ enum Role {
   ENFERMERA
 }
 
+enum Especialidad {
+  CLINICA_MEDICA
+  PEDIATRIA
+  TRAUMATOLOGIA
+}
+
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String?  @unique
-  firstName String?
-  lastName  String?
-  role      Role     @default(PACIENTE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String        @id @default(cuid())
+  clerkId      String?       @unique
+  email        String        @unique
+  firstName    String?
+  lastName     String?
+  role         Role          @default(PACIENTE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  dni          String?       @unique
+  especialidad Especialidad?
+  isActive     Boolean       @default(true)
+  matricula    String?       @unique
+  phone        String?
+  birthDate    DateTime?
+  passwordHash String?
 }

@@ -66,15 +66,15 @@ export async function registrarPaciente(
   }
 
   const repo = getUserRepository();
-  if (repo.findByDni(normalizarDni(datos.dni))) {
+  if (await repo.findByDni(normalizarDni(datos.dni))) {
     return { errors: { dni: MSG_DNI_DUPLICADO } };
   }
-  if (repo.findByEmail(datos.email)) {
+  if (await repo.findByEmail(datos.email)) {
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
   const passwordHash = await hashPassword(datos.password);
-  repo.create({
+  await repo.create({
     firstName: datos.firstName,
     lastName: datos.lastName,
     dni: datos.dni,
@@ -126,15 +126,15 @@ export async function registrarPersonalAdministrativo(
   }
 
   const repo = getUserRepository();
-  if (repo.findByDni(normalizarDni(datos.dni))) {
+  if (await repo.findByDni(normalizarDni(datos.dni))) {
     return { errors: { dni: MSG_DNI_DUPLICADO } };
   }
-  if (repo.findByEmail(datos.email)) {
+  if (await repo.findByEmail(datos.email)) {
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
   const passwordHash = await hashPassword(datos.password);
-  const usuario = repo.create({
+  const usuario = await repo.create({
     firstName: datos.firstName,
     lastName: datos.lastName,
     dni: datos.dni,
@@ -191,15 +191,15 @@ export async function registrarMedico(
   }
 
   const repo = getUserRepository();
-  if (repo.findByDni(normalizarDni(datos.dni))) {
+  if (await repo.findByDni(normalizarDni(datos.dni))) {
     return { errors: { dni: MSG_DNI_DUPLICADO } };
   }
-  if (repo.findByEmail(datos.email)) {
+  if (await repo.findByEmail(datos.email)) {
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
   const passwordHash = await hashPassword(datos.password);
-  const usuario = repo.create({
+  const usuario = await repo.create({
     firstName: datos.firstName,
     lastName: datos.lastName,
     dni: datos.dni,
@@ -258,15 +258,15 @@ export async function registrarEnfermera(
   }
 
   const repo = getUserRepository();
-  if (repo.findByDni(normalizarDni(datos.dni))) {
+  if (await repo.findByDni(normalizarDni(datos.dni))) {
     return { errors: { dni: MSG_DNI_DUPLICADO } };
   }
-  if (repo.findByEmail(datos.email)) {
+  if (await repo.findByEmail(datos.email)) {
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
   const passwordHash = await hashPassword(datos.password);
-  const usuario = repo.create({
+  const usuario = await repo.create({
     firstName: datos.firstName,
     lastName: datos.lastName,
     dni: datos.dni,
@@ -286,4 +286,30 @@ export async function registrarEnfermera(
   redirect(
     `/admin/enfermeras/confirmacion?id=${encodeURIComponent(usuario.id)}`,
   );
+}
+
+/**
+ * Soft delete de usuario (solo ADMINISTRADOR).
+ *
+ * Marca al usuario como inactivo (`active=false` en dominio, `isActive=false`
+ * en DB) en lugar de borrar la fila. Recibe el `id` por `FormData` desde el
+ * panel de detalle del listado; si el id no viene (o no es string), es no-op.
+ *
+ * Revalida las 3 páginas de listado que muestran usuarios (médicos,
+ * enfermeras y pacientes) para que el cambio se refleje en todas.
+ */
+export async function eliminarUsuario(formData: FormData): Promise<void> {
+  // Autorización real (las server actions son alcanzables por POST directo).
+  await requireRole(["admin"]);
+
+  const id = formData.get("id");
+  if (typeof id !== "string" || !id) {
+    return;
+  }
+
+  await getUserRepository().deactivate(id);
+
+  revalidatePath("/admin/medicos");
+  revalidatePath("/admin/enfermeras");
+  revalidatePath("/pacientes");
 }

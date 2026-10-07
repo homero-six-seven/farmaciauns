@@ -24,8 +24,7 @@ export default async function ListadoMedicosPage({
 
   const { especialidad, estado } = await searchParams;
 
-  const medicos = getUserRepository()
-    .listByRole("MEDICO")
+  const medicos = (await getUserRepository().listByRole("MEDICO"))
     .filter((m) => !especialidad || m.especialidad === especialidad)
     .filter((m) =>
       estado === "activo" ? m.active : estado === "inactivo" ? !m.active : true,
@@ -167,7 +166,11 @@ export default async function ListadoMedicosPage({
             </div>
           </div>
         ) : (
-          <ListadoUsuarios usuarios={medicos} mostrarEspecialidad />
+          <ListadoUsuarios
+            usuarios={medicos}
+            mostrarEspecialidad
+            puedeEliminar
+          />
         )}
     </div>
   );

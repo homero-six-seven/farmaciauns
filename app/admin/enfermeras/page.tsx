@@ -13,8 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function ListadoEnfermerasPage() {
   await requireRole(["admin"]);
 
-  const enfermeras = getUserRepository()
-    .listByRole("ENFERMERA")
+  const enfermeras = (await getUserRepository().listByRole("ENFERMERA"))
     .map(toUsuarioPublico);
 
   return (
@@ -75,7 +74,7 @@ export default async function ListadoEnfermerasPage() {
           </Link>
         </div>
       ) : (
-        <ListadoUsuarios usuarios={enfermeras} />
+        <ListadoUsuarios usuarios={enfermeras} puedeEliminar />
       )}
     </div>
   );

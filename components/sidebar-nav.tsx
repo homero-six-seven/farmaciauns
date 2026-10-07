@@ -38,9 +38,11 @@ const NAV_ITEMS: NavItem[] = [
  */
 export function SidebarNav() {
   const pathname = usePathname();
+  const isAdminModule = pathname.startsWith("/admin");
+  const homeHref = isAdminModule ? "/admin" : "/inicio";
   const activeItem = NAV_ITEMS.filter(
     (item) =>
-      pathname === item.href ||
+      pathname === (item.href === "/inicio" ? homeHref : item.href) ||
       (item.href !== "/inicio" &&
         item.href !== "/admin/medicos" &&
         pathname.startsWith(`${item.href}/`)),
@@ -54,7 +56,7 @@ export function SidebarNav() {
         return (
           <Link
             key={item.href}
-            href={item.href}
+            href={item.href === "/inicio" ? homeHref : item.href}
             aria-current={isActive ? "page" : undefined}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
               isActive

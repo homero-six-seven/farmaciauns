@@ -1,4 +1,11 @@
 import Link from "next/link";
+import {
+  BriefcaseMedical,
+  IdCard,
+  Search,
+  Stethoscope,
+  UserPlus,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -7,57 +14,57 @@ export default function AdminDashboardPage() {
     {
       title: "Listado de médicos",
       href: "/admin/medicos",
-      icon: "stethoscope",
+      icon: Stethoscope,
     },
     {
       title: "Alta de médico",
       href: "/admin/medicos/nuevo",
-      icon: "person_add",
+      icon: UserPlus,
     },
     {
       title: "Listado de personal administrativo",
       href: "/admin/personal",
-      icon: "badge",
+      icon: IdCard,
     },
     {
       title: "Alta de personal administrativo",
       href: "/admin/personal/nuevo",
-      icon: "group_add",
+      icon: UserPlus,
     },
     {
       title: "Búsqueda de pacientes",
       href: "/pacientes",
-      icon: "person_search",
+      icon: Search,
     },
     {
       title: "Listado de enfermeras",
       href: "/admin/enfermeras",
-      icon: "medical_services",
+      icon: BriefcaseMedical,
     },
   ];
 
   return (
-    <div className="flex flex-col gap-space-lg w-full max-w-[1200px] mx-auto py-space-sm">
+    <div className="mx-auto flex w-full max-w-[1100px] flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <span className="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-secondary">
           Panel de Control
         </span>
-        <h1 className="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">
+        <h1 className="text-3xl font-bold tracking-tight text-on-surface">
           Bienvenido, Administrador
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg mt-space-sm">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {cards.map((c) => (
           <Link
             key={c.title}
             href={c.href}
-            className="group flex flex-col items-center justify-center p-space-xl bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md hover:bg-surface-container-low transition-all duration-200 text-center min-h-[220px] border border-outline-variant/20"
+            className="group flex min-h-[168px] flex-col items-center justify-center rounded-lg border border-surface-container-lowest bg-surface-container-lowest px-5 py-6 text-center shadow-sm transition-all duration-200 hover:bg-surface-container-low hover:shadow-md"
           >
-            <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-space-md text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-colors duration-200">
-              <span className="material-symbols-outlined text-[36px]">{c.icon}</span>
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary-fixed text-primary transition-colors group-hover:bg-primary group-hover:text-on-primary">
+              <c.icon className="h-6 w-6" />
             </div>
-            <span className="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors font-semibold">
+            <span className="max-w-[210px] text-sm font-semibold leading-5 text-on-surface transition-colors group-hover:text-primary">
               {c.title}
             </span>
           </Link>

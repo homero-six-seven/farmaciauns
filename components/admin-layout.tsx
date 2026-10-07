@@ -1,4 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import type { ReactNode } from "react";
 import { SidebarNav } from "./sidebar-nav";
@@ -19,27 +20,50 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
 
   return (
-    <div className="flex min-h-screen bg-surface">
-      <aside className="flex max-h-screen w-64 shrink-0 flex-col gap-6 overflow-y-auto bg-surface-container-lowest p-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-        <h2 className="px-2 text-xs font-semibold uppercase tracking-wider text-secondary">
-          Módulo administrativo
-        </h2>
-        <SidebarNav />
-      </aside>
-
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-surface-container-high bg-surface-container-lowest px-6">
-          <span className="text-sm font-semibold uppercase tracking-wide text-on-surface">
-            Sala Médica
+    <div className="min-h-screen bg-surface text-on-surface">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-12 items-center justify-between border-b border-surface-container-high bg-surface-container-lowest px-5">
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded bg-black text-white">
+            <span className="material-symbols-outlined text-[17px]">local_hospital</span>
           </span>
-          <div className="flex items-center gap-3">
-            {displayName && (
-              <span className="text-sm text-on-surface">{displayName}</span>
-            )}
-            <UserButton />
+          <span className="text-xs font-bold uppercase tracking-tight">Sala Médica</span>
+        </div>
+        <div className="flex items-center gap-3">
+          {displayName && (
+            <div className="hidden text-right sm:block">
+              <p className="text-xs font-semibold text-on-surface">{displayName}</p>
+              <span className="text-[10px] font-bold uppercase tracking-wide text-on-surface-variant">
+                Administrador
+              </span>
+            </div>
+          )}
+          <UserButton />
+          <span className="h-6 w-px bg-outline-variant" aria-hidden="true" />
+          <SignOutButton redirectUrl="/sign-in">
+            <button
+              type="button"
+              className="hidden rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container sm:block"
+            >
+              Cerrar sesión
+            </button>
+          </SignOutButton>
+        </div>
+      </header>
+
+      <div className="flex min-h-screen pt-12">
+        <aside className="flex max-h-[calc(100vh-3rem)] w-52 shrink-0 flex-col justify-between overflow-y-auto border-r border-surface-container-high bg-surface-container-lowest px-2 py-3">
+          <div>
+            <h2 className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-secondary">
+              Gestión Clínica
+            </h2>
+            <SidebarNav />
           </div>
-        </header>
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          <p className="border-t border-surface-container-high px-2 pt-3 text-[10px] text-secondary">
+            Sistema Sala Médica v1.0
+          </p>
+        </aside>
+
+        <main className="min-w-0 flex-1 overflow-y-auto p-5 lg:p-6">{children}</main>
       </div>
     </div>
   );

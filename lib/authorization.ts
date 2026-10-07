@@ -28,8 +28,13 @@ export async function requireRole(allowedRoles: readonly Role[]) {
 
   const user = await getPrisma().user.findUnique({
     where: { clerkId: userId },
-    select: { role: true },
+    select: { role: true, isActive: true },
   });
+
+  if (user && !user.isActive) {
+    redirect("/sign-in/error?reason=inactive-account");
+  }
+
   const role = normalizeRole(String(user?.role));
 
   if (!role || !allowedRoles.includes(role)) {

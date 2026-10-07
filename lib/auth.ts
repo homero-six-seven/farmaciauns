@@ -35,6 +35,10 @@ export async function getCurrentAdmin() {
     });
   }
 
+  if (dbUser && !dbUser.isActive) {
+    redirect("/sign-in/error?reason=inactive-account");
+  }
+
   const isAdminInDb = dbUser?.role === "ADMINISTRADOR";
 
   if (!isAdminInClerk && !isAdminInDb) {

@@ -7,6 +7,8 @@ import { useState, type FormEvent } from "react";
 import { clerkErrorMessage } from "../../lib/clerk-error-message";
 import styles from "../sign-in/sign-in-form.module.css";
 
+const validNamePattern = /^[\p{L} ]+$/u;
+
 export function SignUpForm() {
   const { signUp, fetchStatus } = useSignUp();
   const router = useRouter();
@@ -59,6 +61,14 @@ export function SignUpForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage("");
+
+    if (
+      !validNamePattern.test(firstName.trim()) ||
+      !validNamePattern.test(lastName.trim())
+    ) {
+      setErrorMessage("El nombre y el apellido solo pueden contener letras.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setErrorMessage("Las contraseñas no coinciden.");
@@ -286,6 +296,10 @@ export function SignUpForm() {
                           onChange={(event) => setFirstName(event.target.value)}
                           placeholder="Ej. Juan Carlos"
                           required
+                          aria-invalid={Boolean(
+                            errorMessage &&
+                              !validNamePattern.test(firstName.trim()),
+                          )}
                           value={firstName}
                         />
                       </div>
@@ -368,6 +382,10 @@ export function SignUpForm() {
                           onChange={(event) => setLastName(event.target.value)}
                           placeholder="Ej. González"
                           required
+                          aria-invalid={Boolean(
+                            errorMessage &&
+                              !validNamePattern.test(lastName.trim()),
+                          )}
                           value={lastName}
                         />
                       </div>

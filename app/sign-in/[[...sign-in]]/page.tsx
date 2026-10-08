@@ -9,15 +9,16 @@ export default async function SignInPage({
   params: Promise<{ "sign-in"?: string[] }>;
   searchParams: Promise<{ reason?: string }>;
 }) {
+  const { "sign-in": segments } = await params;
+  const { reason } = await searchParams;
+
   // Si ya hay una sesión activa (ej. tras navegar "atrás" con el navegador),
   // redirigir a /inicio en vez de mostrar el form: evita el error al re-login.
   const { userId } = await auth();
-  if (userId) {
+  if (userId && reason !== "inactive-account") {
     redirect("/inicio");
   }
 
-  const { "sign-in": segments } = await params;
-  const { reason } = await searchParams;
   const errorMessages: Record<string, string> = {
     credentials:
       "El email o la contraseña son incorrectos. Revisá tus datos e intentá de nuevo.",

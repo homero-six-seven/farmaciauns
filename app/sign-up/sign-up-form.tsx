@@ -475,7 +475,10 @@ export function SignUpForm() {
                         <input
                           autoComplete="tel"
                           id="phone"
-                          onChange={(event) => setPhone(event.target.value)}
+                          inputMode="numeric"
+                          onChange={(event) =>
+                            setPhone(event.target.value.replace(/\D/g, ""))
+                          }
                           placeholder="Ej. 11 4589 2200"
                           required
                           type="tel"

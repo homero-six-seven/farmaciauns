@@ -44,7 +44,7 @@
         </span>
 </div>
 <!-- Form Content -->
-<form class="p-space-lg flex flex-col gap-space-lg" onsubmit="event.preventDefault();">
+<form class="p-space-lg flex flex-col gap-space-lg" id="admin-staff-form" onsubmit="event.preventDefault();">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
 <!-- Column 1 -->
 <div class="flex flex-col gap-space-md">
@@ -57,7 +57,8 @@
 <span class="font-label-sm text-label-sm text-on-surface-variant">Primer y segundo nombre</span>
 </div>
 <div class="relative flex items-center">
-<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-nombre" name="nombre" placeholder="Ej. Mariana Lucía" type="text"/>
+<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-nombre" name="nombre" placeholder="Ej. Mariana Lucía" type="text" aria-describedby="adm-nombre-error"/>
+<p class="hidden text-error font-label-sm text-label-sm" id="adm-nombre-error">El nombre solo puede contener letras y espacios.</p>
 </div>
 </div>
 <!-- 2. DNI -->
@@ -69,7 +70,8 @@
 <span class="font-label-sm text-label-sm text-on-surface-variant">Solo números</span>
 </div>
 <div class="relative flex items-center">
-<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-dni" inputmode="numeric" name="dni" placeholder="Ej. 32901450" type="text"/>
+<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-dni" inputmode="numeric" name="dni" placeholder="Ej. 32901450" type="text" aria-describedby="adm-dni-error"/>
+<p class="hidden text-error font-label-sm text-label-sm" id="adm-dni-error">El DNI no puede estar compuesto únicamente por ceros.</p>
 </div>
 </div>
 <!-- 3. Email -->
@@ -96,7 +98,8 @@
 <span class="font-label-sm text-label-sm text-on-surface-variant">Apellido completo</span>
 </div>
 <div class="relative flex items-center">
-<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-apellido" name="apellido" placeholder="Ej. Fernández" type="text"/>
+<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-apellido" name="apellido" placeholder="Ej. Fernández" type="text" aria-describedby="adm-apellido-error"/>
+<p class="hidden text-error font-label-sm text-label-sm" id="adm-apellido-error">El apellido solo puede contener letras y espacios.</p>
 </div>
 </div>
 <!-- 2. Teléfono -->
@@ -108,7 +111,8 @@
 <span class="font-label-sm text-label-sm text-on-surface-variant">Contacto directo / Guardia</span>
 </div>
 <div class="relative flex items-center">
-<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-telefono" name="telefono" placeholder="+54 11 4872-9010" type="tel"/>
+<input class="w-full h-9 px-space-sm bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded shadow-inner outline-none transition-shadow focus:shadow-[0_0_0_2px_#141b2b] placeholder:text-outline" id="adm-telefono" name="telefono" placeholder="+54 11 4872-9010" type="tel" aria-describedby="adm-telefono-error"/>
+<p class="hidden text-error font-label-sm text-label-sm" id="adm-telefono-error">El teléfono debe contener al menos 7 dígitos.</p>
 </div>
 </div>
 <!-- 3. Contraseña inicial -->
@@ -231,12 +235,58 @@
       const toggleBtn = document.getElementById('toggle-pass');
       const passInput = document.getElementById('adm-pass');
       const eyeIcon = document.getElementById('eye-icon');
-      
+      const form = document.getElementById('admin-staff-form');
+      const nameInputs = [
+        {
+          input: document.getElementById('adm-nombre'),
+          error: document.getElementById('adm-nombre-error'),
+        },
+        {
+          input: document.getElementById('adm-apellido'),
+          error: document.getElementById('adm-apellido-error'),
+        },
+      ];
+      const dniInput = document.getElementById('adm-dni');
+      const dniError = document.getElementById('adm-dni-error');
+      const phoneInput = document.getElementById('adm-telefono');
+      const phoneError = document.getElementById('adm-telefono-error');
+      const validNamePattern = /^[\p{L} ]+$/u;
+
       if (toggleBtn && passInput && eyeIcon) {
         toggleBtn.addEventListener('click', function() {
           const isPass = passInput.getAttribute('type') === 'password';
           passInput.setAttribute('type', isPass ? 'text' : 'password');
           eyeIcon.textContent = isPass ? 'visibility_off' : 'visibility';
+        });
+      }
+
+      if (form) {
+        form.addEventListener('submit', function(event) {
+          let isValid = true;
+
+          nameInputs.forEach(function(field) {
+            const value = field.input.value.trim();
+            const fieldIsValid = validNamePattern.test(value);
+
+            field.error.classList.toggle('hidden', fieldIsValid);
+            field.input.setAttribute('aria-invalid', String(!fieldIsValid));
+            isValid = isValid && fieldIsValid;
+          });
+
+          const dniIsValid = !/^0+$/.test(dniInput.value.trim());
+          dniError.classList.toggle('hidden', dniIsValid);
+          dniInput.setAttribute('aria-invalid', String(!dniIsValid));
+          isValid = isValid && dniIsValid;
+
+          const phoneDigits = phoneInput.value.replace(/\D/g, '');
+          const phoneIsValid = phoneDigits.length >= 7;
+          phoneError.classList.toggle('hidden', phoneIsValid);
+          phoneInput.setAttribute('aria-invalid', String(!phoneIsValid));
+          isValid = isValid && phoneIsValid;
+
+          if (!isValid) {
+            event.preventDefault();
+          }
         });
       }
     })();

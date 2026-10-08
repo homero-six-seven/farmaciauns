@@ -8,6 +8,7 @@ import { clerkErrorMessage } from "../../lib/clerk-error-message";
 import styles from "../sign-in/sign-in-form.module.css";
 
 const validNamePattern = /^[\p{L} ]+$/u;
+const validDniPattern = /^(?!0{8}$)\d{8}$/;
 
 export function SignUpForm() {
   const { signUp, fetchStatus } = useSignUp();
@@ -67,6 +68,13 @@ export function SignUpForm() {
       !validNamePattern.test(lastName.trim())
     ) {
       setErrorMessage("El nombre y el apellido solo pueden contener letras.");
+      return;
+    }
+
+    if (!validDniPattern.test(dni)) {
+      setErrorMessage(
+        "El DNI debe contener exactamente 8 números y no puede ser cero.",
+      );
       return;
     }
 
@@ -312,9 +320,14 @@ export function SignUpForm() {
                           autoComplete="off"
                           id="dni"
                           inputMode="numeric"
+                          maxLength={8}
                           onChange={(event) => setDni(event.target.value)}
+                          pattern="[0-9]{8}"
                           placeholder="Ej. 38450912"
                           required
+                          aria-invalid={Boolean(
+                            errorMessage && !validDniPattern.test(dni),
+                          )}
                           value={dni}
                         />
                       </div>

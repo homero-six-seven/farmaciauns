@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { SignInForm } from "../sign-in-form";
 
 export default async function SignInPage({
@@ -9,6 +11,14 @@ export default async function SignInPage({
 }) {
   const { "sign-in": segments } = await params;
   const { reason } = await searchParams;
+
+  // Si ya hay una sesión activa (ej. tras navegar "atrás" con el navegador),
+  // redirigir a /inicio en vez de mostrar el form: evita el error al re-login.
+  const { userId } = await auth();
+  if (userId && reason !== "inactive-account") {
+    redirect("/inicio");
+  }
+
   const errorMessages: Record<string, string> = {
     credentials:
       "El email o la contraseña son incorrectos. Revisá tus datos e intentá de nuevo.",

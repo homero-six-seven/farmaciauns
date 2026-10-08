@@ -354,7 +354,7 @@ export function SignUpForm() {
                       <div className={styles.field}>
                         <label htmlFor="dni">
                           <span>DNI <b>*</b></span>
-                          <small>Sin puntos</small>
+                          <small>Sin puntos · mínimo 7 dígitos</small>
                         </label>
                         <input
                           autoComplete="off"

@@ -255,89 +255,59 @@ export function MedicosClient({ initialMedicos }: MedicosClientProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
           {/* Columna Izquierda: Tabla */}
           <div className="lg:col-span-8 flex flex-col bg-surface-container-lowest rounded shadow-sm overflow-hidden">
-            <div className="px-space-md py-3 bg-surface-container-low flex items-center justify-between">
-              <div className="flex items-center gap-space-xs">
-                <span className="material-symbols-outlined text-secondary text-[18px]">
-                  list_alt
-                </span>
-                <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface font-semibold">
-                  Listado alfabético por apellido
-                </span>
-              </div>
-              <span className="font-label-sm text-label-sm text-secondary">A - Z</span>
-            </div>
-
             <div className="overflow-x-auto w-full">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
-                    <th className="py-3 px-space-md font-semibold">Apellido y nombre</th>
-                    <th className="py-3 px-space-md font-semibold">DNI</th>
-                    <th className="py-3 px-space-md font-semibold">Especialidad</th>
-                    <th className="py-3 px-space-md font-semibold">Email</th>
-                    <th className="py-3 px-space-md font-semibold text-center">Estado</th>
+                  <tr className="bg-surface-container text-xs uppercase tracking-wider text-on-surface-variant">
+                    <th className="w-12 px-4 py-2.5 text-center">SEL</th>
+                    <th className="px-4 py-2.5">Apellido y nombre</th>
+                    <th className="px-4 py-2.5">DNI</th>
+                    <th className="px-4 py-2.5">Especialidad</th>
+                    <th className="px-4 py-2.5">Email</th>
+                    <th className="px-4 py-2.5 text-right">Estado</th>
                   </tr>
                 </thead>
-                <tbody className="divide-transparent font-body-md text-body-md text-on-surface">
+                <tbody>
                   {filtered.map((m) => {
                     const isSelected = selectedMedico?.id === m.id;
                     return (
                       <tr
                         key={m.id}
                         onClick={() => setSelectedId(m.id)}
-                        className={`cursor-pointer transition-colors duration-150 border-b border-surface-container-low ${
+                        className={`cursor-pointer transition-colors ${
                           isSelected
-                            ? "bg-surface-container"
+                            ? "bg-surface-container-high/70"
                             : "hover:bg-surface-container-low"
                         }`}
                       >
-                        <td className="py-3 px-space-md">
-                          <div className="flex items-center gap-space-xs">
-                            <span
-                              className={`material-symbols-outlined text-[18px] ${
-                                isSelected ? "text-primary" : "text-outline-variant"
-                              }`}
-                            >
-                              {isSelected
-                                ? "radio_button_checked"
-                                : "radio_button_unchecked"}
-                            </span>
-                            <span
-                              className={`font-semibold ${
-                                isSelected
-                                  ? "font-headline-sm text-headline-sm text-on-surface"
-                                  : m.isActive
-                                  ? "text-on-surface"
-                                  : "text-secondary"
-                              }`}
-                            >
-                              {m.lastName}, {m.firstName}
-                            </span>
-                          </div>
+                        <td className="px-4 py-3 text-center">
+                          <input
+                            type="radio"
+                            name="medico-seleccionado"
+                            readOnly
+                            checked={isSelected}
+                            className="h-4 w-4 accent-black"
+                            aria-label={`Seleccionar a ${m.lastName}, ${m.firstName}`}
+                          />
                         </td>
-                        <td className="py-3 px-space-md font-label-sm text-label-sm text-secondary tracking-wider font-mono">
+                        <td className="px-4 py-3 font-medium text-on-surface">
+                          {m.lastName}, {m.firstName}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-on-surface-variant">
                           {formatDni(m.dni)}
                         </td>
-                        <td className="py-3 px-space-md">
-                          <span
-                            className={`px-2 py-0.5 rounded font-label-sm text-label-sm font-medium ${
-                              m.isActive
-                                ? "bg-surface-container-highest text-on-surface"
-                                : "bg-surface-container-highest text-secondary"
-                            }`}
-                          >
-                            {especialidadLabel(m.especialidad)}
-                          </span>
+                        <td className="px-4 py-3 text-on-surface-variant">
+                          {especialidadLabel(m.especialidad)}
                         </td>
-                        <td className="py-3 px-space-md text-secondary font-label-sm text-label-sm">
+                        <td className="max-w-[200px] truncate px-4 py-3 font-mono text-xs text-on-surface-variant">
                           {m.email}
                         </td>
-                        <td className="py-3 px-space-md text-center">
+                        <td className="px-4 py-3 text-right">
                           <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded font-label-sm text-label-sm uppercase tracking-wider font-semibold ${
+                            className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
                               m.isActive
                                 ? "bg-primary text-on-primary"
-                                : "bg-surface-container-high text-secondary"
+                                : "bg-surface-container-high text-on-surface-variant"
                             }`}
                           >
                             {m.isActive ? "Activo" : "Inactivo"}
@@ -350,9 +320,8 @@ export function MedicosClient({ initialMedicos }: MedicosClientProps) {
               </table>
             </div>
 
-            <div className="px-space-md py-3 bg-surface-container-low flex items-center justify-between text-secondary font-label-sm text-label-sm">
-              <span>Seleccione un registro para cargar la ficha técnica en el panel lateral</span>
-              <span className="font-mono">Total {filtered.length}</span>
+            <div className="border-t border-surface-container-high bg-surface-container-low px-4 py-2 text-xs text-on-surface-variant">
+              {filtered.length} registro{filtered.length === 1 ? "" : "s"}
             </div>
           </div>
 

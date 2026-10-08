@@ -35,4 +35,6 @@ model User {
   especialidad Especialidad?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  birthDate    DateTime?
+  passwordHash String?
 }

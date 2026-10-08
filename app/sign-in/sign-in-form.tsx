@@ -44,7 +44,11 @@ export function SignInForm({
                 error.code === "form_identifier_not_found"
               ? "credentials"
               : "service";
-        router.push(`/sign-in/error?reason=${reason}`);
+        // DIAGNÓSTICO TEMPORAL: expone el código real de Clerk en la URL/consola
+        console.error("[sign-in] error de Clerk:", error);
+        router.push(
+          `/sign-in/error?reason=${reason}&code=${error.code ?? "desconocido"}`,
+        );
         return;
       }
 
@@ -75,8 +79,9 @@ export function SignInForm({
       }
 
       setErrorMessage("Tu cuenta requiere una verificación adicional.");
-    } catch {
-      router.push("/sign-in/error?reason=service");
+    } catch (exception) {
+      console.error("[sign-in] excepción:", exception);
+      router.push("/sign-in/error?reason=service&code=exception");
     }
   }
 

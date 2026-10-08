@@ -103,6 +103,28 @@
   height: 1.25rem;
 }
 
+.navIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  color: var(--on-surface);
+  font-size: 0.8125rem;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.navLink:hover {
+  background: var(--surface-low);
+}
+
 .sidebarFooter {
   margin: 0;
   padding: 0.75rem;
@@ -194,6 +216,28 @@
   color: var(--secondary);
   font-size: 0.6875rem;
   font-weight: 600;
+}
+
+.cardLink {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--on-surface);
+  text-decoration: none;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.cardLink:hover {
+  box-shadow: 0 8px 24px rgb(21 28 39 / 12%);
+  transform: translateY(-2px);
+}
+
+.cardLinkArrow {
+  align-self: flex-end;
+  margin-top: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--secondary);
 }
 
 @media (max-width: 760px) {

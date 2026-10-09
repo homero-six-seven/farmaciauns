@@ -79,15 +79,6 @@ export function AltaEnfermeraForm() {
           autoComplete="tel"
           defaultValue={state.values?.phone}
         />
-        <FormInput
-          label="Contraseña inicial"
-          name="password"
-          type="password"
-          required
-          error={errores.password}
-          hint="Provisoria. Mínimo 8 caracteres"
-          autoComplete="new-password"
-        />
       </div>
 
       <div className="flex justify-end gap-3 border-t border-surface-container-high pt-5">
@@ -102,7 +93,7 @@ export function AltaEnfermeraForm() {
           disabled={pending}
           className="inline-flex h-10 items-center justify-center gap-2 rounded bg-primary px-5 text-sm font-semibold text-on-primary transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {pending ? "Confirmando…" : "Confirmar alta"}
+          {pending ? "Enviando invitación…" : "Registrar y enviar invitación"}
         </button>
       </div>
     </form>

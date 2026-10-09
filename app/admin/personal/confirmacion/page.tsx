@@ -73,11 +73,11 @@ export default async function ConfirmacionPersonalAdministrativoPage({
                   />
                 </dl>
                 <p className="rounded-lg bg-surface-container-high/60 p-4 text-sm text-on-surface-variant">
-                  Se envió un email a{" "}
+                  Se envió una invitación de Clerk a{" "}
                   <strong className="font-mono text-on-surface">
                     {usuario.email ?? "—"}
                   </strong>{" "}
-                  con un link para cambiar su contraseña.
+                  para que defina su contraseña y active su cuenta.
                 </p>
               </>
             ) : (

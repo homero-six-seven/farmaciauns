@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { createMedicoAction, type CreateMedicoState } from "./actions";
 
 const initialState: CreateMedicoState = {
@@ -12,7 +12,6 @@ const initialState: CreateMedicoState = {
 export function AltaMedicoForm() {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createMedicoAction, initialState);
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (state.success && state.doctorId) {
@@ -36,7 +35,6 @@ export function AltaMedicoForm() {
     especialidad: "Especialidad",
     telefono: "Teléfono",
     email: "Email",
-    password: "Contraseña",
   };
   const fieldErrors = Object.entries(state.errors ?? {}).filter(([campo]) => campo !== "general");
 
@@ -58,7 +56,8 @@ export function AltaMedicoForm() {
             Alta de médico
           </h1>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-            Ingresá los datos del profesional para registrarlo en el sistema.
+            Ingresá los datos del profesional. Recibirá una invitación por email
+            para definir su contraseña y activar su cuenta.
           </p>
         </div>
 
@@ -435,60 +434,6 @@ export function AltaMedicoForm() {
                   )}
                 </div>
 
-                {/* 8. Campo Contraseña inicial */}
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="password"
-                    className={`font-label-md text-label-md flex items-center justify-between ${
-                      state.errors?.password ? "text-error font-semibold" : "text-on-surface"
-                    }`}
-                  >
-                    <span>
-                      Contraseña inicial <span className="text-error font-bold">*</span>
-                    </span>
-                    <span
-                      className={`font-label-sm text-label-sm ${
-                        state.errors?.password ? "text-error font-bold" : "text-secondary"
-                      }`}
-                    >
-                      Provisoria
-                    </span>
-                  </label>
-                  <div className="relative flex items-center">
-                    <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••••••"
-                      className={`w-full h-10 pl-3 pr-10 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
-                        state.errors?.password
-                          ? "bg-error-container/30 border-error focus:ring-1 focus:ring-error"
-                          : "bg-surface-container-low border-outline-variant/30 text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary"
-                      }`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label="Ver u ocultar contraseña"
-                      className="absolute right-2.5 text-secondary hover:text-on-surface p-1 rounded transition-colors focus:outline-none cursor-pointer"
-                    >
-                      <span className="material-symbols-outlined text-[20px] align-middle">
-                        {showPassword ? "visibility_off" : "visibility"}
-                      </span>
-                    </button>
-                  </div>
-                  <span className="font-body-sm text-body-sm text-secondary">
-                    Mínimo 8 caracteres
-                  </span>
-                  {state.errors?.password && (
-                    <div className="flex items-center gap-1.5 text-error mt-0.5">
-                      <span className="material-symbols-outlined text-[14px]">arrow_right</span>
-                      <p className="font-label-sm text-label-sm text-error font-medium">
-                        {state.errors.password}
-                      </p>
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
 
@@ -507,7 +452,9 @@ export function AltaMedicoForm() {
                 className="w-full sm:w-auto h-10 px-space-xl rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container shadow-md transition-all flex items-center justify-center gap-space-xs disabled:opacity-50 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[18px]">badge</span>
-                <span>{isPending ? "Registrando..." : "Confirmar alta"}</span>
+                <span>
+                  {isPending ? "Enviando invitación..." : "Registrar y enviar invitación"}
+                </span>
               </button>
             </div>
           </form>

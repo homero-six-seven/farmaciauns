@@ -228,13 +228,13 @@ export default async function ConfirmacionAltaMedicoPage({
                 Aviso de emisión de credenciales seguras
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Se envió un email a{" "}
+                Se envió una invitación de Clerk a{" "}
                 <strong className="text-on-surface font-mono font-medium">{doctor.email}</strong>{" "}
-                con un link para cambiar su contraseña (opcional).
+                para que defina su contraseña y active su cuenta.
               </p>
               <p className="font-label-sm text-label-sm text-secondary mt-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[14px]">schedule</span>
-                El enlace cuenta con una validez de 24 horas a partir del momento de emisión.
+                La invitación vence según la vigencia configurada en Clerk.
               </p>
             </div>
           </div>

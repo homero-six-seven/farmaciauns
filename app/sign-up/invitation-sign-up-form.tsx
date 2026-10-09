@@ -1,15 +1,41 @@
 "use client";
 
 import { useSignUp } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { linkCurrentInvitedStaffAccount } from "./actions";
 import { clerkErrorMessage } from "../../lib/clerk-error-message";
 import styles from "../sign-in/sign-in-form.module.css";
 
 export function InvitationSignUpForm({ ticket }: { ticket: string }) {
   const { signUp, fetchStatus } = useSignUp();
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState("");
+  const [accountCreated, setAccountCreated] = useState(false);
+  const [linking, setLinking] = useState(false);
+
+  async function retryAccountLink() {
+    setError("");
+    setLinking(true);
+
+    try {
+      const result = await linkCurrentInvitedStaffAccount();
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+
+      router.push("/inicio");
+    } catch {
+      setError(
+        "La cuenta se creó, pero no se pudo vincular al sistema. Intentá nuevamente.",
+      );
+    } finally {
+      setLinking(false);
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,9 +68,21 @@ export function InvitationSignUpForm({ ticket }: { ticket: string }) {
       }
 
       const { error: finalizeError } = await signUp.finalize({
-        navigate: ({ decorateUrl }) => {
+        navigate: async ({ decorateUrl }) => {
+          setAccountCreated(true);
+          const result = await linkCurrentInvitedStaffAccount();
+
+          if (!result.success) {
+            setError(result.message);
+            return;
+          }
+
           const url = decorateUrl("/inicio");
-          window.location.href = url;
+          if (url.startsWith("http")) {
+            window.location.href = url;
+          } else {
+            router.push(url);
+          }
         },
       });
       if (finalizeError) {
@@ -63,46 +101,66 @@ export function InvitationSignUpForm({ ticket }: { ticket: string }) {
             <h1 id="invitation-title">Definir contraseña</h1>
             <p>Elegí una contraseña personal para activar tu cuenta.</p>
           </div>
-          {error && (
-            <div className={styles.errorBanner} role="alert">
-              <p>{error}</p>
+          {accountCreated ? (
+            <div className={styles.form}>
+              {error && (
+                <div className={styles.errorBanner} role="alert">
+                  <p>{error}</p>
+                </div>
+              )}
+              <button
+                className={styles.submitButton}
+                disabled={linking}
+                onClick={retryAccountLink}
+                type="button"
+              >
+                {linking ? "Vinculando..." : "Reintentar vinculación"}
+              </button>
             </div>
+          ) : (
+            <>
+              {error && (
+                <div className={styles.errorBanner} role="alert">
+                  <p>{error}</p>
+                </div>
+              )}
+              <form className={styles.form} onSubmit={handleSubmit}>
+                <div className={styles.field}>
+                  <label htmlFor="invitation-password">Contraseña</label>
+                  <input
+                    autoComplete="new-password"
+                    id="invitation-password"
+                    minLength={8}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                    type="password"
+                    value={password}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="invitation-confirmation">
+                    Confirmar contraseña
+                  </label>
+                  <input
+                    autoComplete="new-password"
+                    id="invitation-confirmation"
+                    minLength={8}
+                    onChange={(event) => setConfirmation(event.target.value)}
+                    required
+                    type="password"
+                    value={confirmation}
+                  />
+                </div>
+                <button
+                  className={styles.submitButton}
+                  disabled={fetchStatus === "fetching"}
+                  type="submit"
+                >
+                  {fetchStatus === "fetching" ? "Activando..." : "Activar cuenta"}
+                </button>
+              </form>
+            </>
           )}
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.field}>
-              <label htmlFor="invitation-password">Contraseña</label>
-              <input
-                autoComplete="new-password"
-                id="invitation-password"
-                minLength={8}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                type="password"
-                value={password}
-              />
-            </div>
-            <div className={styles.field}>
-              <label htmlFor="invitation-confirmation">
-                Confirmar contraseña
-              </label>
-              <input
-                autoComplete="new-password"
-                id="invitation-confirmation"
-                minLength={8}
-                onChange={(event) => setConfirmation(event.target.value)}
-                required
-                type="password"
-                value={confirmation}
-              />
-            </div>
-            <button
-              className={styles.submitButton}
-              disabled={fetchStatus === "fetching"}
-              type="submit"
-            >
-              {fetchStatus === "fetching" ? "Activando..." : "Activar cuenta"}
-            </button>
-          </form>
         </div>
       </section>
     </main>

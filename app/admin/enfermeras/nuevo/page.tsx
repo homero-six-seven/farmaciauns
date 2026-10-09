@@ -23,8 +23,8 @@ export default async function AltaEnfermeraPage() {
           Alta de enfermería
         </h1>
         <p className="mt-1 text-on-surface-variant">
-          Ingresá los datos del personal de enfermería para habilitar su
-          acceso.
+          Ingresá los datos del personal de enfermería. Recibirá una invitación
+          por email para definir su contraseña y activar su acceso.
         </p>
       </div>
 

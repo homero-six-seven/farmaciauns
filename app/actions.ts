@@ -1,5 +1,6 @@
 "use server";
 
+import { clerkClient } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -11,9 +12,10 @@ import {
   validarDatosPaciente,
   validarDatosPersonalAdministrativo,
 } from "@/lib/domain/usuario";
-import { sendPasswordResetEmail, sendWelcomeEmail } from "@/lib/email";
+import { sendWelcomeEmail } from "@/lib/email";
 import type { FormState } from "@/lib/form-state";
 import { hashPassword } from "@/lib/password";
+import { getPrisma } from "@/lib/prisma";
 import { getUserRepository } from "@/lib/repository";
 import { requireRole } from "@/lib/authorization";
 
@@ -92,8 +94,8 @@ export async function registrarPaciente(
 
 /**
  * US-07 (RF-16) — Registrar personal administrativo (solo ADMINISTRADOR).
- * Valida, crea un usuario ADMINISTRATIVO activo, dispara el STUB de email y
- * redirige a la confirmación (US-08) con el id del usuario creado.
+ * Valida, crea un usuario ADMINISTRATIVO activo en Neon, envía una invitación
+ * de Clerk y redirige a la confirmación (US-08).
  */
 export async function registrarPersonalAdministrativo(
   _prevState: FormState,
@@ -108,7 +110,6 @@ export async function registrarPersonalAdministrativo(
     dni: leerString(formData, "dni"),
     email: leerString(formData, "email"),
     phone: leerString(formData, "phone"),
-    password: leerString(formData, "password"),
   };
 
   const errores = validarDatosPersonalAdministrativo(datos);
@@ -125,30 +126,82 @@ export async function registrarPersonalAdministrativo(
     };
   }
 
-  const repo = getUserRepository();
-  if (await repo.findByDni(normalizarDni(datos.dni))) {
+  const prisma = getPrisma();
+  const dni = normalizarDni(datos.dni);
+  const email = datos.email.trim().toLowerCase();
+
+  if (await prisma.user.findUnique({ where: { dni } })) {
     return { errors: { dni: MSG_DNI_DUPLICADO } };
   }
-  if (await repo.findByEmail(datos.email)) {
+  if (
+    await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+    })
+  ) {
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
-  const passwordHash = await hashPassword(datos.password);
-  const usuario = await repo.create({
-    firstName: datos.firstName,
-    lastName: datos.lastName,
-    dni: datos.dni,
-    email: datos.email,
-    phone: datos.phone,
-    passwordHash,
-    role: "ADMINISTRATIVO",
-    active: true,
-  });
+  let invitationId: string;
+  try {
+    const clerk = await clerkClient();
+    const invitation = await clerk.invitations.createInvitation({
+      emailAddress: email,
+      publicMetadata: { role: "administrativo", farmaciaunsStaffInvite: true },
+      redirectUrl: "/sign-up",
+    });
+    invitationId = invitation.id;
+  } catch (error) {
+    console.error("Failed to send administrative staff invitation.", error);
+    return {
+      errors: {
+        _form: "No se pudo enviar la invitación. Verificá el email e intentá más tarde.",
+      },
+    };
+  }
 
-  await sendPasswordResetEmail(usuario.email ?? "");
+  let usuarioId: string;
+  try {
+    const usuario = await prisma.user.create({
+      data: {
+        email,
+        firstName: datos.firstName.trim(),
+        lastName: datos.lastName.trim(),
+        dni,
+        phone: datos.phone.trim(),
+        role: "ADMINISTRATIVO",
+        isActive: true,
+      },
+      select: { id: true },
+    });
+    usuarioId = usuario.id;
+  } catch (databaseError) {
+    try {
+      const clerk = await clerkClient();
+      await clerk.invitations.revokeInvitation(invitationId);
+    } catch (revokeError) {
+      console.error(
+        "Failed to revoke administrative staff invitation after Neon persistence failed.",
+        { databaseError, revokeError },
+      );
+      return {
+        errors: {
+          _form:
+            "No se pudo guardar el registro en Neon ni anular la invitación. Revisá Clerk antes de volver a intentarlo.",
+        },
+      };
+    }
+
+    console.error("Failed to persist administrative staff in Neon.", databaseError);
+    return {
+      errors: {
+        _form:
+          "No se pudo guardar el registro en Neon. La invitación fue anulada; intentá nuevamente.",
+      },
+    };
+  }
 
   revalidatePath("/admin/personal");
-  redirect(`/admin/personal/confirmacion?id=${encodeURIComponent(usuario.id)}`);
+  redirect(`/admin/personal/confirmacion?id=${encodeURIComponent(usuarioId)}`);
 }
 
 /**
@@ -223,9 +276,8 @@ export async function registrarMedico(
 
 /**
  * US-14 (RF-26) — Registrar enfermera (solo ADMINISTRADOR).
- * Espejo de `registrarPersonalAdministrativo`: valida, crea un usuario
- * ENFERMERA activo, dispara el STUB de email de bienvenida y redirige a la
- * confirmación con el id del usuario creado.
+ * Valida los datos, guarda el usuario ENFERMERA en Neon, envía una invitación
+ * de Clerk y redirige a la confirmación con el id del usuario creado.
  */
 export async function registrarEnfermera(
   _prevState: FormState,
@@ -240,7 +292,6 @@ export async function registrarEnfermera(
     dni: leerString(formData, "dni"),
     email: leerString(formData, "email"),
     phone: leerString(formData, "phone"),
-    password: leerString(formData, "password"),
   };
 
   const errores = validarDatosEnfermera(datos);
@@ -257,34 +308,84 @@ export async function registrarEnfermera(
     };
   }
 
-  const repo = getUserRepository();
-  if (await repo.findByDni(normalizarDni(datos.dni))) {
+  const prisma = getPrisma();
+  const dni = normalizarDni(datos.dni);
+  const email = datos.email.trim().toLowerCase();
+
+  if (await prisma.user.findUnique({ where: { dni } })) {
     return { errors: { dni: MSG_DNI_DUPLICADO } };
   }
-  if (await repo.findByEmail(datos.email)) {
+  if (
+    await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+    })
+  ) {
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
-  const passwordHash = await hashPassword(datos.password);
-  const usuario = await repo.create({
-    firstName: datos.firstName,
-    lastName: datos.lastName,
-    dni: datos.dni,
-    email: datos.email,
-    phone: datos.phone,
-    passwordHash,
-    role: "ENFERMERA",
-    active: true,
-  });
+  let invitationId: string;
+  try {
+    const clerk = await clerkClient();
+    const invitation = await clerk.invitations.createInvitation({
+      emailAddress: email,
+      publicMetadata: { role: "enfermera", farmaciaunsStaffInvite: true },
+      redirectUrl: "/sign-up",
+    });
+    invitationId = invitation.id;
+  } catch (error) {
+    console.error("Failed to send nurse invitation.", error);
+    return {
+      errors: {
+        _form:
+          "No se pudo enviar la invitación desde Clerk. Revisá su configuración o intentá más tarde.",
+      },
+    };
+  }
 
-  await sendWelcomeEmail(
-    usuario.email ?? "",
-    `${usuario.firstName ?? ""} ${usuario.lastName ?? ""}`.trim(),
-  );
+  let usuarioId: string;
+  try {
+    const usuario = await prisma.user.create({
+      data: {
+        email,
+        firstName: datos.firstName.trim(),
+        lastName: datos.lastName.trim(),
+        dni,
+        phone: datos.phone.trim(),
+        role: "ENFERMERA",
+        isActive: true,
+      },
+      select: { id: true },
+    });
+    usuarioId = usuario.id;
+  } catch (databaseError) {
+    try {
+      const clerk = await clerkClient();
+      await clerk.invitations.revokeInvitation(invitationId);
+    } catch (revokeError) {
+      console.error(
+        "Failed to revoke nurse invitation after Neon persistence failed.",
+        { databaseError, revokeError },
+      );
+      return {
+        errors: {
+          _form:
+            "No se pudo guardar la enfermera en Neon y no se pudo anular su invitación. Revisá Clerk antes de volver a intentarlo.",
+        },
+      };
+    }
+
+    console.error("Failed to persist nurse in Neon after invitation.", databaseError);
+    return {
+      errors: {
+        _form:
+          "No se pudo guardar la enfermera en Neon. La invitación fue anulada; intentá nuevamente.",
+      },
+    };
+  }
 
   revalidatePath("/admin/enfermeras");
   redirect(
-    `/admin/enfermeras/confirmacion?id=${encodeURIComponent(usuario.id)}`,
+    `/admin/enfermeras/confirmacion?id=${encodeURIComponent(usuarioId)}`,
   );
 }
 

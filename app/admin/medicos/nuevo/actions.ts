@@ -15,7 +15,6 @@ export interface CreateMedicoState {
     especialidad?: string;
     telefono?: string;
     email?: string;
-    password?: string;
     general?: string;
   };
   // Valores ingresados, para no vaciar el formulario cuando hay errores (sin la contraseña)
@@ -73,7 +72,6 @@ async function createMedico(
   const especialidadRaw = formData.get("especialidad")?.toString().trim() || "";
   const telefono = formData.get("telefono")?.toString().trim() || "";
   const email = formData.get("email")?.toString().trim().toLowerCase() || "";
-  const password = formData.get("password")?.toString() || "";
 
   const errors: CreateMedicoState["errors"] = {};
 
@@ -85,16 +83,10 @@ async function createMedico(
   if (!especialidadRaw) errors.especialidad = "Campo obligatorio";
   if (!telefono) errors.telefono = "Campo obligatorio";
   if (!email) errors.email = "Campo obligatorio";
-  if (!password) errors.password = "Campo obligatorio";
 
   // Validación de DNI numérico (CA6)
   if (dni && !/^\d+$/.test(dni)) {
     errors.dni = "El DNI debe contener solo números";
-  }
-
-  // Validación de contraseña (CA6: menor a 8 caracteres)
-  if (password && password.length < 8) {
-    errors.password = "La contraseña debe tener al menos 8 caracteres";
   }
 
   // Validación de formato de email (CA5)
@@ -140,49 +132,35 @@ async function createMedico(
     return { success: false, errors };
   }
 
-  // Crear usuario en Clerk y en la base de datos
-  let clerkId: string | null = null;
+  let invitationId: string;
   try {
     const clerk = await clerkClient();
-    const clerkUser = await clerk.users.createUser({
-      emailAddress: [email],
-      password,
-      firstName: nombre,
-      lastName: apellido,
+    const invitation = await clerk.invitations.createInvitation({
+      emailAddress: email,
+      redirectUrl: "/sign-up",
       publicMetadata: {
         role: "medico",
+        farmaciaunsStaffInvite: true,
         dni,
         especialidad: especialidadRaw,
       },
     });
-    clerkId = clerkUser.id;
+    invitationId = invitation.id;
   } catch (clerkErr: unknown) {
-    // Si Clerk reporta que el email ya existe o error de contraseña
     const { code, message, nestedMessage } = getClerkErrorDetails(clerkErr);
-    console.warn("Clerk user creation note:", message);
+    console.warn("Clerk doctor invitation failed:", message);
     const msg = nestedMessage || message;
     if (msg.toLowerCase().includes("email") || msg.toLowerCase().includes("taken") || msg.toLowerCase().includes("exists")) {
       return {
         success: false,
-        errors: { email: "El email ya está registrado en el servicio de autenticación" },
+        errors: { email: "El email ya tiene una cuenta o invitación en el servicio de autenticación" },
       };
     }
-    if (code.startsWith("form_password")) {
-      return {
-        success: false,
-        errors: {
-          password:
-            code === "form_password_pwned"
-              ? "Esa contraseña no es segura (aparece en filtraciones). Elegí otra."
-              : "La contraseña no cumple los requisitos de seguridad",
-        },
-      };
-    }
-    // Sin cuenta en Clerk el médico no podría iniciar sesión: no se crea el registro
+    console.error("Clerk doctor invitation error code:", code);
     return {
       success: false,
       errors: {
-        general: "No se pudo crear la cuenta del médico. Intente nuevamente.",
+        general: "No se pudo enviar la invitación al médico. Intente nuevamente.",
       },
     };
   }
@@ -190,7 +168,6 @@ async function createMedico(
   try {
     const doctor = await prisma.user.create({
       data: {
-        clerkId,
         email,
         firstName: nombre,
         lastName: apellido,
@@ -208,11 +185,29 @@ async function createMedico(
       doctorId: doctor.id,
     };
   } catch (dbErr: unknown) {
-    console.error("DB create doctor error:", dbErr);
+    try {
+      const clerk = await clerkClient();
+      await clerk.invitations.revokeInvitation(invitationId);
+    } catch (revokeErr: unknown) {
+      console.error("Failed to revoke doctor invitation after Neon persistence failed.", {
+        dbErr,
+        revokeErr,
+      });
+      return {
+        success: false,
+        errors: {
+          general:
+            "No se pudo guardar el médico en Neon ni anular la invitación. Revisá Clerk antes de volver a intentarlo.",
+        },
+      };
+    }
+
+    console.error("Failed to persist doctor in Neon after invitation.", dbErr);
     return {
       success: false,
       errors: {
-        general: "Ocurrió un error al guardar el registro médico. Intente nuevamente.",
+        general:
+          "No se pudo guardar el médico en Neon. La invitación fue anulada; intentá nuevamente.",
       },
     };
   }

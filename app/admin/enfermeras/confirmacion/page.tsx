@@ -75,11 +75,11 @@ export default async function ConfirmacionEnfermeraPage({
                 />
               </dl>
               <p className="rounded-lg bg-surface-container-high/60 p-4 text-sm text-on-surface-variant">
-                Se envió un email de bienvenida a{" "}
+                Se envió una invitación de Clerk a{" "}
                 <strong className="font-mono text-on-surface">
                   {usuario.email ?? "—"}
                 </strong>{" "}
-                con las instrucciones de primer acceso.
+                para que defina su contraseña y active su cuenta.
               </p>
             </>
           ) : (

@@ -360,7 +360,15 @@ const globalForRepo = globalThis as typeof globalThis & {
  */
 export function getUserRepository(): UserRepository {
   if (!globalForRepo.__farmaciaunsUserRepository) {
-    globalForRepo.__farmaciaunsUserRepository = process.env.DATABASE_URL?.trim()
+    const databaseUrl = process.env.DATABASE_URL?.trim();
+
+    if (process.env.NODE_ENV === "production" && !databaseUrl) {
+      throw new Error(
+        "DATABASE_URL must be configured in production to persist users.",
+      );
+    }
+
+    globalForRepo.__farmaciaunsUserRepository = databaseUrl
       ? new PrismaUserRepository()
       : new InMemoryUserRepository([
           ...pacientesSemilla,

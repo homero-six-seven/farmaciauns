@@ -180,7 +180,6 @@ export interface DatosPersonalAdministrativo {
   dni: string;
   email: string;
   phone: string;
-  password: string;
 }
 
 export interface DatosMedico {
@@ -194,14 +193,13 @@ export interface DatosMedico {
   password: string;
 }
 
-/** Alta de enfermera (US-14): los MISMOS campos que el personal administrativo. */
+/** Alta de enfermera (US-14); la contraseña se define al aceptar la invitación. */
 export interface DatosEnfermera {
   firstName: string;
   lastName: string;
   dni: string;
   email: string;
   phone: string;
-  password: string;
 }
 
 function validarDniYEmail(dni: string, email: string, errores: CampoError): void {
@@ -265,13 +263,11 @@ export function validarDatosPaciente(d: DatosRegistroPaciente): CampoError {
 }
 
 /**
- * Validación compartida del alta de staff (personal administrativo y
- * enfermería): comparten los MISMOS campos (nombre, apellido, dni, email,
- * phone, password).
+ * Valida los campos comunes de altas de personal administrativo y enfermería.
  * NO valida unicidad de DNI/email: eso requiere el repositorio (I/O).
  */
-function validarDatosAltaStaff(
-  d: DatosPersonalAdministrativo,
+function validarDatosAltaStaffComun(
+  d: Pick<DatosPersonalAdministrativo, "firstName" | "lastName" | "dni" | "email" | "phone">,
 ): CampoError {
   const errores: CampoError = {};
 
@@ -280,7 +276,6 @@ function validarDatosAltaStaff(
   validarTelefono(d.phone, errores);
 
   validarDniYEmail(d.dni, d.email, errores);
-  validarPasswordUnica(d.password, errores);
 
   return errores;
 }
@@ -292,16 +287,16 @@ function validarDatosAltaStaff(
 export function validarDatosPersonalAdministrativo(
   d: DatosPersonalAdministrativo,
 ): CampoError {
-  return validarDatosAltaStaff(d);
+  return validarDatosAltaStaffComun(d);
 }
 
 /**
- * Valida los campos del alta de enfermera (US-14). Reutiliza la misma lógica
- * que el alta de personal administrativo (mismos campos).
+ * Valida los datos del alta de enfermera (US-14). La contraseña se define al
+ * aceptar la invitación de Clerk.
  * NO valida unicidad de DNI/email: eso requiere el repositorio (I/O).
  */
 export function validarDatosEnfermera(d: DatosEnfermera): CampoError {
-  return validarDatosAltaStaff(d);
+  return validarDatosAltaStaffComun(d);
 }
 
 /**

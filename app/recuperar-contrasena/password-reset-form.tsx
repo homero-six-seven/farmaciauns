@@ -9,6 +9,13 @@ import styles from "../sign-in/sign-in-form.module.css";
 
 type ResetStep = "email" | "code" | "password" | "done";
 
+const genericResetNotice =
+  "Si el email corresponde a una cuenta, recibirás un código.";
+
+function isUnknownAccountError(error: { code: string } | null) {
+  return error?.code === "form_identifier_not_found";
+}
+
 export function PasswordResetForm() {
   const { signIn, fetchStatus } = useSignIn();
   const router = useRouter();
@@ -32,6 +39,12 @@ export function PasswordResetForm() {
       });
 
       if (createError) {
+        if (isUnknownAccountError(createError)) {
+          setStep("code");
+          setNotice(genericResetNotice);
+          return;
+        }
+
         setErrorMessage(
           "No se pudo iniciar la recuperación. Verificá el email e intentá de nuevo.",
         );
@@ -42,6 +55,12 @@ export function PasswordResetForm() {
         await signIn.resetPasswordEmailCode.sendCode();
 
       if (sendError) {
+        if (isUnknownAccountError(sendError)) {
+          setStep("code");
+          setNotice(genericResetNotice);
+          return;
+        }
+
         setErrorMessage(
           clerkErrorMessage(
             sendError,
@@ -52,7 +71,7 @@ export function PasswordResetForm() {
       }
 
       setStep("code");
-      setNotice("Si el email corresponde a una cuenta, recibirás un código.");
+      setNotice(genericResetNotice);
     } catch {
       setErrorMessage(
         "No se pudo iniciar la recuperación. Intentá de nuevo más tarde.",
@@ -377,13 +396,18 @@ export function PasswordResetForm() {
       const { error } = await signIn.resetPasswordEmailCode.sendCode();
 
       if (error) {
+        if (isUnknownAccountError(error)) {
+          setNotice(genericResetNotice);
+          return;
+        }
+
         setErrorMessage(
           clerkErrorMessage(error, "No se pudo reenviar el código. Intentá de nuevo."),
         );
         return;
       }
 
-      setNotice("Si el email corresponde a una cuenta, recibirás un código.");
+      setNotice(genericResetNotice);
     } catch {
       setErrorMessage("No se pudo reenviar el código. Intentá de nuevo.");
     }

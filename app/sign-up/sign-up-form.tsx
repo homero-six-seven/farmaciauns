@@ -3,9 +3,13 @@
 import { useSignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { clerkErrorMessage } from "../../lib/clerk-error-message";
 import styles from "../sign-in/sign-in-form.module.css";
+import {
+  isPatientEmailAlreadyRegistered,
+  registerCurrentUserAsPatient,
+} from "./actions";
 
 const validNamePattern = /^[\p{L} ]+$/u;
 const validDniPattern = /^(?!0{8}$)\d{8}$/;
@@ -43,9 +47,53 @@ function isValidBirthDate(value: string) {
   return date.getTime() < todayUtc;
 }
 
+function formatBirthDateInput(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+
+  if (digits.length <= 2) {
+    return digits;
+  }
+  if (digits.length <= 4) {
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  }
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
+function getBirthDateCaretPosition(digitCount: number) {
+  if (digitCount <= 2) {
+    return digitCount;
+  }
+  if (digitCount <= 4) {
+    return digitCount + 1;
+  }
+  return digitCount + 2;
+}
+
+function toBirthDateInputValue(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  return match ? `${match[3]}/${match[2]}/${match[1]}` : "";
+}
+
+function toDatePickerValue(value: string) {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  return match && isValidBirthDate(value)
+    ? `${match[3]}-${match[2]}-${match[1]}`
+    : "";
+}
+
+function getLatestBirthDate() {
+  const date = new Date();
+  date.setDate(date.getDate() - 1);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function SignUpForm() {
   const { signUp, fetchStatus } = useSignUp();
   const router = useRouter();
+  const birthDatePickerRef = useRef<HTMLInputElement>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dni, setDni] = useState("");
@@ -59,14 +107,50 @@ export function SignUpForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [awaitingVerification, setAwaitingVerification] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [patientProfilePending, setPatientProfilePending] = useState(false);
+  const [isSavingPatientProfile, setIsSavingPatientProfile] = useState(false);
+  const [postSignupDestination, setPostSignupDestination] = useState("/inicio");
+  const [latestBirthDate] = useState(getLatestBirthDate);
+
+  async function savePatientProfile() {
+    setIsSavingPatientProfile(true);
+
+    try {
+      const result = await registerCurrentUserAsPatient();
+
+      if (!result.success) {
+        setPatientProfilePending(result.retryable ?? true);
+        setErrorMessage(result.message);
+        return false;
+      }
+
+      setPatientProfilePending(false);
+      setErrorMessage("");
+      return true;
+    } catch {
+      setPatientProfilePending(true);
+      setErrorMessage(
+        "La cuenta se creó, pero no se pudo guardar el perfil de paciente. Intentá de nuevo.",
+      );
+      return false;
+    } finally {
+      setIsSavingPatientProfile(false);
+    }
+  }
 
   async function finalizeSignUp() {
     try {
       const { error } = await signUp.finalize({
-        navigate: ({ session, decorateUrl }) => {
+        navigate: async ({ session, decorateUrl }) => {
           const destination = session?.currentTask
             ? `/sign-up/tasks/${session.currentTask.key}`
             : "/inicio";
+          setPostSignupDestination(destination);
+
+          if (!(await savePatientProfile())) {
+            return;
+          }
+
           const url = decorateUrl(destination);
 
           if (url.startsWith("http")) {
@@ -87,8 +171,14 @@ export function SignUpForm() {
       }
     } catch {
       setErrorMessage(
-        "La cuenta se creó, pero no se pudo iniciar la sesión automáticamente. Volvé a iniciar sesión.",
+        "La cuenta se creó, pero no se pudo completar el inicio de sesión. Intentá iniciar sesión nuevamente.",
       );
+    }
+  }
+
+  async function retryPatientProfile() {
+    if (await savePatientProfile()) {
+      router.push(postSignupDestination);
     }
   }
 
@@ -124,6 +214,13 @@ export function SignUpForm() {
     }
 
     try {
+      if (await isPatientEmailAlreadyRegistered(email)) {
+        setErrorMessage(
+          "No podés registrarte: este email ya está registrado en el sistema.",
+        );
+        return;
+      }
+
       const { error } = await signUp.password({
         emailAddress: email,
         password,
@@ -282,6 +379,18 @@ export function SignUpForm() {
                   </div>
                 </div>
               )}
+              {patientProfilePending && (
+                <button
+                  className={styles.secondaryButton}
+                  disabled={isSavingPatientProfile}
+                  onClick={retryPatientProfile}
+                  type="button"
+                >
+                  {isSavingPatientProfile
+                    ? "Guardando perfil..."
+                    : "Reintentar guardar perfil"}
+                </button>
+              )}
 
               {awaitingVerification ? (
                 <form className={styles.form} onSubmit={handleVerify}>
@@ -293,10 +402,15 @@ export function SignUpForm() {
                       autoComplete="one-time-code"
                       id="verification-code"
                       inputMode="numeric"
+                      maxLength={6}
+                      minLength={6}
                       onChange={(event) =>
-                        setVerificationCode(event.target.value)
+                        setVerificationCode(
+                          event.target.value.replace(/\D/g, "").slice(0, 6),
+                        )
                       }
-                      placeholder="Ingresá el código del email"
+                      pattern="[0-9]{6}"
+                      placeholder="Ej. 547068"
                       required
                       value={verificationCode}
                     />
@@ -361,7 +475,9 @@ export function SignUpForm() {
                           id="dni"
                           inputMode="numeric"
                           maxLength={8}
-                          onChange={(event) => setDni(event.target.value)}
+                          onChange={(event) =>
+                            setDni(event.target.value.replace(/\D/g, "").slice(0, 8))
+                          }
                           pattern="[0-9]{8}"
                           placeholder="Ej. 38450912"
                           required
@@ -446,26 +562,61 @@ export function SignUpForm() {
                         <label htmlFor="birth-date">
                           <span>Fecha de nacimiento <b>*</b></span>
                         </label>
-                        <input
-                          autoComplete="bday"
-                          id="birth-date"
-                          inputMode="numeric"
-                          maxLength={10}
-                          onChange={(event) =>
-                            setBirthDate(
-                              event.target.value
-                                .replace(/[^\d/]/g, "")
-                                .slice(0, 10),
-                            )
-                          }
-                          pattern="\d{2}/\d{2}/\d{4}"
-                          placeholder="DD/MM/AAAA"
-                          required
-                          aria-invalid={Boolean(
-                            errorMessage && !isValidBirthDate(birthDate),
-                          )}
-                          value={birthDate}
-                        />
+                        <div className={styles.dateInputControl}>
+                          <input
+                            autoComplete="bday"
+                            id="birth-date"
+                            inputMode="numeric"
+                            maxLength={10}
+                            onChange={(event) => {
+                              const input = event.currentTarget;
+                              const digitsBeforeCaret = input.value
+                                .slice(0, input.selectionStart ?? input.value.length)
+                                .replace(/\D/g, "").length;
+                              const formattedValue = formatBirthDateInput(
+                                input.value,
+                              );
+                              setBirthDate(formattedValue);
+                              const caretPosition =
+                                getBirthDateCaretPosition(digitsBeforeCaret);
+                              requestAnimationFrame(() => {
+                                input.setSelectionRange(
+                                  caretPosition,
+                                  caretPosition,
+                                );
+                              });
+                            }}
+                            pattern="\d{2}/\d{2}/\d{4}"
+                            placeholder="DD/MM/AAAA"
+                            required
+                            aria-invalid={Boolean(
+                              errorMessage && !isValidBirthDate(birthDate),
+                            )}
+                            value={birthDate}
+                          />
+                          <button
+                            aria-label="Elegir fecha de nacimiento"
+                            className={styles.datePickerButton}
+                            onClick={() =>
+                              birthDatePickerRef.current?.showPicker()
+                            }
+                            type="button"
+                          >
+                            <CalendarIcon />
+                          </button>
+                          <input
+                            aria-hidden="true"
+                            className={styles.datePickerNativeInput}
+                            max={latestBirthDate}
+                            onChange={(event) =>
+                              setBirthDate(toBirthDateInputValue(event.target.value))
+                            }
+                            ref={birthDatePickerRef}
+                            tabIndex={-1}
+                            type="date"
+                            value={toDatePickerValue(birthDate)}
+                          />
+                        </div>
                       </div>
                       <div className={styles.field}>
                         <label htmlFor="phone">
@@ -604,6 +755,24 @@ function ReportIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1Zm3 8h2m4 0h2m-8 4h2"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
       />
     </svg>
   );

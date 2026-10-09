@@ -261,8 +261,13 @@ export function PasswordResetForm() {
                     autoComplete="one-time-code"
                     id="reset-code"
                     inputMode="numeric"
-                    onChange={(event) => setCode(event.target.value)}
-                    placeholder="Ingresá el código"
+                    maxLength={6}
+                    minLength={6}
+                    onChange={(event) =>
+                      setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
+                    pattern="[0-9]{6}"
+                    placeholder="Ej. 547068"
                     required
                     value={code}
                   />

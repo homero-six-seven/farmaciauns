@@ -193,14 +193,13 @@ export interface DatosMedico {
   password: string;
 }
 
-/** Alta de enfermera (US-15); la contraseña inicial se crea en Clerk. */
+/** Alta de enfermera (US-15); la contraseña se define al aceptar la invitación. */
 export interface DatosEnfermera {
   firstName: string;
   lastName: string;
   dni: string;
   email: string;
   phone: string;
-  password: string;
 }
 
 function validarDniYEmail(dni: string, email: string, errores: CampoError): void {
@@ -292,14 +291,11 @@ export function validarDatosPersonalAdministrativo(
 }
 
 /**
- * Valida los datos del alta de enfermera (US-15), incluida la contraseña
- * inicial que se usará para crear la cuenta en Clerk.
+ * Valida los datos del alta de enfermera (US-15).
  * NO valida unicidad de DNI/email: eso requiere el repositorio (I/O).
  */
 export function validarDatosEnfermera(d: DatosEnfermera): CampoError {
-  const errores = validarDatosAltaStaffComun(d);
-  validarPasswordUnica(d.password, errores);
-  return errores;
+  return validarDatosAltaStaffComun(d);
 }
 
 /**

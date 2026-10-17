@@ -81,7 +81,8 @@ export default async function ConfirmacionEnfermeraPage({
                 <strong className="font-mono text-on-surface">
                   {usuario.email ?? "—"}
                 </strong>{" "}
-                con instrucciones para cambiar la contraseña inicial.
+                con una invitación para definir su contraseña y activar el
+                acceso.
               </p>
             </>
           ) : (

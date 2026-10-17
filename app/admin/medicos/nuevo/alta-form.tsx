@@ -65,7 +65,9 @@ export function AltaMedicoForm() {
           name="matricula"
           required
           error={errores.matricula}
-          placeholder="Ej. MP-123456"
+          placeholder="Ej. MN 123456"
+          pattern="MN [0-9]{6}"
+          maxLength={9}
           defaultValue={state.values?.matricula}
         />
         <FormSelect
@@ -84,6 +86,7 @@ export function AltaMedicoForm() {
           required
           numeric
           error={errores.phone}
+          pattern="[0-9+ ()-]+"
           placeholder="+54 11 4890-3321"
           autoComplete="tel"
           defaultValue={state.values?.phone}

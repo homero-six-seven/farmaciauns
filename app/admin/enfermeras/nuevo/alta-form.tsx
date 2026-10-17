@@ -7,7 +7,7 @@ import { FormInput } from "@/components/form-input";
 import { ESTADO_INICIAL } from "@/lib/form-state";
 
 /**
- * Formulario de alta de enfermera (US-14).
+ * Formulario de alta de enfermera (US-15).
  * Client component: usa `useActionState` (React 19) con la server action
  * `registrarEnfermera`.
  */

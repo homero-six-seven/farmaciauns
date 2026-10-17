@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   ).invitations.createInvitation({
     emailAddress: email,
     publicMetadata: { role },
-    redirectUrl: `${new URL(request.url).origin}/sign-up`,
+    redirectUrl: new URL("/sign-up", request.url).toString(),
   });
 
   return NextResponse.json(

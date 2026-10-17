@@ -13,6 +13,7 @@ import {
   validarDatosPersonalAdministrativo,
 } from "@/lib/domain/usuario";
 import { sendWelcomeEmail } from "@/lib/email";
+import { getSignUpRedirectUrl } from "@/lib/clerk-urls";
 import type { FormState } from "@/lib/form-state";
 import { hashPassword } from "@/lib/password";
 import { getPrisma } from "@/lib/prisma";
@@ -147,7 +148,7 @@ export async function registrarPersonalAdministrativo(
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
       publicMetadata: { role: "administrativo", farmaciaunsStaffInvite: true },
-      redirectUrl: "/sign-up",
+      redirectUrl: await getSignUpRedirectUrl(),
     });
     invitationId = invitation.id;
   } catch (error) {
@@ -275,9 +276,9 @@ export async function registrarMedico(
 }
 
 /**
- * US-14 (RF-26) — Registrar enfermera (solo ADMINISTRADOR).
- * Valida los datos, guarda el usuario ENFERMERA en Neon, envía una invitación
- * de Clerk y redirige a la confirmación con el id del usuario creado.
+ * US-15 (RF-19) — Registrar enfermera (solo ADMINISTRADOR).
+ * Registra la enfermera en Neon y envía una invitación nativa de Clerk para
+ * que defina su contraseña y active su cuenta.
  */
 export async function registrarEnfermera(
   _prevState: FormState,
@@ -323,21 +324,101 @@ export async function registrarEnfermera(
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
-  let invitationId: string;
+  let clerk;
   try {
-    const clerk = await clerkClient();
-    const invitation = await clerk.invitations.createInvitation({
-      emailAddress: email,
-      publicMetadata: { role: "enfermera", farmaciaunsStaffInvite: true },
-      redirectUrl: "/sign-up",
-    });
-    invitationId = invitation.id;
-  } catch (error) {
-    console.error("Failed to send nurse invitation.", error);
+    clerk = await clerkClient();
+  } catch (clerkConfigurationError) {
+    console.error(
+      "Could not initialize the Clerk client for nurse registration.",
+      clerkConfigurationError,
+    );
     return {
       errors: {
         _form:
-          "No se pudo enviar la invitación desde Clerk. Revisá su configuración o intentá más tarde.",
+          "No se pudo conectar con Clerk. Verificá su configuración e intentá nuevamente.",
+      },
+    };
+  }
+  let pendingInvitations;
+  try {
+    const invitations = await clerk.invitations.getInvitationList({
+      query: email,
+      status: "pending",
+      limit: 100,
+    });
+    pendingInvitations = invitations.data.filter(
+      (pendingInvitation) =>
+        pendingInvitation.emailAddress.toLowerCase() === email &&
+        pendingInvitation.publicMetadata?.role === "enfermera" &&
+        pendingInvitation.publicMetadata?.farmaciaunsStaffInvite === true,
+    );
+  } catch (invitationLookupError) {
+    console.error("Failed to check for a previous nurse invitation.", invitationLookupError);
+    return {
+      errors: {
+        _form:
+          "No se pudo verificar si ya existe una invitación pendiente. Intentá nuevamente.",
+      },
+    };
+  }
+
+  let invitation;
+  try {
+    invitation = await clerk.invitations.createInvitation({
+      emailAddress: email,
+      ignoreExisting: pendingInvitations.length > 0,
+      publicMetadata: {
+        role: "enfermera",
+        farmaciaunsStaffInvite: true,
+      },
+      redirectUrl: await getSignUpRedirectUrl(),
+    });
+  } catch (clerkError) {
+    console.error("Failed to create nurse invitation in Clerk.", clerkError);
+    const clerkErrorCode =
+      typeof clerkError === "object" && clerkError !== null &&
+      "errors" in clerkError && Array.isArray(clerkError.errors)
+        ? clerkError.errors.find(
+            (item): item is { code: string } =>
+              typeof item === "object" &&
+              item !== null &&
+              "code" in item &&
+              typeof item.code === "string",
+          )?.code
+        : undefined;
+
+    if (
+      clerkErrorCode === "form_identifier_exists" ||
+      clerkErrorCode === "form_email_address_taken"
+    ) {
+      return { errors: { email: MSG_EMAIL_DUPLICADO } };
+    }
+    return {
+      errors: {
+        _form:
+          "No se pudo enviar la invitación desde Clerk. Verificá los datos e intentá nuevamente.",
+      },
+    };
+  }
+
+  try {
+    for (const pendingInvitation of pendingInvitations) {
+      await clerk.invitations.revokeInvitation(pendingInvitation.id);
+    }
+  } catch (revokePreviousError) {
+    try {
+      await clerk.invitations.revokeInvitation(invitation.id);
+    } catch (revokeNewError) {
+      console.error("Failed to revoke the replacement nurse invitation.", {
+        revokePreviousError,
+        revokeNewError,
+      });
+    }
+    console.error("Failed to revoke an earlier nurse invitation.", revokePreviousError);
+    return {
+      errors: {
+        _form:
+          "No se pudo reemplazar la invitación anterior. Revisá las invitaciones pendientes en Clerk e intentá nuevamente.",
       },
     };
   }
@@ -359,22 +440,24 @@ export async function registrarEnfermera(
     usuarioId = usuario.id;
   } catch (databaseError) {
     try {
-      const clerk = await clerkClient();
-      await clerk.invitations.revokeInvitation(invitationId);
+      await clerk.invitations.revokeInvitation(invitation.id);
     } catch (revokeError) {
       console.error(
-        "Failed to revoke nurse invitation after Neon persistence failed.",
+        "Failed to revoke the nurse invitation after Neon persistence failed.",
         { databaseError, revokeError },
       );
       return {
         errors: {
           _form:
-            "No se pudo guardar la enfermera en Neon y no se pudo anular su invitación. Revisá Clerk antes de volver a intentarlo.",
+            "No se pudo guardar la enfermera en Neon ni anular su invitación. Revisá ambos sistemas antes de volver a intentarlo.",
         },
       };
     }
 
-    console.error("Failed to persist nurse in Neon after invitation.", databaseError);
+    console.error(
+      "Failed to persist nurse in Neon after creating a Clerk invitation.",
+      databaseError,
+    );
     return {
       errors: {
         _form:

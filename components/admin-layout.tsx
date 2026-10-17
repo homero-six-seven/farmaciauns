@@ -2,6 +2,8 @@ import { UserButton } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import type { ReactNode } from "react";
+import { normalizeRole } from "@/lib/authorization";
+import { getPrisma } from "@/lib/prisma";
 import { SidebarNav } from "./sidebar-nav";
 
 /**
@@ -16,6 +18,28 @@ import { SidebarNav } from "./sidebar-nav";
  */
 export async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await currentUser();
+  const dbUser = user
+    ? await getPrisma().user.findUnique({
+        where: { clerkId: user.id },
+        select: { role: true },
+      })
+    : null;
+  const clerkRole = user?.publicMetadata.role;
+  const role =
+    normalizeRole(dbUser?.role ?? (typeof clerkRole === "string" ? clerkRole : null)) ??
+    "admin";
+  const roleLabels = {
+    admin: "Administrador",
+    enfermera: "Enfermería",
+    medico: "Médico",
+    paciente: "Paciente",
+  } satisfies Record<typeof role, string>;
+  const sidebarTitles = {
+    admin: "Gestión Clínica",
+    enfermera: "Portal de Enfermería",
+    medico: "Portal Médico",
+    paciente: "Portal Paciente",
+  } satisfies Record<typeof role, string>;
   const displayName =
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
 
@@ -33,7 +57,7 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
             <div className="hidden text-right sm:block">
               <p className="text-xs font-semibold text-on-surface">{displayName}</p>
               <span className="text-[10px] font-bold uppercase tracking-wide text-on-surface-variant">
-                Administrador
+                {roleLabels[role]}
               </span>
             </div>
           )}
@@ -42,7 +66,7 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
           <SignOutButton redirectUrl="/sign-in">
             <button
               type="button"
-              className="hidden rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container sm:block"
+              className="whitespace-nowrap rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container"
             >
               Cerrar sesión
             </button>
@@ -54,9 +78,9 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
         <aside className="flex max-h-[calc(100vh-3rem)] w-52 shrink-0 flex-col justify-between overflow-y-auto border-r border-surface-container-high bg-surface-container-lowest px-2 py-3">
           <div>
             <h2 className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-secondary">
-              Gestión Clínica
+              {sidebarTitles[role]}
             </h2>
-            <SidebarNav />
+            <SidebarNav role={role} />
           </div>
           <p className="border-t border-surface-container-high px-2 pt-3 text-[10px] text-secondary">
             Sistema Sala Médica v1.0

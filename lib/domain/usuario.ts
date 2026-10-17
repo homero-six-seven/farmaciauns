@@ -104,7 +104,10 @@ export const MSG_PASSWORDS_NO_COINCIDEN = "Las contraseñas no coinciden";
 export const MSG_DNI_FORMATO = "El DNI debe contener solo números";
 export const MSG_DNI_MIN = "El DNI debe tener al menos 7 dígitos";
 export const MSG_EMAIL_FORMATO = "El email no tiene un formato válido";
-export const MSG_TELEFONO_FORMATO = "El teléfono debe contener solo números";
+export const MSG_TELEFONO_FORMATO =
+  "El teléfono debe contener solo números y separadores válidos";
+export const MSG_MATRICULA_FORMATO =
+  "La matrícula debe tener el formato MN seguido de un espacio y 6 números";
 
 /** Mapa campo -> mensaje de error. Las claves coinciden con el `name` del input. */
 export type CampoError = Record<string, string>;
@@ -137,6 +140,10 @@ export function validarDniLongitud(dni: string): boolean {
 export function validarTelefonoFormato(phone: string): boolean {
   const limpio = phone.replace(/[+\s()-]/g, "");
   return limpio.length > 0 && /^\d+$/.test(limpio);
+}
+
+export function validarMatriculaFormato(matricula: string): boolean {
+  return /^MN \d{6}$/.test(matricula);
 }
 
 /** True si el email tiene un formato básico válido. */
@@ -322,7 +329,11 @@ export function validarDatosMedico(d: DatosMedico): CampoError {
     errores.especialidad = MSG_CAMPO_OBLIGATORIO;
   }
 
-  validarObligatorio(d.matricula, "matricula", errores);
+  if (esVacio(d.matricula)) {
+    errores.matricula = MSG_CAMPO_OBLIGATORIO;
+  } else if (!validarMatriculaFormato(d.matricula)) {
+    errores.matricula = MSG_MATRICULA_FORMATO;
+  }
 
   validarDniYEmail(d.dni, d.email, errores);
   validarPasswordUnica(d.password, errores);

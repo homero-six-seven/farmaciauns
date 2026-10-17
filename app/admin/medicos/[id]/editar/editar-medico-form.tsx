@@ -84,6 +84,9 @@ export function EditarMedicoForm({
           required
           error={state.errors.matricula}
           defaultValue={values?.matricula ?? doctor.matricula}
+          pattern="MN [0-9]{6}"
+          maxLength={9}
+          placeholder="MN 123456"
         />
 
         <div className="flex flex-col gap-1.5">
@@ -131,6 +134,7 @@ export function EditarMedicoForm({
           error={state.errors.phone}
           defaultValue={values?.phone ?? doctor.phone}
           autoComplete="tel"
+          pattern="[0-9+ ()-]+"
         />
       </div>
 
@@ -161,6 +165,9 @@ function Field({
   error,
   defaultValue,
   autoComplete,
+  pattern,
+  maxLength,
+  placeholder,
 }: {
   label: string;
   name: string;
@@ -169,6 +176,9 @@ function Field({
   error?: string;
   defaultValue: string;
   autoComplete?: "given-name" | "family-name" | "email" | "tel";
+  pattern?: string;
+  maxLength?: number;
+  placeholder?: string;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -183,6 +193,9 @@ function Field({
         required={required}
         autoComplete={autoComplete}
         defaultValue={defaultValue}
+        pattern={pattern}
+        maxLength={maxLength}
+        placeholder={placeholder}
         aria-invalid={Boolean(error)}
         className={`h-10 w-full rounded border-0 px-3 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 ${
           error

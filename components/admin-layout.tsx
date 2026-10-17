@@ -34,6 +34,12 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
     medico: "Médico",
     paciente: "Paciente",
   } satisfies Record<typeof role, string>;
+  const sidebarTitles = {
+    admin: "Gestión Clínica",
+    enfermera: "Portal de Enfermería",
+    medico: "Portal Médico",
+    paciente: "Portal Paciente",
+  } satisfies Record<typeof role, string>;
   const displayName =
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
 
@@ -60,7 +66,7 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
           <SignOutButton redirectUrl="/sign-in">
             <button
               type="button"
-              className="hidden rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container sm:block"
+              className="whitespace-nowrap rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container"
             >
               Cerrar sesión
             </button>
@@ -72,7 +78,7 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
         <aside className="flex max-h-[calc(100vh-3rem)] w-52 shrink-0 flex-col justify-between overflow-y-auto border-r border-surface-container-high bg-surface-container-lowest px-2 py-3">
           <div>
             <h2 className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-secondary">
-              Gestión Clínica
+              {sidebarTitles[role]}
             </h2>
             <SidebarNav role={role} />
           </div>

@@ -1,9 +1,7 @@
-import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { requireRole, roles, type Role } from "@/lib/authorization";
-import { SidebarNav } from "@/components/sidebar-nav";
-import styles from "./inicio.module.css";
+import { AdminLayout } from "@/components/admin-layout";
 
 export default async function InicioPage() {
   const role = await requireRole(roles);
@@ -15,55 +13,46 @@ export default async function InicioPage() {
 
   const displayName =
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
-  const portalTitle = portalTitles[role];
   const cards = portalCards[role];
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.brand}>
-          <span aria-hidden="true" className={styles.brandIcon}>
-            <HospitalIcon />
-          </span>
-          <span>Sala Médica</span>
-        </div>
-        <div className={styles.account}>
-          {displayName && <span>{displayName}</span>}
-          <UserButton />
-        </div>
-      </header>
-
-      <aside className={styles.sidebar}>
-        <div>
-          <p className={styles.sidebarLabel}>{portalTitle}</p>
-          <SidebarNav role={role} />
-        </div>
-        <p className={styles.sidebarFooter}>Sistema Sala Médica v1.0</p>
-      </aside>
-
-      <main className={styles.main}>
-        <section className={styles.welcome}>
-          <p className={styles.eyebrow}>{portalTitle}</p>
-          <h1>
+    <AdminLayout>
+      <section className="space-y-6">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wider text-secondary">
+            {portalTitles[role]}
+          </p>
+          <h1 className="text-2xl font-semibold">
             Bienvenido{displayName ? `, ${displayName}` : ""}
           </h1>
-          <p>Iniciaste sesión en Sala Médica.</p>
-        </section>
+          <p className="text-sm text-on-surface-variant">
+            Iniciaste sesión en Sala Médica.
+          </p>
+        </div>
 
-        <section aria-label="Resumen del portal" className={styles.cards}>
+        <section
+          aria-label="Resumen del portal"
+          className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+        >
           {cards.map(({ id, title, description, Icon }) => (
-            <article className={styles.card} id={id} key={id}>
-              <div className={styles.cardIcon}>
+            <article
+              className="space-y-3 rounded-lg border border-surface-container-high bg-surface-container-lowest p-5"
+              id={id}
+              key={id}
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-container text-on-surface">
                 <Icon />
               </div>
-              <h2>{title}</h2>
-              <p>{description}</p>
-              <span className={styles.status}>Próximamente</span>
+              <h2 className="text-lg font-semibold">{title}</h2>
+              <p className="text-sm text-on-surface-variant">{description}</p>
+              <span className="inline-flex rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
+                Próximamente
+              </span>
             </article>
           ))}
         </section>
-      </main>
-    </div>
+      </section>
+    </AdminLayout>
   );
 }
 
@@ -133,20 +122,6 @@ const portalCards = {
     Icon: () => React.JSX.Element;
   }[]
 >;
-
-function HospitalIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M9 3h6v4h4v14H5V7h4V3Zm0 4h6M12 10v7m-3.5-3.5h7"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
 
 function CalendarIcon() {
   return (

@@ -375,6 +375,8 @@ export function AltaMedicoForm() {
                       defaultValue={state.values?.matricula ?? ""}
                       type="text"
                       placeholder="Ej. MN 149832"
+                      pattern="MN [0-9]{6}"
+                      maxLength={9}
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
                         state.errors?.matricula
                           ? "bg-error-container/30 border-error focus:ring-1 focus:ring-error pr-10"
@@ -416,6 +418,7 @@ export function AltaMedicoForm() {
                       name="telefono"
                       defaultValue={state.values?.telefono ?? ""}
                       type="tel"
+                      pattern="[0-9+ ()-]+"
                       placeholder="+54 11 4980-2210"
                       className={`w-full h-10 px-3 font-body-md text-body-md rounded-lg focus:outline-none transition-all border ${
                         state.errors?.telefono

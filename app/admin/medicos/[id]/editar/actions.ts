@@ -4,7 +4,17 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/authorization";
-import { ESPECIALIDADES, MSG_CAMPO_OBLIGATORIO, MSG_EMAIL_DUPLICADO, validarEmailFormato } from "@/lib/domain/usuario";
+import {
+  ESPECIALIDADES,
+  MSG_CAMPO_OBLIGATORIO,
+  MSG_EMAIL_DUPLICADO,
+  MSG_MATRICULA_FORMATO,
+  MSG_TELEFONO_FORMATO,
+  validarEmailFormato,
+  validarMatriculaFormato,
+  validarTelefonoFormato,
+} from "@/lib/domain/usuario";
+import { getSignUpRedirectUrl } from "@/lib/clerk-urls";
 import type { FormState } from "@/lib/form-state";
 import { getPrisma } from "@/lib/prisma";
 
@@ -66,6 +76,12 @@ export async function actualizarMedico(
   }
   if (datos.email && !validarEmailFormato(datos.email)) {
     errors.email = "El email no tiene un formato válido";
+  }
+  if (datos.matricula && !validarMatriculaFormato(datos.matricula)) {
+    errors.matricula = MSG_MATRICULA_FORMATO;
+  }
+  if (datos.phone && !validarTelefonoFormato(datos.phone)) {
+    errors.phone = MSG_TELEFONO_FORMATO;
   }
   if (
     datos.especialidad &&
@@ -221,7 +237,7 @@ export async function actualizarMedico(
         );
         replacementInvitation = await clerk.invitations.createInvitation({
           emailAddress: datos.email,
-          redirectUrl: "/sign-up",
+          redirectUrl: await getSignUpRedirectUrl(),
           publicMetadata: {
             role: "medico",
             farmaciaunsStaffInvite: true,

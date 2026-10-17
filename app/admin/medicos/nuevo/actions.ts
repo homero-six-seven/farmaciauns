@@ -3,6 +3,13 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { getPrisma } from "../../../../lib/prisma";
 import { getCurrentAdmin } from "../../../../lib/auth";
+import { getSignUpRedirectUrl } from "@/lib/clerk-urls";
+import {
+  MSG_MATRICULA_FORMATO,
+  MSG_TELEFONO_FORMATO,
+  validarMatriculaFormato,
+  validarTelefonoFormato,
+} from "@/lib/domain/usuario";
 
 export interface CreateMedicoState {
   success: boolean;
@@ -83,6 +90,12 @@ async function createMedico(
   if (!especialidadRaw) errors.especialidad = "Campo obligatorio";
   if (!telefono) errors.telefono = "Campo obligatorio";
   if (!email) errors.email = "Campo obligatorio";
+  if (matricula && !validarMatriculaFormato(matricula)) {
+    errors.matricula = MSG_MATRICULA_FORMATO;
+  }
+  if (telefono && !validarTelefonoFormato(telefono)) {
+    errors.telefono = MSG_TELEFONO_FORMATO;
+  }
 
   // Validación de DNI numérico (CA6)
   if (dni && !/^\d+$/.test(dni)) {
@@ -137,7 +150,7 @@ async function createMedico(
     const clerk = await clerkClient();
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
-      redirectUrl: "/sign-up",
+      redirectUrl: await getSignUpRedirectUrl(),
       publicMetadata: {
         role: "medico",
         farmaciaunsStaffInvite: true,

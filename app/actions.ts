@@ -13,6 +13,7 @@ import {
   validarDatosPersonalAdministrativo,
 } from "@/lib/domain/usuario";
 import { sendWelcomeEmail } from "@/lib/email";
+import { getSignUpRedirectUrl } from "@/lib/clerk-urls";
 import type { FormState } from "@/lib/form-state";
 import { hashPassword } from "@/lib/password";
 import { getPrisma } from "@/lib/prisma";
@@ -147,7 +148,7 @@ export async function registrarPersonalAdministrativo(
     const invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
       publicMetadata: { role: "administrativo", farmaciaunsStaffInvite: true },
-      redirectUrl: "/sign-up",
+      redirectUrl: await getSignUpRedirectUrl(),
     });
     invitationId = invitation.id;
   } catch (error) {
@@ -338,15 +339,39 @@ export async function registrarEnfermera(
       },
     };
   }
+  let pendingInvitations;
+  try {
+    const invitations = await clerk.invitations.getInvitationList({
+      query: email,
+      status: "pending",
+      limit: 100,
+    });
+    pendingInvitations = invitations.data.filter(
+      (pendingInvitation) =>
+        pendingInvitation.emailAddress.toLowerCase() === email &&
+        pendingInvitation.publicMetadata?.role === "enfermera" &&
+        pendingInvitation.publicMetadata?.farmaciaunsStaffInvite === true,
+    );
+  } catch (invitationLookupError) {
+    console.error("Failed to check for a previous nurse invitation.", invitationLookupError);
+    return {
+      errors: {
+        _form:
+          "No se pudo verificar si ya existe una invitación pendiente. Intentá nuevamente.",
+      },
+    };
+  }
+
   let invitation;
   try {
     invitation = await clerk.invitations.createInvitation({
       emailAddress: email,
+      ignoreExisting: pendingInvitations.length > 0,
       publicMetadata: {
         role: "enfermera",
         farmaciaunsStaffInvite: true,
       },
-      redirectUrl: "/sign-up",
+      redirectUrl: await getSignUpRedirectUrl(),
     });
   } catch (clerkError) {
     console.error("Failed to create nurse invitation in Clerk.", clerkError);
@@ -372,6 +397,28 @@ export async function registrarEnfermera(
       errors: {
         _form:
           "No se pudo enviar la invitación desde Clerk. Verificá los datos e intentá nuevamente.",
+      },
+    };
+  }
+
+  try {
+    for (const pendingInvitation of pendingInvitations) {
+      await clerk.invitations.revokeInvitation(pendingInvitation.id);
+    }
+  } catch (revokePreviousError) {
+    try {
+      await clerk.invitations.revokeInvitation(invitation.id);
+    } catch (revokeNewError) {
+      console.error("Failed to revoke the replacement nurse invitation.", {
+        revokePreviousError,
+        revokeNewError,
+      });
+    }
+    console.error("Failed to revoke an earlier nurse invitation.", revokePreviousError);
+    return {
+      errors: {
+        _form:
+          "No se pudo reemplazar la invitación anterior. Revisá las invitaciones pendientes en Clerk e intentá nuevamente.",
       },
     };
   }

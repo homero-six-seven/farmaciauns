@@ -50,6 +50,13 @@ Un administrador puede crear una invitación de personal mediante
 `{ "email": "...", "role": "enfermera" }`. Clerk envía el email y la persona
 define su contraseña desde el enlace recibido.
 
+El alta administrativa de enfermeras solicita una contraseña inicial, crea la
+cuenta directamente en Clerk y envía un email con el enlace al flujo de
+recuperación de contraseña de Clerk. Configura `CLERK_EMAIL_FROM` con una
+dirección cuyo dominio de envío esté verificado para la instancia Clerk y
+`APP_URL` con la URL pública de la aplicación. Para desarrollo
+local, esta última puede ser `http://localhost:3000`.
+
 ## 🔐 Usuarios y Credenciales de Prueba
 
 Para probar las diferentes funcionalidades y permisos de la aplicación según el rol, se han creado los siguientes usuarios desde el Dashboard de Clerk. 

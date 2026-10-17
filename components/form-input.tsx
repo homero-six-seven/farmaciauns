@@ -9,6 +9,7 @@ type FormInputProps = {
   name: string;
   type?: FormInputType;
   required?: boolean;
+  minLength?: number;
   hint?: string;
   error?: string;
   placeholder?: string;
@@ -33,6 +34,7 @@ export function FormInput({
   name,
   type = "text",
   required,
+  minLength,
   hint,
   error,
   placeholder,
@@ -74,6 +76,7 @@ export function FormInput({
         name={name}
         type={type}
         required={required}
+        minLength={minLength}
         inputMode={numeric ? "numeric" : inputMode}
         autoComplete={autoComplete}
         placeholder={placeholder}

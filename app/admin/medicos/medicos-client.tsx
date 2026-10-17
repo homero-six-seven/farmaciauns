@@ -17,6 +17,7 @@ export interface MedicoItem {
 
 interface MedicosClientProps {
   initialMedicos: MedicoItem[];
+  updatedDoctorId?: string;
 }
 
 function formatDni(dni: string | null | undefined): string {
@@ -44,11 +45,16 @@ function especialidadLabel(esp: MedicoItem["especialidad"]): string {
   }
 }
 
-export function MedicosClient({ initialMedicos }: MedicosClientProps) {
+export function MedicosClient({
+  initialMedicos,
+  updatedDoctorId,
+}: MedicosClientProps) {
   const [filtroEspecialidad, setFiltroEspecialidad] = useState("todas");
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [selectedId, setSelectedId] = useState<string | null>(
-    initialMedicos[0]?.id ?? null
+    initialMedicos.find((medico) => medico.id === updatedDoctorId)?.id ??
+      initialMedicos[0]?.id ??
+      null,
   );
 
   const filtered = useMemo(() => {
@@ -122,6 +128,14 @@ export function MedicosClient({ initialMedicos }: MedicosClientProps) {
             Cuerpo facultativo y profesionales matriculados en Sala Médica
           </p>
         </div>
+        {updatedDoctorId && initialMedicos.some((medico) => medico.id === updatedDoctorId) && (
+          <p
+            className="rounded-lg bg-primary-fixed px-4 py-3 text-sm font-medium text-on-surface"
+            role="status"
+          >
+            Los cambios del médico se guardaron correctamente.
+          </p>
+        )}
         <Link
           href="/admin/medicos/nuevo"
           className="inline-flex items-center gap-space-xs bg-primary text-on-primary px-space-md py-2 rounded shadow-sm hover:bg-on-surface transition-all active:scale-[0.98]"
@@ -485,6 +499,13 @@ export function MedicosClient({ initialMedicos }: MedicosClientProps) {
                     REGISTRO AUDITADO #MED-{selectedMedico.dni?.slice(-5) || "00000"} • SOLO LECTURA
                   </span>
                 </div>
+                <Link
+                  href={`/admin/medicos/${selectedMedico.id}/editar`}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-secondary"
+                >
+                  <span className="material-symbols-outlined text-[18px]">edit</span>
+                  Modificar
+                </Link>
               </div>
             </div>
           )}

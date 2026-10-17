@@ -12,7 +12,10 @@ import {
   validarDatosPaciente,
   validarDatosPersonalAdministrativo,
 } from "@/lib/domain/usuario";
-import { sendWelcomeEmail } from "@/lib/email";
+import {
+  sendNursePasswordChangeEmail,
+  sendWelcomeEmail,
+} from "@/lib/email";
 import type { FormState } from "@/lib/form-state";
 import { hashPassword } from "@/lib/password";
 import { getPrisma } from "@/lib/prisma";
@@ -275,9 +278,9 @@ export async function registrarMedico(
 }
 
 /**
- * US-14 (RF-26) — Registrar enfermera (solo ADMINISTRADOR).
- * Valida los datos, guarda el usuario ENFERMERA en Neon, envía una invitación
- * de Clerk y redirige a la confirmación con el id del usuario creado.
+ * US-15 (RF-19) — Registrar enfermera (solo ADMINISTRADOR).
+ * Crea la cuenta en Clerk con su contraseña inicial, la vincula en Neon y
+ * envía un email de Clerk con el enlace para cambiar la contraseña.
  */
 export async function registrarEnfermera(
   _prevState: FormState,
@@ -292,6 +295,7 @@ export async function registrarEnfermera(
     dni: leerString(formData, "dni"),
     email: leerString(formData, "email"),
     phone: leerString(formData, "phone"),
+    password: leerString(formData, "password"),
   };
 
   const errores = validarDatosEnfermera(datos);
@@ -323,21 +327,113 @@ export async function registrarEnfermera(
     return { errors: { email: MSG_EMAIL_DUPLICADO } };
   }
 
-  let invitationId: string;
-  try {
-    const clerk = await clerkClient();
-    const invitation = await clerk.invitations.createInvitation({
-      emailAddress: email,
-      publicMetadata: { role: "enfermera", farmaciaunsStaffInvite: true },
-      redirectUrl: "/sign-up",
-    });
-    invitationId = invitation.id;
-  } catch (error) {
-    console.error("Failed to send nurse invitation.", error);
+  const emailFrom = process.env.CLERK_EMAIL_FROM?.trim();
+  const appUrl = process.env.APP_URL?.trim();
+  if (!emailFrom || !appUrl) {
+    console.error(
+      "Nurse registration requires CLERK_EMAIL_FROM and APP_URL.",
+    );
     return {
       errors: {
         _form:
-          "No se pudo enviar la invitación desde Clerk. Revisá su configuración o intentá más tarde.",
+          "Falta configurar el remitente de email o la URL pública de la aplicación.",
+      },
+    };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailFrom)) {
+    console.error("CLERK_EMAIL_FROM is not a valid email address.");
+    return {
+      errors: {
+        _form: "El remitente de email configurado no es válido.",
+      },
+    };
+  }
+
+  let passwordChangeUrl: string;
+  try {
+    const baseUrl = new URL(appUrl);
+    if (
+      !["http:", "https:"].includes(baseUrl.protocol) ||
+      baseUrl.username ||
+      baseUrl.password ||
+      (process.env.NODE_ENV === "production" && baseUrl.protocol !== "https:")
+    ) {
+      throw new Error(
+        "APP_URL must use HTTPS in production and contain no credentials.",
+      );
+    }
+    passwordChangeUrl = new URL(
+      "/recuperar-contrasena",
+      baseUrl.origin,
+    ).toString();
+  } catch (configurationError) {
+    console.error("APP_URL is invalid.", configurationError);
+    return {
+      errors: {
+        _form: "La URL pública de la aplicación no está configurada correctamente.",
+      },
+    };
+  }
+
+  let clerk;
+  try {
+    clerk = await clerkClient();
+  } catch (clerkConfigurationError) {
+    console.error(
+      "Could not initialize the Clerk client for nurse registration.",
+      clerkConfigurationError,
+    );
+    return {
+      errors: {
+        _form:
+          "No se pudo conectar con Clerk. Verificá su configuración e intentá nuevamente.",
+      },
+    };
+  }
+  let clerkUser;
+  try {
+    clerkUser = await clerk.users.createUser({
+      emailAddress: [email],
+      emailAddressIdentificationStatus: ["reserved"],
+      firstName: datos.firstName.trim(),
+      lastName: datos.lastName.trim(),
+      password: datos.password,
+      publicMetadata: { role: "enfermera" },
+    });
+  } catch (clerkError) {
+    console.error("Failed to create nurse account in Clerk.", clerkError);
+    const clerkErrorCode =
+      typeof clerkError === "object" && clerkError !== null &&
+      "errors" in clerkError && Array.isArray(clerkError.errors)
+        ? clerkError.errors.find(
+            (item): item is { code: string } =>
+              typeof item === "object" &&
+              item !== null &&
+              "code" in item &&
+              typeof item.code === "string",
+          )?.code
+        : undefined;
+
+    if (
+      clerkErrorCode === "form_identifier_exists" ||
+      clerkErrorCode === "form_email_address_taken"
+    ) {
+      return { errors: { email: MSG_EMAIL_DUPLICADO } };
+    }
+    if (clerkErrorCode === "form_password_pwned") {
+      return {
+        errors: {
+          password:
+            "Clerk no permite esta contraseña porque aparece en una filtración. Elegí otra.",
+        },
+      };
+    }
+
+    return {
+      errors: {
+        _form:
+          "Clerk no pudo crear la cuenta. Verificá los datos e intentá nuevamente.",
       },
     };
   }
@@ -346,6 +442,7 @@ export async function registrarEnfermera(
   try {
     const usuario = await prisma.user.create({
       data: {
+        clerkId: clerkUser.id,
         email,
         firstName: datos.firstName.trim(),
         lastName: datos.lastName.trim(),
@@ -359,26 +456,63 @@ export async function registrarEnfermera(
     usuarioId = usuario.id;
   } catch (databaseError) {
     try {
-      const clerk = await clerkClient();
-      await clerk.invitations.revokeInvitation(invitationId);
+      await clerk.users.deleteUser(clerkUser.id);
     } catch (revokeError) {
       console.error(
-        "Failed to revoke nurse invitation after Neon persistence failed.",
+        "Failed to delete the Clerk nurse account after Neon persistence failed.",
         { databaseError, revokeError },
       );
       return {
         errors: {
           _form:
-            "No se pudo guardar la enfermera en Neon y no se pudo anular su invitación. Revisá Clerk antes de volver a intentarlo.",
+            "No se pudo guardar la enfermera en Neon ni eliminar su cuenta de Clerk. Revisá ambos sistemas antes de volver a intentarlo.",
         },
       };
     }
 
-    console.error("Failed to persist nurse in Neon after invitation.", databaseError);
+    console.error(
+      "Failed to persist nurse in Neon after Clerk account creation.",
+      databaseError,
+    );
     return {
       errors: {
         _form:
-          "No se pudo guardar la enfermera en Neon. La invitación fue anulada; intentá nuevamente.",
+          "No se pudo guardar la enfermera en Neon. La cuenta de Clerk fue eliminada; intentá nuevamente.",
+      },
+    };
+  }
+
+  try {
+    await sendNursePasswordChangeEmail(
+      clerkUser.id,
+      emailFrom,
+      passwordChangeUrl,
+    );
+  } catch (emailError) {
+    console.error(
+      "Failed to send nurse password change email through Clerk.",
+      emailError,
+    );
+    try {
+      await prisma.user.delete({ where: { id: usuarioId } });
+      await clerk.users.deleteUser(clerkUser.id);
+    } catch (rollbackError) {
+      console.error("Failed to roll back nurse creation after email failure.", {
+        emailError,
+        rollbackError,
+      });
+      return {
+        errors: {
+          _form:
+            "No se pudo enviar el email y no se pudo deshacer completamente el alta. Revisá Neon y Clerk antes de volver a intentarlo.",
+        },
+      };
+    }
+
+    return {
+      errors: {
+        _form:
+          "No se pudo enviar el email desde Clerk. El alta fue anulada; verificá el remitente configurado e intentá nuevamente.",
       },
     };
   }

@@ -1,38 +1,22 @@
 import { UserButton } from "@clerk/nextjs";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { requireRole, roles } from "@/lib/authorization";
-import { getPrisma } from "@/lib/prisma";
+import { requireRole, roles, type Role } from "@/lib/authorization";
+import { SidebarNav } from "@/components/sidebar-nav";
 import styles from "./inicio.module.css";
 
 export default async function InicioPage() {
-  await auth.protect();
-  await requireRole(roles);
+  const role = await requireRole(roles);
   const user = await currentUser();
 
-  const clerkRole = (user?.publicMetadata?.role as string | undefined)?.toLowerCase();
-  if (clerkRole === "admin" || clerkRole === "administrador") {
-    redirect("/admin");
-  }
-
-  const prisma = getPrisma();
-  const dbUser = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { clerkId: user?.id },
-        ...(user?.emailAddresses?.[0]?.emailAddress
-          ? [{ email: user.emailAddresses[0].emailAddress.toLowerCase() }]
-          : []),
-      ],
-    },
-  });
-
-  if (dbUser?.role === "ADMINISTRADOR") {
+  if (role === "admin") {
     redirect("/admin");
   }
 
   const displayName =
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
+  const portalTitle = portalTitles[role];
+  const cards = portalCards[role];
 
   return (
     <div className={styles.page}>
@@ -51,20 +35,15 @@ export default async function InicioPage() {
 
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.sidebarLabel}>Portal Paciente</p>
-          <nav aria-label="Navegación del paciente">
-            <span aria-current="page" className={styles.activeNav}>
-              <DashboardIcon />
-              Inicio
-            </span>
-          </nav>
+          <p className={styles.sidebarLabel}>{portalTitle}</p>
+          <SidebarNav role={role} />
         </div>
         <p className={styles.sidebarFooter}>Sistema Sala Médica v1.0</p>
       </aside>
 
       <main className={styles.main}>
         <section className={styles.welcome}>
-          <p className={styles.eyebrow}>Portal Paciente</p>
+          <p className={styles.eyebrow}>{portalTitle}</p>
           <h1>
             Bienvenido{displayName ? `, ${displayName}` : ""}
           </h1>
@@ -72,34 +51,88 @@ export default async function InicioPage() {
         </section>
 
         <section aria-label="Resumen del portal" className={styles.cards}>
-          <article className={styles.card}>
-            <div className={styles.cardIcon}>
-              <CalendarIcon />
-            </div>
-            <h2>Mis turnos</h2>
-            <p>
-              Cuando el servicio esté disponible, vas a poder consultar y
-              gestionar tus turnos desde acá.
-            </p>
-            <span className={styles.status}>Próximamente</span>
-          </article>
-
-          <article className={styles.card}>
-            <div className={styles.cardIcon}>
-              <MedicalRecordIcon />
-            </div>
-            <h2>Mi historia clínica</h2>
-            <p>
-              Tu información clínica estará disponible en este espacio cuando
-              se integre la base de datos.
-            </p>
-            <span className={styles.status}>Próximamente</span>
-          </article>
+          {cards.map(({ id, title, description, Icon }) => (
+            <article className={styles.card} id={id} key={id}>
+              <div className={styles.cardIcon}>
+                <Icon />
+              </div>
+              <h2>{title}</h2>
+              <p>{description}</p>
+              <span className={styles.status}>Próximamente</span>
+            </article>
+          ))}
         </section>
       </main>
     </div>
   );
 }
+
+const portalTitles = {
+  admin: "Panel de Administración",
+  enfermera: "Portal de Enfermería",
+  medico: "Portal Médico",
+  paciente: "Portal Paciente",
+} satisfies Record<Role, string>;
+
+const portalCards = {
+  admin: [],
+  enfermera: [
+    {
+      id: "stock-vacunas",
+      title: "Stock de vacunas",
+      description:
+        "La gestión y consulta del stock de vacunas estará disponible en este espacio.",
+      Icon: SyringeIcon,
+    },
+  ],
+  medico: [
+    {
+      id: "mi-agenda",
+      title: "Mi agenda",
+      description:
+        "La agenda médica y los turnos habilitados estarán disponibles en este espacio.",
+      Icon: CalendarIcon,
+    },
+    {
+      id: "mis-coberturas",
+      title: "Mis coberturas",
+      description:
+        "La configuración de las coberturas que aceptás estará disponible en este espacio.",
+      Icon: CoverageIcon,
+    },
+  ],
+  paciente: [
+    {
+      id: "mis-turnos",
+      title: "Mis turnos",
+      description:
+        "Cuando el servicio esté disponible, vas a poder consultar y gestionar tus turnos desde acá.",
+      Icon: CalendarIcon,
+    },
+    {
+      id: "historia-clinica",
+      title: "Mi historia clínica",
+      description:
+        "Tu información clínica estará disponible en este espacio cuando se integre la base de datos.",
+      Icon: MedicalRecordIcon,
+    },
+    {
+      id: "mi-cobertura",
+      title: "Mi cobertura",
+      description:
+        "La consulta de tu cobertura médica estará disponible en este espacio.",
+      Icon: CoverageIcon,
+    },
+  ],
+} satisfies Record<
+  Role,
+  {
+    id: string;
+    title: string;
+    description: string;
+    Icon: () => React.JSX.Element;
+  }[]
+>;
 
 function HospitalIcon() {
   return (
@@ -115,12 +148,13 @@ function HospitalIcon() {
   );
 }
 
-function DashboardIcon() {
+function CalendarIcon() {
   return (
     <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
       <path
-        d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
+        d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1Zm2 8h3m4 0h3m-10 4h3"
         stroke="currentColor"
+        strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="1.7"
       />
@@ -128,11 +162,25 @@ function DashboardIcon() {
   );
 }
 
-function CalendarIcon() {
+function CoverageIcon() {
   return (
     <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
       <path
-        d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1Zm2 8h3m4 0h3m-10 4h3"
+        d="M12 3 4.5 6v5.5c0 4.3 3.2 7.7 7.5 9.5 4.3-1.8 7.5-5.2 7.5-9.5V6L12 3Zm-3 8.5 2 2 4-4"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function SyringeIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+      <path
+        d="m14 5 5 5M12 7l5 5m-9 9 12-12M6 12l6 6m-8 2 4-4m7-13 5 5M4 20l-1 1m8-14 6 6M4 14l6 6"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"

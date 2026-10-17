@@ -2,6 +2,8 @@ import { UserButton } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import type { ReactNode } from "react";
+import { normalizeRole } from "@/lib/authorization";
+import { getPrisma } from "@/lib/prisma";
 import { SidebarNav } from "./sidebar-nav";
 
 /**
@@ -16,6 +18,22 @@ import { SidebarNav } from "./sidebar-nav";
  */
 export async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await currentUser();
+  const dbUser = user
+    ? await getPrisma().user.findUnique({
+        where: { clerkId: user.id },
+        select: { role: true },
+      })
+    : null;
+  const clerkRole = user?.publicMetadata.role;
+  const role =
+    normalizeRole(dbUser?.role ?? (typeof clerkRole === "string" ? clerkRole : null)) ??
+    "admin";
+  const roleLabels = {
+    admin: "Administrador",
+    enfermera: "Enfermería",
+    medico: "Médico",
+    paciente: "Paciente",
+  } satisfies Record<typeof role, string>;
   const displayName =
     user?.firstName ?? user?.username ?? user?.emailAddresses[0]?.emailAddress;
 
@@ -33,7 +51,7 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
             <div className="hidden text-right sm:block">
               <p className="text-xs font-semibold text-on-surface">{displayName}</p>
               <span className="text-[10px] font-bold uppercase tracking-wide text-on-surface-variant">
-                Administrador
+                {roleLabels[role]}
               </span>
             </div>
           )}
@@ -56,7 +74,7 @@ export async function AdminLayout({ children }: { children: ReactNode }) {
             <h2 className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-secondary">
               Gestión Clínica
             </h2>
-            <SidebarNav />
+            <SidebarNav role={role} />
           </div>
           <p className="border-t border-surface-container-high px-2 pt-3 text-[10px] text-secondary">
             Sistema Sala Médica v1.0

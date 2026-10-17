@@ -5,7 +5,7 @@ import { AltaEnfermeraForm } from "./alta-form";
 export const dynamic = "force-dynamic";
 
 /**
- * US-14 (RF-26) — Alta de enfermera (exclusivo ADMINISTRADOR).
+ * US-15 (RF-19) — Alta de enfermera (exclusivo ADMINISTRADOR).
  */
 export default async function AltaEnfermeraPage() {
   await requireRole(["admin"]);
@@ -23,8 +23,8 @@ export default async function AltaEnfermeraPage() {
           Alta de enfermería
         </h1>
         <p className="mt-1 text-on-surface-variant">
-          Ingresá los datos del personal de enfermería. Recibirá una invitación
-          por email para definir su contraseña y activar su acceso.
+          Ingresá los datos del personal de enfermería y asignale una contraseña
+          inicial. Recibirá un email con los pasos para cambiarla.
         </p>
       </div>
 

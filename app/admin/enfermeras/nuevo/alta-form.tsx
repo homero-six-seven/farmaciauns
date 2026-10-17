@@ -7,7 +7,7 @@ import { FormInput } from "@/components/form-input";
 import { ESTADO_INICIAL } from "@/lib/form-state";
 
 /**
- * Formulario de alta de enfermera (US-14).
+ * Formulario de alta de enfermera (US-15).
  * Client component: usa `useActionState` (React 19) con la server action
  * `registrarEnfermera`.
  */
@@ -79,6 +79,16 @@ export function AltaEnfermeraForm() {
           autoComplete="tel"
           defaultValue={state.values?.phone}
         />
+        <FormInput
+          label="Contraseña inicial"
+          name="password"
+          type="password"
+          required
+          minLength={8}
+          error={errores.password}
+          hint="Mínimo 8 caracteres"
+          autoComplete="new-password"
+        />
       </div>
 
       <div className="flex justify-end gap-3 border-t border-surface-container-high pt-5">
@@ -93,7 +103,7 @@ export function AltaEnfermeraForm() {
           disabled={pending}
           className="inline-flex h-10 items-center justify-center gap-2 rounded bg-primary px-5 text-sm font-semibold text-on-primary transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {pending ? "Enviando invitación…" : "Registrar y enviar invitación"}
+          {pending ? "Registrando…" : "Registrar enfermera"}
         </button>
       </div>
     </form>

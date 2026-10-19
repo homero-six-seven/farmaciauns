@@ -1,15 +1,41 @@
 import {
   esMesHabilitado,
+  etiquetaMes,
+  formatearHora,
   formatearMes,
   hoyEnArgentina,
   mesDeFecha,
+  mesesHabilitados,
   parsearMes,
+  patronDesdeFranjas,
+  primerDiaDelMes,
+  sumarMeses,
+  ultimoDiaDelMes,
+  type FranjaSemanal,
+  type MesAgenda,
 } from "@/lib/domain/agenda";
-import { obtenerDuracionTurno } from "@/lib/agenda-repository";
+import { listarFranjas, obtenerDuracionTurno } from "@/lib/agenda-repository";
 import { requireMedico } from "@/lib/authorization";
 import { DuracionForm } from "./duracion-form";
+import { FranjasEditor, type FilaFranja } from "./franjas-editor";
 
 export const dynamic = "force-dynamic";
+
+const MENSAJES_GUARDADO: Record<string, string> = {
+  franjas: "Tu disponibilidad se guardó correctamente.",
+};
+
+function rangoDelMes(mes: MesAgenda) {
+  return { desde: primerDiaDelMes(mes), hasta: ultimoDiaDelMes(mes) };
+}
+
+function aFilas(patron: FranjaSemanal[]): FilaFranja[] {
+  return patron.map((f) => ({
+    diaSemana: f.diaSemana,
+    inicio: formatearHora(f.inicioMin),
+    fin: formatearHora(f.finMin),
+  }));
+}
 
 /**
  * US-25, US-26 y US-28 (RF-01) — Configuración de la agenda del médico:
@@ -28,7 +54,31 @@ export default async function DisponibilidadPage({
   const mes =
     mesPedido && esMesHabilitado(mesPedido, hoy) ? mesPedido : mesDeFecha(hoy);
 
-  const duracionActual = await obtenerDuracionTurno(medico.id);
+  const [duracionActual, franjasDelMes] = await Promise.all([
+    obtenerDuracionTurno(medico.id),
+    listarFranjas(medico.id, rangoDelMes(mes)),
+  ]);
+
+  // El patrón vigente sale de las franjas de hoy en adelante: si el médico
+  // cerró la agenda del resto del mes, las franjas pasadas no lo reabren.
+  let patron = patronDesdeFranjas(franjasDelMes.filter((f) => f.fecha >= hoy));
+  let precargadoDe: string | null = null;
+  if (franjasDelMes.length === 0) {
+    const mesAnterior = sumarMeses(mes, -1);
+    const franjasAnteriores = await listarFranjas(medico.id, rangoDelMes(mesAnterior));
+    if (franjasAnteriores.length > 0) {
+      patron = patronDesdeFranjas(franjasAnteriores);
+      precargadoDe = etiquetaMes(mesAnterior);
+    }
+  }
+
+  const filasIniciales = aFilas(patron);
+  const mensajeGuardado =
+    guardado === "duracion"
+      ? `La duración de tus turnos se guardó: ${duracionActual} min.`
+      : guardado
+        ? MENSAJES_GUARDADO[guardado]
+        : undefined;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
@@ -45,12 +95,12 @@ export default async function DisponibilidadPage({
         </p>
       </div>
 
-      {guardado === "duracion" && (
+      {mensajeGuardado && (
         <div
           role="status"
           className="rounded-lg bg-primary-fixed px-4 py-3 text-sm font-medium text-on-primary-fixed"
         >
-          La duración de tus turnos se guardó: {duracionActual} min.
+          {mensajeGuardado}
         </div>
       )}
 
@@ -58,6 +108,19 @@ export default async function DisponibilidadPage({
         key={duracionActual ?? "sin-duracion"}
         duracionActual={duracionActual}
         mes={formatearMes(mes)}
+      />
+
+      <FranjasEditor
+        // Se vuelve a montar al cambiar de mes o al guardar, para partir de lo guardado.
+        key={`${formatearMes(mes)}|${duracionActual}|${JSON.stringify(filasIniciales)}`}
+        mes={formatearMes(mes)}
+        meses={mesesHabilitados(hoy).map((m) => ({
+          valor: formatearMes(m),
+          etiqueta: etiquetaMes(m),
+        }))}
+        duracionTurnoMin={duracionActual}
+        filasIniciales={filasIniciales}
+        precargadoDe={precargadoDe}
       />
     </div>
   );

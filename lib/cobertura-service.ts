@@ -213,3 +213,37 @@ export async function asignarCoberturaAPaciente(
     numeroAfiliado: afiliado,
   };
 }
+
+/**
+ * Devuelve un mapa `pacienteId → { coberturaNombre, numeroAfiliado }` para
+ * mostrar la cobertura en los listados de pacientes (US-21 / S4).
+ */
+export async function coberturasDePacientes(pacienteIds: string[]) {
+  const prisma = getPrisma();
+  const mapa: Record<
+    string,
+    { coberturaNombre: string | null; numeroAfiliado: string | null }
+  > = {};
+
+  if (pacienteIds.length === 0) {
+    return mapa;
+  }
+
+  const rows = await prisma.user.findMany({
+    where: { id: { in: pacienteIds } },
+    select: {
+      id: true,
+      cobertura: { select: { nombre: true } },
+      numeroAfiliado: true,
+    },
+  });
+
+  for (const row of rows) {
+    mapa[row.id] = {
+      coberturaNombre: row.cobertura?.nombre ?? null,
+      numeroAfiliado: row.numeroAfiliado ?? null,
+    };
+  }
+
+  return mapa;
+}

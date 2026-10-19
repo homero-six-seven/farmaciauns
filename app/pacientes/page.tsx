@@ -3,6 +3,7 @@ import { ListadoUsuarios } from "@/components/listado-usuarios";
 import { toUsuarioPublico } from "@/lib/domain/usuario";
 import { getUserRepository } from "@/lib/repository";
 import { requireRole } from "@/lib/authorization";
+import { coberturasDePacientes } from "@/lib/cobertura-service";
 import { NuevaBusqueda } from "./nueva-busqueda";
 
 /**
@@ -28,6 +29,16 @@ export default async function PacientesPage({
       ? repo.searchByNameOrDni(query)
       : repo.listByRole("PACIENTE"))
   ).map(toUsuarioPublico);
+
+  // Adjunta la cobertura (US-21) para mostrarla en el detalle. Requiere DB.
+  let pacientesConCobertura = pacientes;
+  if (process.env.DATABASE_URL?.trim()) {
+    const coberturas = await coberturasDePacientes(pacientes.map((p) => p.id));
+    pacientesConCobertura = pacientes.map((p) => ({
+      ...p,
+      ...(coberturas[p.id] ?? {}),
+    }));
+  }
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col">
@@ -128,7 +139,7 @@ export default async function PacientesPage({
           </div>
         ) : (
           <ListadoUsuarios
-            usuarios={pacientes}
+            usuarios={pacientesConCobertura}
             puedeEliminar={role === "admin"}
           />
         )}

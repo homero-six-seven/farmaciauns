@@ -193,6 +193,21 @@ export function ListadoUsuarios({
                     valor={formatearFecha(seleccionado.birthDate)}
                   />
                 )}
+                {seleccionado.role === "PACIENTE" && (
+                  <>
+                    <FilaDetalle
+                      etiqueta="Cobertura"
+                      valor={seleccionado.coberturaNombre ?? "Particular"}
+                    />
+                    {seleccionado.coberturaNombre && (
+                      <FilaDetalle
+                        etiqueta="N° de afiliado"
+                        valor={seleccionado.numeroAfiliado ?? "—"}
+                        mono
+                      />
+                    )}
+                  </>
+                )}
                 <FilaDetalle
                   etiqueta="Estado"
                   valor={seleccionado.active ? "Activo" : "Inactivo"}

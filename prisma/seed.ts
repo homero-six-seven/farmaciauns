@@ -151,6 +151,23 @@ async function main() {
   }
   console.log(`✅ Loaded ${medicos.length} medicos.`);
 
+  // Catálogo fijo de vacunas (RF-04a). Upsert sin tocar `stockActual` en el
+  // update para no resetear el stock acumulado ante re-seeds.
+  const vacunas = [
+    { nombre: "Vacuna contra la Hepatitis B" },
+    { nombre: "Vacuna antipoliomielítica (Polio)" },
+    { nombre: "Vacuna contra el VPH (Virus del Papiloma Humano)" },
+  ];
+
+  for (const v of vacunas) {
+    await prisma.vacuna.upsert({
+      where: { nombre: v.nombre },
+      update: { nombre: v.nombre },
+      create: { nombre: v.nombre, stockActual: 0 },
+    });
+  }
+  console.log(`✅ Loaded ${vacunas.length} vacunas.`);
+
   console.log("✨ Seed completed successfully.");
 }
 

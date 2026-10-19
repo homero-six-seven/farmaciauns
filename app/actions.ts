@@ -522,3 +522,28 @@ export async function darDeBajaPersonalAdministrativo(
   revalidatePath("/admin/personal");
   redirect("/admin/personal?deactivated=1");
 }
+
+/**
+ * US-19 (RF-17) — Reactivar personal administrativo sin modificar sus datos.
+ */
+export async function reactivarPersonalAdministrativo(
+  formData: FormData,
+): Promise<void> {
+  await requireRole(["admin"]);
+
+  const id = formData.get("id");
+  if (typeof id !== "string" || !id) {
+    throw new Error("No se recibió un administrativo válido para reactivar.");
+  }
+
+  const repo = getUserRepository();
+  const usuario = await repo.findById(id);
+  if (!usuario || usuario.role !== "ADMINISTRATIVO") {
+    throw new Error("El usuario seleccionado no es un administrativo válido.");
+  }
+
+  await repo.activate(id);
+
+  revalidatePath("/admin/personal");
+  redirect("/admin/personal?activated=1");
+}

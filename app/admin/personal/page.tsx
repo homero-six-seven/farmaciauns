@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { darDeBajaPersonalAdministrativo } from "@/app/actions";
+import {
+  darDeBajaPersonalAdministrativo,
+  reactivarPersonalAdministrativo,
+} from "@/app/actions";
 import { ListadoUsuarios } from "@/components/listado-usuarios";
 import { toUsuarioPublico } from "@/lib/domain/usuario";
 import { getUserRepository } from "@/lib/repository";
@@ -14,10 +17,10 @@ export const dynamic = "force-dynamic";
 export default async function ListadoPersonalAdministrativoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ deactivated?: string }>;
+  searchParams: Promise<{ activated?: string; deactivated?: string }>;
 }) {
   await requireRole(["admin"]);
-  const { deactivated } = await searchParams;
+  const { activated, deactivated } = await searchParams;
 
   const personal = (await getUserRepository().listByRole("ADMINISTRATIVO"))
     .map(toUsuarioPublico);
@@ -54,6 +57,14 @@ export default async function ListadoPersonalAdministrativoPage({
             className="mb-6 rounded-lg bg-primary-fixed px-4 py-3 text-sm font-medium text-on-primary-fixed"
           >
             El administrativo fue dado de baja correctamente.
+          </div>
+        )}
+        {activated === "1" && (
+          <div
+            role="status"
+            className="mb-6 rounded-lg bg-primary-fixed px-4 py-3 text-sm font-medium text-on-primary-fixed"
+          >
+            El administrativo fue reactivado correctamente.
           </div>
         )}
 
@@ -94,6 +105,7 @@ export default async function ListadoPersonalAdministrativoPage({
             usuarios={personal}
             puedeEliminar
             accionBaja={darDeBajaPersonalAdministrativo}
+            accionReactivar={reactivarPersonalAdministrativo}
           />
         )}
     </div>

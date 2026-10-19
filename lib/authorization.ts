@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getPrisma } from "@/lib/prisma";
 
@@ -26,8 +26,16 @@ export async function requireRole(allowedRoles: readonly Role[]) {
     redirect("/sign-in");
   }
 
-  const user = await getPrisma().user.findUnique({
-    where: { clerkId: userId },
+  const clerkUser = await currentUser();
+  const email = clerkUser?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
+  const prisma = getPrisma();
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { clerkId: userId },
+        ...(email ? [{ email }] : []),
+      ],
+    },
     select: { role: true, isActive: true },
   });
 
@@ -35,7 +43,10 @@ export async function requireRole(allowedRoles: readonly Role[]) {
     redirect("/sign-in/error?reason=inactive-account");
   }
 
-  const role = normalizeRole(String(user?.role));
+  const clerkRole = normalizeRole(
+    clerkUser?.publicMetadata?.role as string | undefined,
+  );
+  const role = normalizeRole(String(user?.role)) ?? clerkRole;
 
   if (!role || !allowedRoles.includes(role)) {
     redirect("/prototipos/pantalla_6_acceso_denegado");

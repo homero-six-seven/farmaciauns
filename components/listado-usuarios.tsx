@@ -5,6 +5,8 @@ import type { UsuarioPublico } from "@/lib/domain/usuario";
 import { etiquetaRol } from "@/lib/domain/usuario";
 import { eliminarUsuario } from "@/app/actions";
 
+type AccionBaja = (formData: FormData) => void | Promise<void>;
+
 function EstadoBadge({ activo }: { activo: boolean }) {
   if (activo) {
     return (
@@ -47,10 +49,12 @@ export function ListadoUsuarios({
   usuarios,
   mostrarEspecialidad = false,
   puedeEliminar = false,
+  accionBaja = eliminarUsuario,
 }: {
   usuarios: UsuarioPublico[];
   mostrarEspecialidad?: boolean;
   puedeEliminar?: boolean;
+  accionBaja?: AccionBaja;
 }) {
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(
     usuarios[0]?.id ?? null,
@@ -200,11 +204,11 @@ export function ListadoUsuarios({
               </dl>
               {puedeEliminar && (
                 <form
-                  action={eliminarUsuario}
+                  action={accionBaja}
                   onSubmit={(e) => {
                     if (
                       !window.confirm(
-                        `¿Dar de baja a ${seleccionado.firstName} ${seleccionado.lastName}? Se marcará como inactivo.`,
+                        `¿Dar de baja a ${seleccionado.firstName} ${seleccionado.lastName}? No va a poder iniciar sesión.`,
                       )
                     ) {
                       e.preventDefault();

@@ -497,3 +497,28 @@ export async function eliminarUsuario(formData: FormData): Promise<void> {
   revalidatePath("/admin/enfermeras");
   revalidatePath("/pacientes");
 }
+
+/**
+ * US-18 (RF-17) — Dar de baja personal administrativo sin borrar sus datos.
+ */
+export async function darDeBajaPersonalAdministrativo(
+  formData: FormData,
+): Promise<void> {
+  await requireRole(["admin"]);
+
+  const id = formData.get("id");
+  if (typeof id !== "string" || !id) {
+    throw new Error("No se recibió un administrativo válido para dar de baja.");
+  }
+
+  const repo = getUserRepository();
+  const usuario = await repo.findById(id);
+  if (!usuario || usuario.role !== "ADMINISTRATIVO") {
+    throw new Error("El usuario seleccionado no es un administrativo válido.");
+  }
+
+  await repo.deactivate(id);
+
+  revalidatePath("/admin/personal");
+  redirect("/admin/personal?deactivated=1");
+}

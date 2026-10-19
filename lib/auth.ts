@@ -2,6 +2,42 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getPrisma } from "./prisma";
 
+/**
+ * Devuelve la fila `User` de Prisma del usuario autenticado en Clerk, o `null`
+ * si no hay sesión. Reutiliza el mismo criterio de `getCurrentAdmin` (por
+ * `clerkId`, con fallback por email) y linkea `clerkId` si la fila existe por
+ * email pero aún no tiene el vínculo.
+ */
+export async function getCurrentDbUser() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return null;
+  }
+
+  const user = await currentUser();
+  const email = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
+
+  const prisma = getPrisma();
+  let dbUser = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { clerkId: userId },
+        ...(email ? [{ email }] : []),
+      ],
+    },
+  });
+
+  if (dbUser && !dbUser.clerkId) {
+    dbUser = await prisma.user.update({
+      where: { id: dbUser.id },
+      data: { clerkId: userId },
+    });
+  }
+
+  return dbUser;
+}
+
 export async function getCurrentAdmin() {
   const { userId } = await auth();
 

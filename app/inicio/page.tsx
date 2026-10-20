@@ -1,4 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole, roles, type Role } from "@/lib/authorization";
 import { AdminLayout } from "@/components/admin-layout";
@@ -34,7 +35,7 @@ export default async function InicioPage() {
           aria-label="Resumen del portal"
           className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
         >
-          {cards.map(({ id, title, description, Icon }) => (
+          {cards.map(({ id, title, description, Icon, href }: PortalCard) => (
             <article
               className="space-y-3 rounded-lg border border-surface-container-high bg-surface-container-lowest p-5"
               id={id}
@@ -45,9 +46,18 @@ export default async function InicioPage() {
               </div>
               <h2 className="text-lg font-semibold">{title}</h2>
               <p className="text-sm text-on-surface-variant">{description}</p>
-              <span className="inline-flex rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
-                Próximamente
-              </span>
+              {href ? (
+                <Link
+                  href={href}
+                  className="inline-flex h-9 items-center rounded bg-primary px-4 text-xs font-semibold text-on-primary transition-colors hover:bg-secondary"
+                >
+                  Ir a {title.toLowerCase()}
+                </Link>
+              ) : (
+                <span className="inline-flex rounded-full bg-surface-container px-3 py-1 text-xs font-semibold text-on-surface-variant">
+                  Próximamente
+                </span>
+              )}
             </article>
           ))}
         </section>
@@ -79,8 +89,9 @@ const portalCards = {
       id: "mi-agenda",
       title: "Mi agenda",
       description:
-        "La agenda médica y los turnos habilitados estarán disponibles en este espacio.",
+        "Configurá tu disponibilidad y consultá los turnos habilitados de cada mes.",
       Icon: CalendarIcon,
+      href: "/medico/agenda",
     },
     {
       id: "mis-coberturas",
@@ -113,15 +124,16 @@ const portalCards = {
       Icon: CoverageIcon,
     },
   ],
-} satisfies Record<
-  Role,
-  {
-    id: string;
-    title: string;
-    description: string;
-    Icon: () => React.JSX.Element;
-  }[]
->;
+} satisfies Record<Role, PortalCard[]>;
+
+type PortalCard = {
+  id: string;
+  title: string;
+  description: string;
+  Icon: () => React.JSX.Element;
+  /** Si la sección ya está disponible, la tarjeta enlaza a ella. */
+  href?: string;
+};
 
 function CalendarIcon() {
   return (

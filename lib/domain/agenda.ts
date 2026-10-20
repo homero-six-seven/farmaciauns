@@ -371,6 +371,17 @@ export function ultimoDiaDelMes({ anio, mes }: MesAgenda): FechaISO {
   return aFechaISO(anio, mes, dias);
 }
 
+/** Rango inclusivo de fechas del mes. */
+export function rangoDelMes(mes: MesAgenda): { desde: FechaISO; hasta: FechaISO } {
+  return { desde: primerDiaDelMes(mes), hasta: ultimoDiaDelMes(mes) };
+}
+
+/** `"2026-11-02"` → `"Lunes 2 de Noviembre de 2026"` (formato del wireframe de US-27). */
+export function etiquetaFechaLarga(fecha: FechaISO): string {
+  const [anio, mes, dia] = fecha.split("-").map(Number);
+  return `${etiquetaDia(diaSemanaDe(fecha))} ${dia} de ${NOMBRES_MES[mes - 1]} de ${anio}`;
+}
+
 export function diasDelMes(mes: MesAgenda): FechaISO[] {
   const cantidad = Number(ultimoDiaDelMes(mes).slice(8));
   return Array.from({ length: cantidad }, (_, i) =>

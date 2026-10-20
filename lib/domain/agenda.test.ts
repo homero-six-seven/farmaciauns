@@ -17,6 +17,7 @@ import {
   diaSemanaDe,
   diasDelMes,
   esMesHabilitado,
+  etiquetaFechaLarga,
   etiquetaMes,
   expandirMes,
   formatearHora,
@@ -28,6 +29,7 @@ import {
   parsearHora,
   parsearMes,
   patronDesdeFranjas,
+  rangoDelMes,
   sumarMeses,
   validarDuracion,
   validarFranjas,
@@ -205,6 +207,11 @@ describe("fechas y meses", () => {
     assert.equal(diasDelMes({ anio: 2028, mes: 2 }).length, 29);
     assert.equal(diasDelMes(NOVIEMBRE_2026).length, 30);
     assert.equal(diasDelMes({ anio: 2026, mes: 12 }).at(-1), "2026-12-31");
+  });
+
+  test("arma el rango del mes y la fecha larga", () => {
+    assert.deepEqual(rangoDelMes({ anio: 2027, mes: 2 }), { desde: "2027-02-01", hasta: "2027-02-28" });
+    assert.equal(etiquetaFechaLarga("2026-11-02"), "Lunes 2 de Noviembre de 2026");
   });
 
   test("hoy se calcula en hora de Argentina, no en UTC", () => {

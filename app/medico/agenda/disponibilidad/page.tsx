@@ -9,10 +9,9 @@ import {
   parsearMes,
   patronDesdeFranjas,
   primerDiaDelMes,
+  rangoDelMes,
   sumarMeses,
-  ultimoDiaDelMes,
   type FranjaSemanal,
-  type MesAgenda,
 } from "@/lib/domain/agenda";
 import { listarFranjas, obtenerDuracionTurno } from "@/lib/agenda-repository";
 import { requireMedico } from "@/lib/authorization";
@@ -29,10 +28,6 @@ const MENSAJES_GUARDADO: Record<string, string> = {
 /** `"2026-10-19"` → `"19/10"`. */
 function fechaCorta(fecha: string): string {
   return `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}`;
-}
-
-function rangoDelMes(mes: MesAgenda) {
-  return { desde: primerDiaDelMes(mes), hasta: ultimoDiaDelMes(mes) };
 }
 
 function aFilas(patron: FranjaSemanal[]): FilaFranja[] {

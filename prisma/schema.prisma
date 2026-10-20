@@ -21,27 +21,40 @@ enum Especialidad {
   TRAUMATOLOGIA
 }
 
+enum TipoMovimiento {
+  INGRESO
+  EGRESO
+}
+
+enum MotivoEgreso {
+  VENCIMIENTO
+  ROTURA_PERDIDA
+  CORRECCION_CARGA
+  OTRO
+}
+
 model User {
-  id              String            @id @default(cuid())
-  clerkId         String?           @unique
-  email           String            @unique
-  firstName       String?
-  lastName        String?
-  dni             String?           @unique
-  phone           String?
-  role            Role              @default(PACIENTE)
-  isActive        Boolean           @default(true)
-  matricula       String?           @unique
-  especialidad    Especialidad?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  birthDate       DateTime?
-  passwordHash    String?
-  coberturaId     String?
-  numeroAfiliado  String?
-  MedicoCobertura MedicoCobertura[]
-  MovimientoStock MovimientoStock[]
-  Cobertura       Cobertura?        @relation(fields: [coberturaId], references: [id])
+  id             String        @id @default(cuid())
+  clerkId        String?       @unique
+  email          String        @unique
+  firstName      String?
+  lastName       String?
+  dni            String?       @unique
+  phone          String?
+  role           Role          @default(PACIENTE)
+  isActive       Boolean       @default(true)
+  matricula      String?       @unique
+  especialidad   Especialidad?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  birthDate      DateTime?
+  passwordHash   String?
+  coberturaId    String?
+  numeroAfiliado String?
+
+  cobertura           Cobertura?         @relation(fields: [coberturaId], references: [id], onDelete: SetNull)
+  coberturasAceptadas MedicoCobertura[]
+  movimientosStock    MovimientoStock[]
 
   // RF-01 (agenda médica): solo para usuarios con rol MEDICO.
   configuracionAgenda ConfiguracionAgenda?
@@ -85,66 +98,56 @@ model FranjaHoraria {
   @@index([medicoId, fecha])
 }
 
-// ---------------------------------------------------------------------------
-// Modelos traídos de Neon con `prisma db pull` (RF-05b coberturas y RF-04a
-// stock, de otros grupos). Están acá para que un `db push` desde esta rama no
-// los borre. Al mergear con las ramas de esos grupos, conservar su versión.
-// ---------------------------------------------------------------------------
-
+/// Catálogo canónico de coberturas. Una fila por nombre normalizado (case-insensitive).
 model Cobertura {
-  id                String            @id
+  id                String   @id @default(cuid())
   nombre            String
-  nombreNormalizado String            @unique
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime
-  MedicoCobertura   MedicoCobertura[]
-  User              User[]
+  nombreNormalizado String   @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  medicos   MedicoCobertura[]
+  pacientes User[]
 }
 
+/// Unión médico ↔ cobertura aceptada. Borrar esta fila NO borra la Cobertura.
 model MedicoCobertura {
-  id          String    @id
+  id          String    @id @default(cuid())
   medicoId    String
   coberturaId String
   createdAt   DateTime  @default(now())
-  Cobertura   Cobertura @relation(fields: [coberturaId], references: [id], onDelete: Cascade)
-  User        User      @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+
+  medico    User      @relation(fields: [medicoId], references: [id], onDelete: Cascade)
+  cobertura Cobertura @relation(fields: [coberturaId], references: [id], onDelete: Cascade)
 
   @@unique([medicoId, coberturaId])
   @@index([coberturaId])
 }
 
+/// Catálogo fijo de vacunas (3 filas precargadas, stock inicial 0).
+model Vacuna {
+  id          String   @id @default(cuid())
+  nombre      String   @unique
+  stockActual Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  movimientos MovimientoStock[]
+}
+
+/// Ledger inmutable de movimientos de stock (auditoría).
 model MovimientoStock {
-  id            String         @id
+  id            String        @id @default(cuid())
   vacunaId      String
   tipo          TipoMovimiento
   cantidad      Int
   motivo        MotivoEgreso?
   motivoDetalle String?
   realizadoPor  String
-  createdAt     DateTime       @default(now())
-  User          User           @relation(fields: [realizadoPor], references: [id])
-  Vacuna        Vacuna         @relation(fields: [vacunaId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now())
+
+  vacuna  Vacuna @relation(fields: [vacunaId], references: [id], onDelete: Cascade)
+  usuario User   @relation(fields: [realizadoPor], references: [id], onDelete: Restrict)
 
   @@index([vacunaId, createdAt])
-}
-
-model Vacuna {
-  id              String            @id
-  nombre          String            @unique
-  stockActual     Int               @default(0)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime
-  MovimientoStock MovimientoStock[]
-}
-
-enum MotivoEgreso {
-  VENCIMIENTO
-  ROTURA_PERDIDA
-  CORRECCION_CARGA
-  OTRO
-}
-
-enum TipoMovimiento {
-  INGRESO
-  EGRESO
 }

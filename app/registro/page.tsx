@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { FormBaseLayout } from "@/components/form-base-layout";
 import { InfoCard } from "@/components/info-card";
+import { listarCoberturasDisponibles } from "@/lib/cobertura-service";
 import { RegistroPacienteForm } from "./registro-paciente-form";
 
-export default function RegistroPage() {
+export const dynamic = "force-dynamic";
+
+export default async function RegistroPage() {
+  // Coberturas disponibles para el desplegable (US-21). Requiere DB.
+  const usaCoberturas = Boolean(process.env.DATABASE_URL?.trim());
+  const coberturas = usaCoberturas ? await listarCoberturasDisponibles() : [];
+
   return (
     <main className="min-h-screen bg-surface text-on-surface">
       <div className="mx-auto max-w-5xl px-6 py-10">
@@ -50,7 +57,7 @@ export default function RegistroPage() {
             </>
           }
         >
-          <RegistroPacienteForm />
+          <RegistroPacienteForm coberturas={coberturas} />
         </FormBaseLayout>
 
         <footer className="mt-6 text-center text-xs text-on-surface-variant">

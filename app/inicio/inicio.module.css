@@ -8,10 +8,8 @@
   --secondary: #555f6d;
   --outline: #c6c6cd;
   --primary: #000000;
-  min-height: 100vh;
   background: var(--surface);
   color: var(--on-surface);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .header {
@@ -104,9 +102,14 @@
 }
 
 .navIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .navLink {
@@ -123,6 +126,12 @@
 
 .navLink:hover {
   background: var(--surface-low);
+}
+
+.navLink svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
 }
 
 .sidebarFooter {

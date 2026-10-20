@@ -1,21 +1,29 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { registrarPaciente } from "@/app/actions";
 import { FormInput } from "@/components/form-input";
 import { ESTADO_INICIAL } from "@/lib/form-state";
 
+type CoberturaDisponible = { id: string; nombre: string };
+
 /**
- * Formulario de autorregistro de paciente (US-06).
- * Client component: usa `useActionState` (React 19) con la server action
- * `registrarPaciente`.
+ * Formulario de autorregistro de paciente (US-06) con selección de cobertura
+ * médica (US-21). Si elige una cobertura, el nº de afiliado es obligatorio; si
+ * elige "Particular", no se requiere.
  */
-export function RegistroPacienteForm() {
+export function RegistroPacienteForm({
+  coberturas,
+}: {
+  coberturas: CoberturaDisponible[];
+}) {
   const [state, formAction, pending] = useActionState(
     registrarPaciente,
     ESTADO_INICIAL,
   );
   const errores = state.errors;
+
+  const [coberturaSeleccionada, setCoberturaSeleccionada] = useState("");
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -87,6 +95,48 @@ export function RegistroPacienteForm() {
           autoComplete="tel"
           defaultValue={state.values?.phone}
         />
+
+        {/* Cobertura médica (US-21) */}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="coberturaId"
+            className="flex items-center gap-1 text-sm font-medium text-on-surface"
+          >
+            <span>Cobertura médica</span>
+          </label>
+          <select
+            id="coberturaId"
+            name="coberturaId"
+            defaultValue={state.values?.coberturaId ?? ""}
+            onChange={(e) => setCoberturaSeleccionada(e.target.value)}
+            aria-invalid={Boolean(errores.coberturaId)}
+            className="h-10 w-full rounded border-0 bg-surface-container-low px-3 text-sm text-on-surface focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40"
+          >
+            <option value="">Particular</option>
+            {coberturas.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nombre}
+              </option>
+            ))}
+          </select>
+          {errores.coberturaId && (
+            <span role="alert" className="text-xs font-medium text-error">
+              {errores.coberturaId}
+            </span>
+          )}
+        </div>
+
+        {coberturaSeleccionada !== "" && (
+          <FormInput
+            label="Número de afiliado"
+            name="numeroAfiliado"
+            required
+            error={errores.numeroAfiliado}
+            placeholder="Ej. 123456"
+            defaultValue={state.values?.numeroAfiliado}
+          />
+        )}
+
         <FormInput
           label="Contraseña"
           name="password"

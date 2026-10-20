@@ -70,6 +70,10 @@ export type UsuarioPublico = {
   matricula: string | null;
   role: Role;
   active: boolean;
+  /** Nombre de la cobertura del paciente (o `null` si es Particular). Solo PACIENTE. */
+  coberturaNombre?: string | null;
+  /** Número de afiliado (solo cuando tiene cobertura). Solo PACIENTE. */
+  numeroAfiliado?: string | null;
 };
 
 /** Convierte un `Usuario` en su vista pública (sin contraseña ni clerkId). */

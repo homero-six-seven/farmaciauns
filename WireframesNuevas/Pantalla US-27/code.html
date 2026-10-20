@@ -1,0 +1,555 @@
+<!DOCTYPE html><html lang="es" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "surface-container-lowest": "#ffffff",
+        "on-tertiary": "#ffffff",
+        "surface-container-high": "#e2e8f8",
+        "on-tertiary-container": "#968065",
+        "inverse-on-surface": "#ebf1ff",
+        "on-primary-fixed-variant": "#404758",
+        "surface-container-highest": "#dce2f3",
+        "primary": "#000000",
+        "secondary-fixed": "#d9e3f4",
+        "primary-fixed": "#dce2f7",
+        "secondary-container": "#d6e0f1",
+        "on-secondary-fixed-variant": "#3e4755",
+        "inverse-surface": "#2a313d",
+        "tertiary-container": "#261906",
+        "tertiary-fixed": "#f9debf",
+        "secondary-fixed-dim": "#bdc7d8",
+        "surface-tint": "#575e70",
+        "surface-variant": "#dce2f3",
+        "primary-fixed-dim": "#c0c6db",
+        "on-tertiary-fixed-variant": "#55442d",
+        "error-container": "#ffdad6",
+        "on-secondary": "#ffffff",
+        "surface": "#f9f9ff",
+        "on-primary-container": "#7d8497",
+        "outline": "#76777d",
+        "on-secondary-fixed": "#121c28",
+        "on-background": "#151c27",
+        "secondary": "#555f6d",
+        "tertiary": "#000000",
+        "inverse-primary": "#c0c6db",
+        "surface-dim": "#d3daea",
+        "on-error": "#ffffff",
+        "background": "#f9f9ff",
+        "on-error-container": "#93000a",
+        "on-primary-fixed": "#141b2b",
+        "on-tertiary-fixed": "#261906",
+        "surface-container-low": "#f0f3ff",
+        "on-secondary-container": "#596372",
+        "primary-container": "#141b2b",
+        "outline-variant": "#c6c6cd",
+        "on-surface-variant": "#45464c",
+        "error": "#ba1a1a",
+        "on-surface": "#151c27",
+        "surface-bright": "#f9f9ff",
+        "on-primary": "#ffffff",
+        "tertiary-fixed-dim": "#dcc2a4",
+        "surface-container": "#e7eefe"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      "spacing": {
+        "space-lg": "1.5rem",
+        "space-sm": "0.5rem",
+        "gutter": "1.5rem",
+        "margin": "2rem",
+        "space-xl": "2rem",
+        "space-md": "1rem",
+        "space-xs": "0.25rem"
+      },
+      "fontFamily": {
+        "body-sm": ["Inter"],
+        "headline-md": ["Inter"],
+        "label-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "display-lg": ["Inter"],
+        "label-sm": ["Inter"],
+        "headline-lg": ["Inter"],
+        "headline-sm": ["Inter"],
+        "label-md": ["Inter"]
+      },
+      "fontSize": {
+        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+        "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+        "headline-sm": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600"}],
+        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+      }
+    }
+  }
+}</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-outline-variant/40"><div class="h-16 px-space-lg flex items-center gap-space-sm"><div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary"><span class="material-symbols-outlined text-[18px]">local_hospital</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase leading-none">Sala Médica</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-0.5">Gestión Clínica</span></div></div><div class="px-space-md py-space-sm"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider px-space-sm">Rol Médico</span></div><nav class="flex-1 px-space-md space-y-1"><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="inicio" href="#"><span class="material-symbols-outlined text-[20px]">home</span><span class="">Inicio</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="busqueda-de-pacientes" href="#"><span class="material-symbols-outlined text-[20px]">person_search</span><span class="">Búsqueda de pacientes</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-label-md text-label-md bg-primary text-on-primary transition-colors shadow-sm" data-path="mi-agenda" href="#"><span class="material-symbols-outlined text-[20px]">calendar_month</span><span class="">Mi agenda</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="mis-coberturas" href="#"><span class="material-symbols-outlined text-[20px]">verified_user</span><span class="">Mis coberturas</span></a></nav><div class="p-space-md mt-auto"><div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between border border-outline-variant/30"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[16px]">domain</span><span class="font-body-sm text-body-sm text-secondary">Consultorios Norte</span></div><span class="w-2 h-2 rounded-full bg-primary"></span></div></div></aside><div class="pl-64 flex flex-col min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)] px-space-xl flex items-center justify-between border-b border-outline-variant/40"><div class="flex items-center gap-space-sm"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Estación de Trabajo</span><span class="font-label-sm text-label-sm text-outline-variant">/</span><span class="font-label-md text-label-md text-on-surface font-semibold">Servicio Ambulatorio</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="flex flex-col text-left"><div class="flex items-center gap-space-xs"><span class="font-label-md text-label-md text-on-surface font-semibold">Dr. Marcos Álvarez</span><span class="bg-surface-container-high text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase tracking-wider font-semibold">MÉDICO</span></div><span class="font-body-sm text-body-sm text-on-surface-variant leading-none">Matrícula: MN-48291</span></div></div><div class="h-6 w-px bg-surface-container-high"></div><button class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low px-2.5 py-1.5 rounded-lg transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">logout</span><span class="">Cerrar sesión</span></button></div></header><main class="relative w-full pt-16 flex-1 px-space-xl py-space-lg bg-background"><div class="flex flex-col w-full max-w-7xl mx-auto space-y-space-lg">
+<!-- 1. Barra superior de control de la agenda -->
+<div class="flex flex-col gap-space-md">
+<!-- Título y descripción + Acciones principales -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider mb-1">
+<span class="">Agenda Médica</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-semibold">Turnos Programados</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">Mi agenda</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+        Listado cronológico de turnos programados del mes, seguimiento de pacientes y estado de atención.
+      </p>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<button class="inline-flex items-center gap-1.5 bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container-low text-on-surface px-3 py-2 rounded-lg font-label-md text-label-md font-medium transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">print</span>
+<span class="">Imprimir agenda</span>
+</button>
+<button class="inline-flex items-center gap-1.5 bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container-low text-on-surface px-3 py-2 rounded-lg font-label-md text-label-md font-medium transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="">Descargar lista</span>
+</button>
+<a class="inline-flex items-center gap-1.5 bg-primary hover:bg-secondary-container hover:text-on-surface text-on-primary px-3.5 py-2 rounded-lg font-label-md text-label-md font-medium transition-colors shadow-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span class="">Configurar disponibilidad</span>
+</a>
+</div>
+</div>
+<!-- Selector de mes desplegable + Filtros por estado -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-outline-variant/40 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-wrap items-center gap-space-md">
+<!-- Selector desplegable de mes -->
+<div class="flex items-center gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold whitespace-nowrap" for="selector-mes">Mes:</label>
+<div class="relative">
+<select class="appearance-none bg-surface-container-low border border-outline-variant/60 text-on-surface font-label-md text-label-md font-semibold rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-sm" id="selector-mes">
+<option selected="" value="nov-2026">Noviembre 2026 (Activo)</option>
+<option value="dic-2026">Diciembre 2026 (Sin cupos)</option>
+<option value="ene-2027">Enero 2027</option>
+<option value="feb-2027">Febrero 2027</option>
+</select>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="h-6 w-px bg-outline-variant/50 hidden sm:block"></div>
+<!-- Filtros rápidos por estado -->
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold mr-1">Estado:</span>
+<button class="px-2.5 py-1 rounded-md text-label-sm font-semibold bg-primary text-on-primary transition-colors" type="button">Todos (48)</button>
+<button class="px-2.5 py-1 rounded-md text-label-sm font-medium bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button">Confirmado</button>
+<button class="px-2.5 py-1 rounded-md text-label-sm font-medium bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button">En espera</button>
+<button class="px-2.5 py-1 rounded-md text-label-sm font-medium bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button">Atendido</button>
+<button class="px-2.5 py-1 rounded-md text-label-sm font-medium bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button">Cancelado</button>
+<button class="px-2.5 py-1 rounded-md text-label-sm font-medium bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button">Disponible</button>
+</div>
+</div>
+<!-- Quick helper badge sede -->
+<div class="flex items-center gap-2 self-start lg:self-auto text-on-surface-variant font-label-sm text-label-sm bg-surface-container-low px-2.5 py-1.5 rounded-lg border border-outline-variant/30">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="">Sede: <strong>Consultorios Norte</strong> (Consultorio 3B)</span>
+</div>
+</div>
+<!-- Resumen numérico rápido del mes (chips métricos en escala de grises) -->
+
+</div>
+<!-- 2. Listado cronológico de turnos agrupados por día -->
+<div class="flex flex-col space-y-space-lg">
+<!-- ================= DÍA 1: Lunes 2 de Noviembre de 2026 ================= -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/40 shadow-sm overflow-hidden">
+<!-- Encabezado de sección cronológica -->
+<div class="bg-surface-container-low/70 px-space-lg py-3 border-b border-outline-variant/30 flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold text-body-sm">
+          02
+        </div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Lunes 2 de Noviembre de 2026</h2>
+<span class="bg-surface-container text-on-surface text-[11px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider">Hoy</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Franja horaria matutina: 08:00 a 10:00 hs • 20 min / turno</span>
+</div>
+</div>
+<span class="font-label-md text-label-md font-semibold bg-surface-container-lowest px-2.5 py-1 rounded-md border border-outline-variant/30 text-on-surface">
+        6 turnos programados
+      </span>
+</div>
+<!-- Lista de turnos del día -->
+<div class="divide-y divide-outline-variant/20">
+<!-- Turno 1: Atendido -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<!-- Bloque Horario -->
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">08:00</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<!-- Datos Paciente y Consulta -->
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Gómez, Valeria Sofía</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 34.812.904</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #1042</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                OSDE 310
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Control cardiológico anual y lectura de ECG</span>
+</div>
+</div>
+</div>
+<!-- Estado y Acciones -->
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[240px]"><span class="bg-surface-container-high text-on-surface border border-outline-variant/40 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-on-surface"></span>Atendido</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<!-- Turno 2: Atendido -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">08:20</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Benítez, Fernando Martín</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 28.455.190</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #0891</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                Swiss Medical SMG20
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Revisión de estudios de laboratorio y ajuste de medicación</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[240px]"><span class="bg-surface-container-high text-on-surface border border-outline-variant/40 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-on-surface"></span>Atendido</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<!-- Turno 3: En sala de espera -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md bg-surface-container-low/20">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-primary text-on-primary w-20 py-2 rounded-lg shrink-0 shadow-sm">
+<span class="font-label-lg text-label-lg font-bold font-mono">08:40</span>
+<span class="font-label-sm text-[10px] text-surface-container-highest">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Navarro, Claudia Beatriz</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 31.904.312</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #2144</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                Galeno 220
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Cefalea recurrente y control de presión arterial</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[270px]"><span class="bg-surface-container-highest text-on-surface border border-outline font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-bold flex items-center gap-1.5 animate-pulse whitespace-nowrap"><span class="w-2 h-2 rounded-full bg-primary"></span>En sala de espera</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-3 py-1.5 bg-primary text-on-primary hover:bg-secondary-container hover:text-on-surface rounded-lg font-label-md text-label-md transition-colors shadow-sm flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">login</span><span class="">Llamar paciente</span></button><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<!-- Turno 4: Confirmado -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">09:00</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Rossi, Lucas Ignacio</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 41.200.781</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #3019</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                Particular
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Primera consulta de evaluación prequirúrgica</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[270px]"><span class="bg-surface-container text-on-surface border border-outline-variant/50 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Confirmado</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">play_arrow</span><span class="">Iniciar consulta</span></button><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<!-- Turno 5: Cancelado -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md opacity-75">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-secondary">09:20</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-secondary line-through">Díaz, Gonzalo Javier</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 36.551.402</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #1872</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-secondary">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                OSDE 210
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-secondary italic">Cancelado con aviso previo por el paciente</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[240px]"><span class="bg-surface-container-high text-secondary border border-outline-variant font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="material-symbols-outlined text-[14px]">cancel</span>Cancelado</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-secondary rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">event_repeat</span><span class="">Reasignar</span></button></div></div>
+</article>
+<!-- Turno 6: Disponible -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md border-l-4 border-l-outline-variant">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-dashed border-outline-variant shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">09:40</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface-variant italic">Turno disponible para reserva</span>
+</div>
+<div class="flex items-center gap-2 mt-1 font-body-sm text-body-sm text-on-surface-variant">
+<span class="">Sin paciente asignado • Cupo habilitado en plataforma de turnos web y recepción</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[240px]"><span class="bg-surface-container-lowest text-on-surface-variant border border-outline-variant/60 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-medium flex items-center gap-1 whitespace-nowrap"><span class="material-symbols-outlined text-[14px]">radio_button_unchecked</span>Disponible</span><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap shrink-0" type="button"><span class="material-symbols-outlined text-[16px]">lock</span><span class="">Bloquear turno</span></button></div>
+</article>
+</div>
+</section>
+<!-- ================= DÍA 2: Miércoles 4 de Noviembre de 2026 ================= -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/40 shadow-sm overflow-hidden">
+<!-- Encabezado de sección cronológica -->
+<div class="bg-surface-container-low/70 px-space-lg py-3 border-b border-outline-variant/30 flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest text-on-surface flex items-center justify-center font-bold text-body-sm border border-outline-variant/40">
+          04
+        </div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Miércoles 4 de Noviembre de 2026</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Franja horaria matutina: 08:00 a 10:00 hs • 20 min / turno</span>
+</div>
+</div>
+<span class="font-label-md text-label-md font-semibold bg-surface-container-lowest px-2.5 py-1 rounded-md border border-outline-variant/30 text-on-surface">
+        5 turnos programados
+      </span>
+</div>
+<!-- Lista de turnos del día -->
+<div class="divide-y divide-outline-variant/20">
+<!-- Turno 1 -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">08:00</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Molina, Gabriel Esteban</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 27.601.890</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #1180</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                OSDE 310
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Seguimiento posquirúrgico y retiro de puntos</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[270px]"><span class="bg-surface-container text-on-surface border border-outline-variant/50 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Confirmado</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">play_arrow</span><span class="">Iniciar consulta</span></button><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<!-- Turno 2 -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">08:20</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Alonso, Mariana Paz</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 38.411.029</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #2640</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                Swiss Medical SMG20
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Evaluación de riesgo cardiovascular para apto físico</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[270px]"><span class="bg-surface-container text-on-surface border border-outline-variant/50 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Confirmado</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">play_arrow</span><span class="">Iniciar consulta</span></button><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<!-- Turno 3 -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">08:40</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Castro, Roberto Dante</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 22.180.994</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #0452</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                Particular
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Renovación de receta y control de hipertensión arterial</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[270px]"><span class="bg-surface-container text-on-surface border border-outline-variant/50 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Confirmado</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">play_arrow</span><span class="">Iniciar consulta</span></button><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<!-- Turno 4 -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md border-l-4 border-l-outline-variant">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-dashed border-outline-variant shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">09:00</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface-variant italic">Turno disponible para reserva</span>
+</div>
+<div class="flex items-center gap-2 mt-1 font-body-sm text-body-sm text-on-surface-variant">
+<span class="">Sin paciente asignado • Cupo habilitado</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[240px]"><span class="bg-surface-container-lowest text-on-surface-variant border border-outline-variant/60 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-medium flex items-center gap-1 whitespace-nowrap"><span class="material-symbols-outlined text-[14px]">radio_button_unchecked</span>Disponible</span><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap shrink-0" type="button"><span class="material-symbols-outlined text-[16px]">lock</span><span class="">Bloquear turno</span></button></div>
+</article>
+<!-- Turno 5 -->
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md border-l-4 border-l-outline-variant">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-dashed border-outline-variant shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">09:20</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface-variant italic">Turno disponible para reserva</span>
+</div>
+<div class="flex items-center gap-2 mt-1 font-body-sm text-body-sm text-on-surface-variant">
+<span class="">Sin paciente asignado • Cupo habilitado</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[240px]"><span class="bg-surface-container-lowest text-on-surface-variant border border-outline-variant/60 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-medium flex items-center gap-1 whitespace-nowrap"><span class="material-symbols-outlined text-[14px]">radio_button_unchecked</span>Disponible</span><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap shrink-0" type="button"><span class="material-symbols-outlined text-[16px]">lock</span><span class="">Bloquear turno</span></button></div>
+</article>
+</div>
+</section>
+<!-- ================= DÍA 3: Lunes 9 de Noviembre de 2026 (Próxima jornada) ================= -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/40 shadow-sm overflow-hidden">
+<div class="bg-surface-container-low/70 px-space-lg py-3 border-b border-outline-variant/30 flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest text-on-surface flex items-center justify-center font-bold text-body-sm border border-outline-variant/40">
+          09
+        </div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Lunes 9 de Noviembre de 2026</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Franja horaria matutina: 08:00 a 10:00 hs • 20 min / turno</span>
+</div>
+</div>
+<span class="font-label-md text-label-md font-semibold bg-surface-container-lowest px-2.5 py-1 rounded-md border border-outline-variant/30 text-on-surface">
+        6 turnos programados
+      </span>
+</div>
+<div class="divide-y divide-outline-variant/20">
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">08:00</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Vázquez, Hernán Darío</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 35.120.481</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #1509</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                Galeno 220
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Control de arritmia y evaluación de Holter</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[270px]"><span class="bg-surface-container text-on-surface border border-outline-variant/50 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Confirmado</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">play_arrow</span><span class="">Iniciar consulta</span></button><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+<article class="p-space-md hover:bg-surface-container-low/40 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="flex flex-col items-center justify-center bg-surface-container-low w-20 py-2 rounded-lg border border-outline-variant/30 shrink-0">
+<span class="font-label-lg text-label-lg font-bold font-mono text-on-surface">08:20</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">20 min</span>
+</div>
+<div class="flex flex-col">
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Ortiz, Camila Belén</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• DNI 40.119.822</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• HC #3301</span>
+</div>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 font-body-sm text-body-sm">
+<span class="inline-flex items-center gap-1 font-medium text-on-surface">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+                OSDE 310
+              </span>
+<span class="text-outline-variant">•</span>
+<span class="text-on-surface-variant">Motivo: Primera consulta por dolor precordial en reposo</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md justify-end shrink-0 self-end lg:self-auto min-w-[270px]"><span class="bg-surface-container text-on-surface border border-outline-variant/50 font-label-sm text-label-sm px-2.5 py-1 rounded-md uppercase tracking-wider font-semibold flex items-center gap-1 whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Confirmado</span><div class="flex items-center gap-1.5 shrink-0"><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">play_arrow</span><span class="">Iniciar consulta</span></button><button class="px-2.5 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1 whitespace-nowrap" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="">Ver HC</span></button></div></div>
+</article>
+</div>
+</section>
+</div>
+<!-- 4. Componente de Referencia: Estado vacío en caso de seleccionar un mes sin turnos -->
+<div class="bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant/60 p-space-lg flex flex-col items-center justify-center text-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-secondary mb-2">
+<span class="material-symbols-outlined text-[24px]">event_busy</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">
+    Vista previa: si seleccionás Diciembre 2026
+  </h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md mt-1">
+    "No hay turnos registrados para el mes seleccionado." Podés habilitar la agenda copiando la configuración de Noviembre.
+  </p>
+<button class="mt-space-sm inline-flex items-center gap-1.5 bg-surface-container text-on-surface hover:bg-surface-container-high px-3 py-1.5 rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30" type="button">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+<span class="">Cargar disponibilidad para Diciembre</span>
+</button>
+</div>
+</div></main><footer class="w-full bg-surface-container-lowest py-space-md px-space-xl border-t border-outline-variant/30"><div class="flex flex-col sm:flex-row items-center justify-between gap-space-xs text-on-surface-variant"><span class="font-body-sm text-body-sm">© 2026 Sala Médica. Sistema de Gestión Clínica.</span><div class="flex items-center gap-space-md"><span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary">Terminal v2.4.0</span><span class="font-body-sm text-body-sm text-outline-variant">|</span><span class="font-body-sm text-body-sm text-secondary">Protocolo HL7/FHIR activo</span></div></div></footer></div>
+
+</body></html>

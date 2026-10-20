@@ -108,7 +108,10 @@ export const MSG_PASSWORDS_NO_COINCIDEN = "Las contraseñas no coinciden";
 export const MSG_DNI_FORMATO = "El DNI debe contener solo números";
 export const MSG_DNI_MIN = "El DNI debe tener al menos 7 dígitos";
 export const MSG_EMAIL_FORMATO = "El email no tiene un formato válido";
-export const MSG_TELEFONO_FORMATO = "El teléfono debe contener solo números";
+export const MSG_TELEFONO_FORMATO =
+  "El teléfono debe contener solo números y separadores válidos";
+export const MSG_MATRICULA_FORMATO =
+  "La matrícula debe tener el formato MN seguido de un espacio y 6 números";
 
 /** Mapa campo -> mensaje de error. Las claves coinciden con el `name` del input. */
 export type CampoError = Record<string, string>;
@@ -141,6 +144,10 @@ export function validarDniLongitud(dni: string): boolean {
 export function validarTelefonoFormato(phone: string): boolean {
   const limpio = phone.replace(/[+\s()-]/g, "");
   return limpio.length > 0 && /^\d+$/.test(limpio);
+}
+
+export function validarMatriculaFormato(matricula: string): boolean {
+  return /^MN \d{6}$/.test(matricula);
 }
 
 /** True si el email tiene un formato básico válido. */
@@ -184,7 +191,6 @@ export interface DatosPersonalAdministrativo {
   dni: string;
   email: string;
   phone: string;
-  password: string;
 }
 
 export interface DatosMedico {
@@ -198,14 +204,13 @@ export interface DatosMedico {
   password: string;
 }
 
-/** Alta de enfermera (US-14): los MISMOS campos que el personal administrativo. */
+/** Alta de enfermera (US-15); la contraseña se define al aceptar la invitación. */
 export interface DatosEnfermera {
   firstName: string;
   lastName: string;
   dni: string;
   email: string;
   phone: string;
-  password: string;
 }
 
 function validarDniYEmail(dni: string, email: string, errores: CampoError): void {
@@ -269,13 +274,11 @@ export function validarDatosPaciente(d: DatosRegistroPaciente): CampoError {
 }
 
 /**
- * Validación compartida del alta de staff (personal administrativo y
- * enfermería): comparten los MISMOS campos (nombre, apellido, dni, email,
- * phone, password).
+ * Valida los campos comunes de altas de personal administrativo y enfermería.
  * NO valida unicidad de DNI/email: eso requiere el repositorio (I/O).
  */
-function validarDatosAltaStaff(
-  d: DatosPersonalAdministrativo,
+function validarDatosAltaStaffComun(
+  d: Pick<DatosPersonalAdministrativo, "firstName" | "lastName" | "dni" | "email" | "phone">,
 ): CampoError {
   const errores: CampoError = {};
 
@@ -284,7 +287,6 @@ function validarDatosAltaStaff(
   validarTelefono(d.phone, errores);
 
   validarDniYEmail(d.dni, d.email, errores);
-  validarPasswordUnica(d.password, errores);
 
   return errores;
 }
@@ -296,16 +298,15 @@ function validarDatosAltaStaff(
 export function validarDatosPersonalAdministrativo(
   d: DatosPersonalAdministrativo,
 ): CampoError {
-  return validarDatosAltaStaff(d);
+  return validarDatosAltaStaffComun(d);
 }
 
 /**
- * Valida los campos del alta de enfermera (US-14). Reutiliza la misma lógica
- * que el alta de personal administrativo (mismos campos).
+ * Valida los datos del alta de enfermera (US-15).
  * NO valida unicidad de DNI/email: eso requiere el repositorio (I/O).
  */
 export function validarDatosEnfermera(d: DatosEnfermera): CampoError {
-  return validarDatosAltaStaff(d);
+  return validarDatosAltaStaffComun(d);
 }
 
 /**
@@ -332,7 +333,11 @@ export function validarDatosMedico(d: DatosMedico): CampoError {
     errores.especialidad = MSG_CAMPO_OBLIGATORIO;
   }
 
-  validarObligatorio(d.matricula, "matricula", errores);
+  if (esVacio(d.matricula)) {
+    errores.matricula = MSG_CAMPO_OBLIGATORIO;
+  } else if (!validarMatriculaFormato(d.matricula)) {
+    errores.matricula = MSG_MATRICULA_FORMATO;
+  }
 
   validarDniYEmail(d.dni, d.email, errores);
   validarPasswordUnica(d.password, errores);

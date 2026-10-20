@@ -203,4 +203,11 @@ export class PrismaUserRepository implements UserRepository {
       data: { isActive: false },
     });
   }
+
+  async activate(id: string): Promise<void> {
+    await getPrisma().user.updateMany({
+      where: { id },
+      data: { isActive: true },
+    });
+  }
 }

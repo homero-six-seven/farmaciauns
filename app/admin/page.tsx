@@ -41,6 +41,11 @@ export default function AdminDashboardPage() {
       href: "/admin/enfermeras",
       icon: BriefcaseMedical,
     },
+    {
+      title: "Alta de enfermera",
+      href: "/admin/enfermeras/nuevo",
+      icon: UserPlus,
+    },
   ];
 
   return (

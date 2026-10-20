@@ -56,6 +56,17 @@ export default async function InicioPage() {
         <section aria-label="Accesos del portal" className={styles.cards}>
           {esMedico ? (
             <>
+              <Link href="/medico/agenda" className={styles.card}>
+                <div className={styles.cardIcon}>
+                  <CalendarIcon />
+                </div>
+                <h2>Mi agenda</h2>
+                <p>
+                  Configurá tu disponibilidad y consultá los turnos
+                  habilitados de cada mes.
+                </p>
+                <span className={styles.status}>Disponible</span>
+              </Link>
               <Link href="/coberturas" className={styles.card}>
                 <div className={styles.cardIcon}>
                   <ShieldIcon />

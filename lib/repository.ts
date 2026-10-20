@@ -37,6 +37,8 @@ export interface UserRepository {
   searchByNameOrDni(query: string): Promise<Usuario[]>;
   /** Soft delete: marca al usuario como inactivo (`active=false`). No borra la fila. */
   deactivate(id: string): Promise<void>;
+  /** Reactiva un usuario existente sin modificar sus demás datos. */
+  activate(id: string): Promise<void>;
 }
 
 /** Implementación en memoria. El array vive en el singleton de `getUserRepository`. */
@@ -123,6 +125,13 @@ export class InMemoryUserRepository implements UserRepository {
     const usuario = this.usuarios.find((u) => u.id === id);
     if (usuario) {
       usuario.active = false;
+    }
+  }
+
+  async activate(id: string): Promise<void> {
+    const usuario = this.usuarios.find((u) => u.id === id);
+    if (usuario) {
+      usuario.active = true;
     }
   }
 }
@@ -360,7 +369,15 @@ const globalForRepo = globalThis as typeof globalThis & {
  */
 export function getUserRepository(): UserRepository {
   if (!globalForRepo.__farmaciaunsUserRepository) {
-    globalForRepo.__farmaciaunsUserRepository = process.env.DATABASE_URL?.trim()
+    const databaseUrl = process.env.DATABASE_URL?.trim();
+
+    if (process.env.NODE_ENV === "production" && !databaseUrl) {
+      throw new Error(
+        "DATABASE_URL must be configured in production to persist users.",
+      );
+    }
+
+    globalForRepo.__farmaciaunsUserRepository = databaseUrl
       ? new PrismaUserRepository()
       : new InMemoryUserRepository([
           ...pacientesSemilla,

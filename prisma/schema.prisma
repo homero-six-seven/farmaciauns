@@ -56,7 +56,46 @@ model User {
   coberturasAceptadas MedicoCobertura[]
   movimientosStock    MovimientoStock[]
 
+  // RF-01 (agenda médica): solo para usuarios con rol MEDICO.
+  configuracionAgenda ConfiguracionAgenda?
+  franjasHorarias     FranjaHoraria[]
+
   @@index([coberturaId])
+}
+
+// ---------------------------------------------------------------------------
+// RF-01 — Agenda médica (US-25 a US-28).
+//
+// Las franjas se guardan con fecha concreta y una copia de la duración de turno
+// vigente al guardarlas: así las fechas pasadas no cambian cuando el médico
+// modifica su disponibilidad o su duración. Los turnos no se persisten; se
+// calculan dividiendo cada franja por su `duracionTurnoMin`.
+// ---------------------------------------------------------------------------
+
+/// Duración de turno que definió el médico (US-25).
+model ConfiguracionAgenda {
+  medicoId         String   @id
+  medico           User     @relation(fields: [medicoId], references: [id])
+  duracionTurnoMin Int
+  updatedAt        DateTime @updatedAt
+}
+
+/// Bloque de atención de un médico en un día concreto (US-26 y US-28).
+model FranjaHoraria {
+  id               String   @id @default(cuid())
+  medicoId         String
+  medico           User     @relation(fields: [medicoId], references: [id])
+  /// Día calendario, sin hora.
+  fecha            DateTime @db.Date
+  /// Minutos desde las 00:00, hora de Argentina.
+  inicioMin        Int
+  finMin           Int
+  /// Copia de la duración vigente al guardar la franja.
+  duracionTurnoMin Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([medicoId, fecha])
 }
 
 /// Catálogo canónico de coberturas. Una fila por nombre normalizado (case-insensitive).

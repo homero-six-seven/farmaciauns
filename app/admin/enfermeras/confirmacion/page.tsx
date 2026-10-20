@@ -6,7 +6,7 @@ import { requireRole } from "@/lib/authorization";
 export const dynamic = "force-dynamic";
 
 /**
- * US-14 (RF-26) — Confirmación de alta de enfermera.
+ * US-16 (RF-19) — Confirmación de alta de enfermera.
  * Muestra el resumen del usuario recién creado SIN exponer la contraseña.
  */
 export default async function ConfirmacionEnfermeraPage({
@@ -22,29 +22,31 @@ export default async function ConfirmacionEnfermeraPage({
   return (
     <div className="mx-auto flex max-w-3xl flex-col">
       <div className="flex flex-col overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
-        <div className="flex flex-col items-center gap-4 bg-surface-container-low px-8 py-10 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-on-primary ring-8 ring-surface-container-high">
-            <svg
-              className="h-8 w-8"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
+        {usuario ? (
+          <div className="flex flex-col items-center gap-4 bg-surface-container-low px-8 py-10 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-on-primary ring-8 ring-surface-container-high">
+              <svg
+                className="h-8 w-8"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Enfermera registrada correctamente
+            </h1>
+            <p className="max-w-xl text-on-surface-variant">
+              El personal de enfermería ha sido incorporado al sistema y
+              habilitado para la gestión de vacunas.
+            </p>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Enfermera registrada correctamente
-          </h1>
-          <p className="max-w-xl text-on-surface-variant">
-            El personal de enfermería ha sido incorporado al sistema y
-            habilitado para la gestión de vacunas.
-          </p>
-        </div>
+        ) : null}
 
         <div className="flex flex-col gap-4 p-8">
           {usuario ? (
@@ -75,18 +77,22 @@ export default async function ConfirmacionEnfermeraPage({
                 />
               </dl>
               <p className="rounded-lg bg-surface-container-high/60 p-4 text-sm text-on-surface-variant">
-                Se envió un email de bienvenida a{" "}
+                Se envió un email de Clerk a{" "}
                 <strong className="font-mono text-on-surface">
                   {usuario.email ?? "—"}
                 </strong>{" "}
-                con las instrucciones de primer acceso.
+                con una invitación para definir su contraseña y activar el
+                acceso.
               </p>
             </>
           ) : (
-            <p className="text-sm text-on-surface-variant">
-              No se encontró el registro solicitado. Es posible que el enlace
-              haya expirado.
-            </p>
+            <div className="rounded-lg bg-error-container p-5 text-sm text-on-error-container" role="alert">
+              <h1 className="font-semibold">No se encontró el alta</h1>
+              <p className="mt-1">
+                No se encontró el registro solicitado. Es posible que el enlace
+                haya expirado o que el alta no se haya completado.
+              </p>
+            </div>
           )}
 
           <div className="flex flex-col gap-3 border-t border-surface-container-high pt-6 sm:flex-row sm:justify-end">

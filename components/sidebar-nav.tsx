@@ -41,7 +41,7 @@ const NAV_BY_ROLE: Record<SidebarRole, NavItem[]> = {
   MEDICO: [
     { href: "/inicio", label: "Inicio", icon: LayoutDashboard },
     { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
-    { href: "/agenda", label: "Mi agenda", icon: CalendarDays },
+    { href: "/medico/agenda", label: "Mi agenda", icon: CalendarDays },
     { href: "/coberturas", label: "Mis coberturas", icon: ShieldCheck },
   ],
   ENFERMERA: [
@@ -88,23 +88,24 @@ export function SidebarNav({ role }: { role?: string | null }) {
     .sort((a, b) => b.href.length - a.href.length)[0];
 
   return (
-    <nav className="flex flex-col gap-1">
+    <nav aria-label="Navegación principal" className="flex flex-col gap-1">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = activeItem?.href === item.href;
         return (
           <Link
             key={item.href}
-            href={item.href === "/inicio" ? homeHref : item.href}
+            href={item.href}
+            aria-label={item.label}
             aria-current={isActive ? "page" : undefined}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors max-[760px]:w-11 max-[760px]:justify-center max-[760px]:overflow-hidden ${
               isActive
                 ? "bg-[#141b2b] text-white"
                 : "text-on-surface hover:bg-surface-container-low"
             }`}
           >
             <Icon className="h-4 w-4 shrink-0" />
-            <span>{item.label}</span>
+            <span className="max-[760px]:hidden">{item.label}</span>
           </Link>
         );
       })}

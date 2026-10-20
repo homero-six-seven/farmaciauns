@@ -1,4 +1,8 @@
 import Link from "next/link";
+import {
+  darDeBajaPersonalAdministrativo,
+  reactivarPersonalAdministrativo,
+} from "@/app/actions";
 import { ListadoUsuarios } from "@/components/listado-usuarios";
 import { toUsuarioPublico } from "@/lib/domain/usuario";
 import { getUserRepository } from "@/lib/repository";
@@ -10,8 +14,13 @@ export const dynamic = "force-dynamic";
  * US-13 (RF-25) — Listado de personal administrativo (exclusivo ADMINISTRADOR).
  * Ordenado alfabéticamente por apellido (lo garantiza `listByRole`).
  */
-export default async function ListadoPersonalAdministrativoPage() {
+export default async function ListadoPersonalAdministrativoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ activated?: string; deactivated?: string }>;
+}) {
   await requireRole(["admin"]);
+  const { activated, deactivated } = await searchParams;
 
   const personal = (await getUserRepository().listByRole("ADMINISTRATIVO"))
     .map(toUsuarioPublico);
@@ -41,6 +50,23 @@ export default async function ListadoPersonalAdministrativoPage() {
             + Nuevo administrativo
           </Link>
         </div>
+
+        {deactivated === "1" && (
+          <div
+            role="status"
+            className="mb-6 rounded-lg bg-primary-fixed px-4 py-3 text-sm font-medium text-on-primary-fixed"
+          >
+            El administrativo fue dado de baja correctamente.
+          </div>
+        )}
+        {activated === "1" && (
+          <div
+            role="status"
+            className="mb-6 rounded-lg bg-primary-fixed px-4 py-3 text-sm font-medium text-on-primary-fixed"
+          >
+            El administrativo fue reactivado correctamente.
+          </div>
+        )}
 
         {personal.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl bg-surface-container-low p-12 text-center">
@@ -75,7 +101,12 @@ export default async function ListadoPersonalAdministrativoPage() {
             </Link>
           </div>
         ) : (
-          <ListadoUsuarios usuarios={personal} />
+          <ListadoUsuarios
+            usuarios={personal}
+            puedeEliminar
+            accionBaja={darDeBajaPersonalAdministrativo}
+            accionReactivar={reactivarPersonalAdministrativo}
+          />
         )}
     </div>
   );

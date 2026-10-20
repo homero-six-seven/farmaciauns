@@ -5,6 +5,8 @@ import type { UsuarioPublico } from "@/lib/domain/usuario";
 import { etiquetaRol } from "@/lib/domain/usuario";
 import { eliminarUsuario } from "@/app/actions";
 
+type AccionBaja = (formData: FormData) => void | Promise<void>;
+
 function EstadoBadge({ activo }: { activo: boolean }) {
   if (activo) {
     return (
@@ -47,10 +49,14 @@ export function ListadoUsuarios({
   usuarios,
   mostrarEspecialidad = false,
   puedeEliminar = false,
+  accionBaja = eliminarUsuario,
+  accionReactivar,
 }: {
   usuarios: UsuarioPublico[];
   mostrarEspecialidad?: boolean;
   puedeEliminar?: boolean;
+  accionBaja?: AccionBaja;
+  accionReactivar?: AccionBaja;
 }) {
   const [seleccionadoId, setSeleccionadoId] = useState<string | null>(
     usuarios[0]?.id ?? null,
@@ -215,11 +221,17 @@ export function ListadoUsuarios({
               </dl>
               {puedeEliminar && (
                 <form
-                  action={eliminarUsuario}
+                  action={
+                    seleccionado.active || !accionReactivar
+                      ? accionBaja
+                      : accionReactivar
+                  }
                   onSubmit={(e) => {
                     if (
                       !window.confirm(
-                        `¿Dar de baja a ${seleccionado.firstName} ${seleccionado.lastName}? Se marcará como inactivo.`,
+                        seleccionado.active
+                          ? `¿Dar de baja a ${seleccionado.firstName} ${seleccionado.lastName}? No va a poder iniciar sesión.`
+                          : `¿Reactivar a ${seleccionado.firstName} ${seleccionado.lastName}? Va a poder volver a iniciar sesión.`,
                       )
                     ) {
                       e.preventDefault();
@@ -230,10 +242,14 @@ export function ListadoUsuarios({
                   <input type="hidden" name="id" value={seleccionado.id} />
                   <button
                     type="submit"
-                    disabled={!seleccionado.active}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded bg-error px-4 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={!seleccionado.active && !accionReactivar}
+                    className={`inline-flex h-10 flex-1 items-center justify-center gap-2 rounded px-4 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${
+                      seleccionado.active
+                        ? "bg-error"
+                        : "bg-primary"
+                    }`}
                   >
-                    Dar de baja
+                    {seleccionado.active ? "Dar de baja" : "Reactivar"}
                   </button>
                 </form>
               )}

@@ -1,12 +1,4 @@
-/**
- * Envío de emails — STUB.
- *
- * `sendPasswordResetEmail` (US-07/US-08/US-11) solo hace `console.log` porque
- * no hay proveedor de email configurado. Cuando se integre un proveedor
- * (Resend, SendGrid, SMTP, etc.), reemplazar el cuerpo de esta función.
- *
- * Ver docs/CAMBIOS-US-GRUPO1.md → "Hardcodeos".
- */
+/** Emails de la aplicación; los flujos heredados de restablecimiento y bienvenida siguen siendo stubs. */
 
 export async function sendPasswordResetEmail(email: string): Promise<void> {
   // STUB: sin proveedor de email. Solo se registra la intención en consola.

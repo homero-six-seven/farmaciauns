@@ -3,7 +3,12 @@ import { MedicosClient, type MedicoItem } from "./medicos-client";
 
 export const dynamic = "force-dynamic";
 
-export default async function MedicosPage() {
+export default async function MedicosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ actualizado?: string }>;
+}) {
+  const { actualizado } = await searchParams;
   const prisma = getPrisma();
 
   const medicosDb = await prisma.user.findMany({
@@ -29,5 +34,10 @@ export default async function MedicosPage() {
     (a.firstName ?? "").localeCompare(b.firstName ?? "", "es", { sensitivity: "base" }),
   );
 
-  return <MedicosClient initialMedicos={medicos} />;
+  return (
+    <MedicosClient
+      initialMedicos={medicos}
+      updatedDoctorId={actualizado}
+    />
+  );
 }

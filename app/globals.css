@@ -73,6 +73,16 @@ body {
   padding: 0;
 }
 
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Typography tokens from Clinical Grayscale Blueprint */
 .font-display-lg, .text-display-lg {
   font-size: 32px;

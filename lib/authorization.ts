@@ -1,4 +1,6 @@
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { getPrisma } from "./prisma";
 import { getCurrentDbUser } from "./auth";
 
 export const roles = ["admin", "enfermera", "medico", "paciente"] as const;
@@ -41,4 +43,56 @@ export async function requireRole(allowedRoles: readonly Role[]) {
   }
 
   return role;
+}
+
+/**
+ * RF-01 — Médico logueado, como fila de `User` en Neon.
+ *
+ * Reusa `requireRole` para el control de acceso y después busca la fila del
+ * médico, porque la agenda se guarda por `medicoId`. Si la cuenta de Clerk
+ * todavía no estaba vinculada (`clerkId` nulo), la vincula por email, igual
+ * que `getCurrentAdmin`.
+ */
+export async function requireMedico() {
+  await requireRole(["medico"]);
+
+  const { userId } = await auth();
+  const clerkUser = await currentUser();
+  const email = clerkUser?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
+  const prisma = getPrisma();
+  const medico = await prisma.user.findFirst({
+    where: {
+      role: "MEDICO",
+      OR: [
+        ...(userId ? [{ clerkId: userId }] : []),
+        ...(email ? [{ email }] : []),
+      ],
+    },
+    select: {
+      id: true,
+      clerkId: true,
+      firstName: true,
+      lastName: true,
+      matricula: true,
+    },
+  });
+
+  if (!medico) {
+    // Rol médico en Clerk pero sin fila en Neon: no hay dónde guardar su agenda.
+    throw new Error("La cuenta médica no está registrada en la base de datos.");
+  }
+
+  if (!medico.clerkId && userId) {
+    await prisma.user.update({
+      where: { id: medico.id },
+      data: { clerkId: userId },
+    });
+  }
+
+  return {
+    id: medico.id,
+    firstName: medico.firstName,
+    lastName: medico.lastName,
+    matricula: medico.matricula,
+  };
 }

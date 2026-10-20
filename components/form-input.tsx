@@ -9,12 +9,15 @@ type FormInputProps = {
   name: string;
   type?: FormInputType;
   required?: boolean;
+  minLength?: number;
   hint?: string;
   error?: string;
   placeholder?: string;
   autoComplete?: InputHTMLAttributes<HTMLInputElement>["autoComplete"];
   inputMode?: InputHTMLAttributes<HTMLInputElement>["inputMode"];
   defaultValue?: string;
+  pattern?: string;
+  maxLength?: number;
   /** Si es true, bloquea el ingreso de letras y fuerza `inputMode="numeric"`. */
   numeric?: boolean;
 };
@@ -33,12 +36,15 @@ export function FormInput({
   name,
   type = "text",
   required,
+  minLength,
   hint,
   error,
   placeholder,
   autoComplete,
   inputMode,
   defaultValue,
+  pattern,
+  maxLength,
   numeric,
 }: FormInputProps) {
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -74,10 +80,13 @@ export function FormInput({
         name={name}
         type={type}
         required={required}
+        minLength={minLength}
         inputMode={numeric ? "numeric" : inputMode}
         autoComplete={autoComplete}
         placeholder={placeholder}
         defaultValue={defaultValue}
+        pattern={pattern}
+        maxLength={maxLength}
         aria-invalid={Boolean(error)}
         onKeyDown={handleKeyDown}
         className="h-10 w-full rounded border-0 bg-surface-container-low px-3 text-sm text-on-surface placeholder:text-outline focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40"

@@ -70,7 +70,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
           <SignOutButton redirectUrl="/sign-in">
             <button
               type="button"
-              className="hidden rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container sm:block"
+              className="whitespace-nowrap rounded border border-outline-variant px-3 py-1 text-[11px] font-semibold text-on-surface transition-colors hover:bg-surface-container"
             >
               Cerrar sesión
             </button>

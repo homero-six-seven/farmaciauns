@@ -51,7 +51,7 @@ const NAV_ITEMS: Record<Role, NavItem[]> = {
   ],
   medico: [
     { href: "/inicio", label: "Inicio", icon: LayoutDashboard },
-    { href: "/inicio#mi-agenda", label: "Mi agenda", icon: CalendarDays },
+    { href: "/medico/agenda", label: "Mi agenda", icon: CalendarDays },
     { href: "/inicio#mis-coberturas", label: "Mis coberturas", icon: ShieldCheck },
     { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
   ],

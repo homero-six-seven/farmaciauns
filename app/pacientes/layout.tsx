@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { AdminLayout } from "@/components/admin-layout";
+import { AppShell } from "@/components/app-shell";
 
 /**
- * Envuelve `/pacientes` con el mismo `AdminLayout` (sidebar + header) que las
- * rutas `/admin/*`, para que la barra lateral de navegación no desaparezca.
+ * Envuelve `/pacientes` con el mismo shell (encabezado + panel lateral) que el
+ * resto de los sectores, para que la navegación no cambie de forma al entrar.
  */
 export default function PacientesLayout({ children }: { children: ReactNode }) {
-  return <AdminLayout>{children}</AdminLayout>;
+  return <AppShell>{children}</AppShell>;
 }

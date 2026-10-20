@@ -32,11 +32,37 @@
 | T10 | S3,S4 | inline | done | 894d823 |
 | T11 | S1,S5 | inline | done | 894d823 |
 | T12 | S1,S3,S6,S7,S8 | inline | done | 899970f |
+| T13 | S3,S4 (US-21 menú paciente) | inline | done | — |
+| T14 | UI: sidebar + métricas + badges + mensajes exactos | inline | done | — |
+| T15 | US-20: píldora N Activas + autocomplete + modal confirmación | inline | done | — |
+| T16 | US-22/23: modales + hint disponible + mensajes | inline | done | — |
+| T17 | US-24: métricas + SIN STOCK + modales + toast | inline | done | — |
+| T18 | US-21: banner + notas + card COBERTURA ACTIVA | inline | done | — |
 
 ## Log
 
 - **L1:** "Arranca las implementaciones, luego testealas y dame el verdicto final una vez terminado todo, tambien dime que implementaste y que deberia hacer para testearlo manualmente"
 - **L2 (2026-10-19):** Implementación completa en rama `feat/coberturas-stock` (4 commits). Verificación: `tsc --noEmit` OK, `eslint --quiet` OK, `pnpm test` 8/8 OK, `prisma validate` OK.
-- **L3 (2026-10-19, PENDIENTE):** Aplicación del schema a Neon BLOQUEADA desde el entorno de ejecución (P1001, host Neon inaccesible). Pasos pendientes en el entorno del usuario:
-  - `pnpm exec prisma db push` (aditivo: 4 tablas + 2 enums + 2 columnas nullable en User).
-  - `pnpm db:seed` (carga las 3 vacunas fijas con stock 0; el upsert no resetea stock existente).
+- **L3 (2026-10-19, RESUELTA):** Aplicación del schema a Neon resuelta por HTTP (el TCP 5432 hacia Neon está bloqueado en esta red, así que `prisma db push` no puede correr):
+  - DDL aditivo generado offline con `prisma migrate diff --from-schema --to-schema --script`.
+  - Aplicado vía `@neondatabase/serverless` (driver HTTP) en una transacción: 4 tablas + 2 enums + 2 columnas nullable en User.
+  - `pnpm db:seed` corrido: 3 vacunas fijas (stock 0) + 5 enfermeras + 6 médicos de prueba.
+- **L4 (2026-10-19):** Cierre de la brecha de US-21 (menú paciente "Mi cobertura"): no existía la pantalla del paciente para ver/registrar su cobertura (solo se capturaba en el autorregistro US-06 y en el detalle US-12). Se agregó:
+  - `app/cobertura/page.tsx` + `app/cobertura/cobertura-form.tsx` (vista de solo lectura si ya tiene cobertura; formulario con desplegable "Particular" + disponibles si no).
+  - Server action `registrarCoberturaPaciente` en `app/actions.ts`.
+  - Card "Mi cobertura" en `app/inicio/page.tsx` (rama paciente).
+  - Fix de mensaje US-23 CA2: `MSG_STOCK_INSUFICIENTE` ahora es "No hay suficientes unidades" (antes "Stock insuficiente").
+- **L5 (2026-10-19):** Fase 2 — alineación con wireframes (`WireframesNuevas/` US-20/21/22-23/24), **opción (a)** elegida por el usuario: solo ajustes de UI **sin** cambios de schema. Alcance acordado:
+  - Sidebar lateral consistente (`Volver al inicio`) en `/coberturas`, `/cobertura` y `/stock`.
+  - Métricas/badges computables desde datos existentes: "Convenios N Activas" (US-20), "Catálogo: 3" + "Disponibilidad Neta %" + "SIN STOCK" (US-24).
+  - Modales de ingreso/egreso (US-22/23/24) + confirmación al quitar cobertura (US-20, reemplaza `window.confirm`).
+  - Autocomplete enriquecido (dropdown filtrable) en US-20 (sin tipo/descripción: eso era schema).
+  - Mensajes exactos: voseo "Ya aceptás esta cobertura", "Ingresá una cantidad mayor a 0", "No hay suficientes unidades (disponibles: N)".
+  - US-21: banner "Todavía no registraste tu cobertura", notas de ayuda y card "COBERTURA ACTIVA" (sin plan/vigencia: eso era schema).
+  - **Fuera de alcance (schema):** `Cobertura.tipo/descripcion`, `Vacuna.lote/descripcion`, `MovimientoStock.proveedor/destino`, `User.plan/vigencia`, y motivos de egreso alternativos del wireframe US-24 (manda US-23).
+- **L6 (2026-10-19):** Fase 2 implementada (opción a, sin schema):
+  - `components/page-sidebar.tsx` compartido; aplicado en `/stock`, `/coberturas` y `/cobertura`.
+  - Mensajes exactos: `MSG_CANTIDAD_INVALIDA` → "Ingresá una cantidad mayor a 0"; `MSG_COBERTURA_YA_ACEPTADA` → "Ya aceptás esta cobertura"; `msgStockInsuficiente(n)` → "No hay suficientes unidades (disponibles: n)" (con `stockActual` en `registrarEgreso` y mapeo `startsWith` en `errorStock`).
+  - `/stock`: métricas (catálogo + disponibilidad neta), badge "Sin stock", movimientos vía `stock-modals.tsx` (modales) + `stock-toast.tsx` (toast vía `?ok=ingreso|egreso`). Se eliminó `stock-form.tsx`.
+  - `/coberturas`: píldora "N activas", autocomplete enriquecido (`coberturas-form.tsx`) y confirmación con modal (`coberturas-lista.tsx`, reemplaza `window.confirm`).
+  - `/cobertura`: banner "Todavía no registraste tu cobertura", card "Cobertura activa" y notas de ayuda.

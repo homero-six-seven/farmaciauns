@@ -142,12 +142,17 @@ async function main() {
     },
   ];
 
+  const medicosActivos: string[] = [];
+
   for (const m of medicos) {
-    await prisma.user.upsert({
+    const creado = await prisma.user.upsert({
       where: { email: m.email },
       update: m,
       create: m,
     });
+    if (creado.isActive) {
+      medicosActivos.push(creado.id);
+    }
   }
   console.log(`✅ Loaded ${medicos.length} medicos.`);
 
@@ -167,6 +172,47 @@ async function main() {
     });
   }
   console.log(`✅ Loaded ${vacunas.length} vacunas.`);
+
+  // Catálogo de coberturas médicas comunes (RF-05b / US-20). Se precargan para
+  // que los pacientes tengan opciones al registrar su cobertura (US-21); los
+  // médicos activos del seed las aceptan por defecto.
+  const coberturas = [
+    "OSDE",
+    "IOMA",
+    "Swiss Medical",
+    "PAMI",
+    "Galeno",
+    "Medifé",
+  ];
+
+  const coberturasCreadas: { id: string; nombre: string }[] = [];
+  for (const nombre of coberturas) {
+    const c = await prisma.cobertura.upsert({
+      where: { nombreNormalizado: nombre.trim().toLowerCase() },
+      update: {},
+      create: {
+        nombre: nombre.trim(),
+        nombreNormalizado: nombre.trim().toLowerCase(),
+      },
+    });
+    coberturasCreadas.push({ id: c.id, nombre: c.nombre });
+  }
+  console.log(`✅ Loaded ${coberturasCreadas.length} coberturas.`);
+
+  for (const medicoId of medicosActivos) {
+    for (const cobertura of coberturasCreadas) {
+      await prisma.medicoCobertura.upsert({
+        where: {
+          medicoId_coberturaId: {
+            medicoId,
+            coberturaId: cobertura.id,
+          },
+        },
+        update: {},
+        create: { medicoId, coberturaId: cobertura.id },
+      });
+    }
+  }
 
   console.log("✨ Seed completed successfully.");
 }

@@ -38,13 +38,18 @@ export function esMotivoEgreso(motivo: string): motivo is MotivoEgreso {
 // Mensajes de error exactos
 // ---------------------------------------------------------------------------
 
-export const MSG_CANTIDAD_INVALIDA = "La cantidad debe ser un entero mayor a 0";
+export const MSG_CANTIDAD_INVALIDA = "Ingresá una cantidad mayor a 0";
 export const MSG_MOTIVO_OBLIGATORIO = "El motivo es obligatorio";
 export const MSG_MOTIVO_INVALIDO = "Motivo inválido";
 export const MSG_DETALLE_OBLIGATORIO =
   "El detalle es obligatorio cuando el motivo es Otro";
-export const MSG_STOCK_INSUFICIENTE = "Stock insuficiente";
+export const MSG_STOCK_INSUFICIENTE = "No hay suficientes unidades";
 export const MSG_VACUNA_NO_ENCONTRADA = "Vacuna no encontrada";
+
+/** Mensaje de stock insuficiente con las unidades disponibles (wireframe US-22/23). */
+export function msgStockInsuficiente(disponible: number): string {
+  return `${MSG_STOCK_INSUFICIENTE} (disponibles: ${disponible})`;
+}
 
 // ---------------------------------------------------------------------------
 // Validaciones atómicas (puras)

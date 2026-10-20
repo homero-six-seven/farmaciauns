@@ -27,6 +27,7 @@ import {
 import {
   MSG_AFILIADO_OBLIGATORIO,
   MSG_COBERTURA_NO_DISPONIBLE,
+  MSG_COBERTURA_NO_ENCONTRADA,
 } from "@/lib/domain/cobertura";
 import { registrarIngreso, registrarEgreso } from "@/lib/stock-service";
 import {
@@ -424,11 +425,52 @@ export async function quitarCobertura(formData: FormData): Promise<void> {
   revalidatePath("/coberturas");
 }
 
+/**
+ * US-21 — Registrar la cobertura del paciente autenticado ("Mi cobertura").
+ *
+ * `coberturaId` vacío → "Particular" (sin nº de afiliado). Si elige una
+ * cobertura, el nº de afiliado es obligatorio (lo valida el servicio). Cada
+ * paciente tiene una sola cobertura; modificarla corresponde a RF-15.
+ */
+export async function registrarCoberturaPaciente(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const pacienteId = await idUsuarioActual(["paciente"]);
+  const coberturaId = leerString(formData, "coberturaId");
+  const numeroAfiliado = leerString(formData, "numeroAfiliado");
+  const valores = { coberturaId, numeroAfiliado };
+
+  try {
+    await asignarCoberturaAPaciente(
+      pacienteId,
+      coberturaId || null,
+      numeroAfiliado || undefined,
+    );
+  } catch (err) {
+    if (err instanceof ApiError) {
+      const campo =
+        err.message === MSG_AFILIADO_OBLIGATORIO
+          ? "numeroAfiliado"
+          : err.message === MSG_COBERTURA_NO_DISPONIBLE ||
+              err.message === MSG_COBERTURA_NO_ENCONTRADA
+            ? "coberturaId"
+            : "_form";
+      return { errors: { [campo]: err.message }, values: valores };
+    }
+    return { errors: { _form: "Error inesperado" }, values: valores };
+  }
+
+  revalidatePath("/cobertura");
+  redirect("/cobertura");
+}
+
 /** Mapea un `ApiError` de stock al campo del formulario que corresponde. */
 function errorStock(err: unknown, valores: Record<string, string>): FormState {
   if (err instanceof ApiError) {
     const campo =
-      err.message === MSG_CANTIDAD_INVALIDA || err.message === MSG_STOCK_INSUFICIENTE
+      err.message === MSG_CANTIDAD_INVALIDA ||
+      err.message.startsWith(MSG_STOCK_INSUFICIENTE)
         ? "cantidad"
         : err.message === MSG_MOTIVO_OBLIGATORIO ||
             err.message === MSG_MOTIVO_INVALIDO
@@ -463,7 +505,7 @@ export async function registrarIngresoStock(
   }
 
   revalidatePath("/stock");
-  redirect("/stock");
+  redirect("/stock?ok=ingreso");
 }
 
 /** US-23 — Registrar egreso/ajuste de stock (solo ENFERMERA). */
@@ -497,5 +539,5 @@ export async function registrarEgresoStock(
   }
 
   revalidatePath("/stock");
-  redirect("/stock");
+  redirect("/stock?ok=egreso");
 }

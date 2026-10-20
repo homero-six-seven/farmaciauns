@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { requireRole, roles } from "@/lib/authorization";
 import { getPrisma } from "@/lib/prisma";
+import { AppShell } from "@/components/app-shell";
 import styles from "./inicio.module.css";
 
 export default async function InicioPage() {
@@ -45,34 +45,8 @@ export default async function InicioPage() {
       : "Portal Paciente";
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.brand}>
-          <span aria-hidden="true" className={styles.brandIcon}>
-            <HospitalIcon />
-          </span>
-          <span>Sala Médica</span>
-        </div>
-        <div className={styles.account}>
-          {displayName && <span>{displayName}</span>}
-          <UserButton />
-        </div>
-      </header>
-
-      <aside className={styles.sidebar}>
-        <div>
-          <p className={styles.sidebarLabel}>{portalLabel}</p>
-          <nav aria-label={`Navegación de ${portalLabel}`}>
-            <span aria-current="page" className={styles.activeNav}>
-              <DashboardIcon />
-              Inicio
-            </span>
-          </nav>
-        </div>
-        <p className={styles.sidebarFooter}>Sistema Sala Médica v1.0</p>
-      </aside>
-
-      <main className={styles.main}>
+    <AppShell>
+      <div className={`${styles.page} mx-auto w-full max-w-6xl`}>
         <section className={styles.welcome}>
           <p className={styles.eyebrow}>{portalLabel}</p>
           <h1>Bienvenido{displayName ? `, ${displayName}` : ""}</h1>
@@ -116,6 +90,18 @@ export default async function InicioPage() {
             </Link>
           ) : (
             <>
+              <Link href="/cobertura" className={styles.card}>
+                <div className={styles.cardIcon}>
+                  <ShieldIcon />
+                </div>
+                <h2>Mi cobertura</h2>
+                <p>
+                  Consultá y registrá tu cobertura médica y tu número de
+                  afiliado.
+                </p>
+                <span className={styles.status}>Disponible</span>
+              </Link>
+
               <article className={styles.card}>
                 <div className={styles.cardIcon}>
                   <CalendarIcon />
@@ -142,35 +128,8 @@ export default async function InicioPage() {
             </>
           )}
         </section>
-      </main>
-    </div>
-  );
-}
-
-function HospitalIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M9 3h6v4h4v14H5V7h4V3Zm0 4h6M12 10v7m-3.5-3.5h7"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-function DashboardIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"
-        stroke="currentColor"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
-    </svg>
+      </div>
+    </AppShell>
   );
 }
 

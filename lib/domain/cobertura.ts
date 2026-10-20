@@ -31,7 +31,7 @@ export type CoberturaResumen = {
 // ---------------------------------------------------------------------------
 
 export const MSG_COBERTURA_OBLIGATORIA = "El nombre de la cobertura es obligatorio";
-export const MSG_COBERTURA_YA_ACEPTADA = "Ya acepta esta cobertura";
+export const MSG_COBERTURA_YA_ACEPTADA = "Ya aceptás esta cobertura";
 export const MSG_COBERTURA_NO_DISPONIBLE =
   "La cobertura no está disponible para nuevos pacientes";
 export const MSG_AFILIADO_OBLIGATORIO = "El número de afiliado es obligatorio";

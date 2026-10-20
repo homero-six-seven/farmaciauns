@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { AdminLayout as SharedAdminLayout } from "@/components/admin-layout";
+import { AppShell } from "@/components/app-shell";
 import { getCurrentAdmin } from "@/lib/auth";
 
 export default async function AdminRootLayout({
@@ -8,5 +8,5 @@ export default async function AdminRootLayout({
   children: ReactNode;
 }) {
   await getCurrentAdmin();
-  return <SharedAdminLayout>{children}</SharedAdminLayout>;
+  return <AppShell>{children}</AppShell>;
 }

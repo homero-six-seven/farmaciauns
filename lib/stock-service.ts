@@ -13,9 +13,9 @@ import {
   MSG_DETALLE_OBLIGATORIO,
   MSG_MOTIVO_INVALIDO,
   MSG_MOTIVO_OBLIGATORIO,
-  MSG_STOCK_INSUFICIENTE,
   MSG_VACUNA_NO_ENCONTRADA,
   esMotivoEgreso,
+  msgStockInsuficiente,
   normalizarDetalleMotivo,
   validarCantidad,
   type MotivoEgreso,
@@ -110,12 +110,12 @@ export async function registrarEgreso(
     if (result.count === 0) {
       const vacuna = await tx.vacuna.findUnique({
         where: { id: vacunaId },
-        select: { id: true },
+        select: { id: true, stockActual: true },
       });
       if (!vacuna) {
         throw new ApiError(404, MSG_VACUNA_NO_ENCONTRADA);
       }
-      throw new ApiError(409, MSG_STOCK_INSUFICIENTE);
+      throw new ApiError(409, msgStockInsuficiente(vacuna.stockActual));
     }
 
     const actualizada = await tx.vacuna.findUniqueOrThrow({

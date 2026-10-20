@@ -1,8 +1,8 @@
 "use client";
 
-import { Check, Clock, Pencil, Plus, Save, Trash2, TriangleAlert } from "lucide-react";
+import { Check, Clock, Copy, Pencil, Plus, Save, Trash2, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useRef, useState, type FormEvent } from "react";
 import {
   DIAS_SEMANA,
   MSG_SIN_DURACION,
@@ -27,40 +27,97 @@ type FilaEditor = FilaFranja & { clave: string; editando: boolean };
 
 const FILA_NUEVA = { inicio: "08:00", fin: "12:00" };
 
+function filasDelEditor(filas: FilaFranja[]): FilaEditor[] {
+  return filas.map((fila, i) => ({ ...fila, clave: `inicial-${i}`, editando: false }));
+}
+
+function serializar(filas: FilaFranja[]): string {
+  return JSON.stringify(filas.map(({ diaSemana, inicio, fin }) => ({ diaSemana, inicio, fin })));
+}
+
 /**
- * Editor de "Franjas de atención ambulatoria" (US-26), según el wireframe de
- * US-25/26/28. Las filas se editan localmente y se validan en vivo con las
- * reglas del dominio; nada se guarda hasta "Guardar disponibilidad", que
- * reenvía el patrón a la server action para validarlo de nuevo.
+ * Editor de "Franjas de atención ambulatoria" (US-26 y US-28), según el
+ * wireframe de US-25/26/28. Las filas se editan localmente y se validan en
+ * vivo con las reglas del dominio; nada se guarda hasta "Guardar
+ * disponibilidad", que reenvía el patrón a la server action para validarlo de
+ * nuevo. "Cancelar" descarta los cambios y vuelve a lo guardado.
+ *
+ * Si el mes no tiene franjas, ofrece copiar el patrón del mes anterior: las
+ * filas copiadas son un cambio sin guardar más, que "Cancelar" descarta.
  */
 export function FranjasEditor({
   mes,
+  etiquetaMesActual,
   meses,
   duracionTurnoMin,
   filasIniciales,
-  precargadoDe,
+  sugerencia,
+  aplicaDesde,
 }: {
   mes: string;
+  etiquetaMesActual: string;
   meses: { valor: string; etiqueta: string }[];
   duracionTurnoMin: number | null;
   filasIniciales: FilaFranja[];
-  /** Etiqueta del mes del que se precargó el patrón, si el mes está vacío. */
-  precargadoDe: string | null;
+  /** Patrón del mes anterior, para copiar cuando este mes está vacío. */
+  sugerencia: { etiquetaMes: string; filas: FilaFranja[] } | null;
+  /** Fecha desde la que se aplican los cambios ("19/10"), si el mes ya empezó. */
+  aplicaDesde: string | null;
 }) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(
     guardarDisponibilidad,
     ESTADO_INICIAL,
   );
-  const [filas, setFilas] = useState<FilaEditor[]>(() =>
-    filasIniciales.map((fila, i) => ({ ...fila, clave: `inicial-${i}`, editando: false })),
-  );
+  const [filas, setFilas] = useState<FilaEditor[]>(() => filasDelEditor(filasIniciales));
+  const [copiadoDe, setCopiadoDe] = useState<string | null>(null);
   const siguienteClave = useRef(0);
 
   const bloqueado = duracionTurnoMin === null;
   const validacion = bloqueado ? null : validarFranjas(filas, duracionTurnoMin);
   const errores = validacion && !validacion.ok ? validacion.errores : {};
   const hayErrores = Object.keys(errores).length > 0;
+
+  const hayCambios = serializar(filas) !== serializar(filasIniciales);
+  // Quitar todas las filas solo "cierra" algo si había franjas guardadas.
+  const cierraAgenda = filas.length === 0 && filasIniciales.length > 0;
+  const puedeGuardar = !pending && !hayErrores && hayCambios;
+
+  function copiarSugerencia() {
+    if (!sugerencia) {
+      return;
+    }
+    setFilas(filasDelEditor(sugerencia.filas));
+    setCopiadoDe(sugerencia.etiquetaMes);
+  }
+
+  function descartarCambios() {
+    setFilas(filasDelEditor(filasIniciales));
+    setCopiadoDe(null);
+  }
+
+  function cambiarMes(nuevoMes: string) {
+    if (
+      hayCambios &&
+      !window.confirm(
+        `Tenés cambios sin guardar en ${etiquetaMesActual}. ¿Cambiar de mes y descartarlos?`,
+      )
+    ) {
+      return;
+    }
+    router.push(`?mes=${nuevoMes}`);
+  }
+
+  function confirmarGuardado(evento: FormEvent<HTMLFormElement>) {
+    if (
+      cierraAgenda &&
+      !window.confirm(
+        `¿Cerrar tu agenda de ${etiquetaMesActual}${aplicaDesde ? ` desde el ${aplicaDesde}` : ""}? No vas a tener turnos disponibles en esos días.`,
+      )
+    ) {
+      evento.preventDefault();
+    }
+  }
 
   function actualizarFila(clave: string, cambios: Partial<FilaEditor>) {
     setFilas((actuales) =>
@@ -107,7 +164,7 @@ export function FranjasEditor({
           Mes
           <select
             value={mes}
-            onChange={(e) => router.push(`?mes=${e.target.value}`)}
+            onChange={(e) => cambiarMes(e.target.value)}
             className="h-10 rounded border-0 bg-surface-container-low px-3 text-sm font-semibold normal-case tracking-normal text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
             {meses.map((m) => (
@@ -127,23 +184,27 @@ export function FranjasEditor({
           {MSG_SIN_DURACION} para poder cargar tus franjas.
         </div>
       ) : (
-        <form action={formAction} className="mt-5 flex flex-col gap-4">
+        <form action={formAction} onSubmit={confirmarGuardado} className="mt-5 flex flex-col gap-4">
           <input type="hidden" name="mes" value={mes} />
-          <input
-            type="hidden"
-            name="franjas"
-            value={JSON.stringify(
-              filas.map(({ diaSemana, inicio, fin }) => ({ diaSemana, inicio, fin })),
-            )}
-          />
+          <input type="hidden" name="franjas" value={serializar(filas)} />
 
-          {precargadoDe && (
+          {aplicaDesde && (
+            <p
+              role="note"
+              className="rounded-lg bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant"
+            >
+              Este mes ya empezó: los cambios se aplican desde hoy ({aplicaDesde}).
+              Los días anteriores no se modifican.
+            </p>
+          )}
+
+          {copiadoDe && filas.length > 0 && (
             <p
               role="status"
               className="rounded-lg bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant"
             >
-              Este mes no tiene franjas. Precargamos el patrón de {precargadoDe}{" "}
-              para que lo ajustes; no se guarda hasta que confirmes.
+              Copiaste el patrón de {copiadoDe}. Ajustalo si hace falta y guardá
+              para aplicarlo a {etiquetaMesActual}.
             </p>
           )}
 
@@ -157,7 +218,7 @@ export function FranjasEditor({
           )}
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+            <table className="w-full min-w-160 border-collapse text-left text-sm">
               <thead>
                 <tr className="bg-surface-container-low text-xs uppercase tracking-wider text-on-surface-variant">
                   <th scope="col" className="px-4 py-3">Día de la semana</th>
@@ -170,7 +231,19 @@ export function FranjasEditor({
                 {filas.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-4 py-6 text-center text-on-surface-variant">
-                      Todavía no hay franjas para este mes. Usá “Agregar franja”.
+                      {cierraAgenda
+                        ? "Quitaste todas las franjas. Guardá para cerrar la agenda o tocá “Cancelar”."
+                        : "Todavía no hay franjas para este mes. Usá “Agregar franja”."}
+                      {sugerencia && filasIniciales.length === 0 && (
+                        <button
+                          type="button"
+                          onClick={copiarSugerencia}
+                          className="mx-auto mt-3 flex h-9 items-center gap-2 rounded bg-surface-container-low px-4 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container"
+                        >
+                          <Copy className="h-4 w-4" aria-hidden="true" />
+                          Copiar el patrón de {sugerencia.etiquetaMes}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 )}
@@ -201,17 +274,28 @@ export function FranjasEditor({
 
           <div className="flex flex-col gap-3 rounded-lg bg-surface-container-low px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-on-surface-variant">
-              Los cambios impactarán en la reserva de turnos de tus pacientes al
-              guardarse.
+              {hayCambios
+                ? "Tenés cambios sin guardar."
+                : "Los cambios impactarán en la reserva de turnos de tus pacientes al guardarse."}
             </p>
-            <button
-              type="submit"
-              disabled={pending || hayErrores || filas.length === 0}
-              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded bg-primary px-5 text-sm font-semibold text-on-primary transition-colors hover:bg-secondary disabled:opacity-60"
-            >
-              <Save className="h-4 w-4" aria-hidden="true" />
-              {pending ? "Guardando…" : "Guardar disponibilidad"}
-            </button>
+            <div className="flex shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={descartarCambios}
+                disabled={pending || !hayCambios}
+                className="inline-flex h-10 items-center justify-center rounded bg-surface-container-lowest px-5 text-sm font-semibold text-on-surface shadow-sm transition-colors hover:bg-surface-container disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={!puedeGuardar}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded bg-primary px-5 text-sm font-semibold text-on-primary transition-colors hover:bg-secondary disabled:opacity-60"
+              >
+                <Save className="h-4 w-4" aria-hidden="true" />
+                {pending ? "Guardando…" : cierraAgenda ? "Cerrar agenda" : "Guardar disponibilidad"}
+              </button>
+            </div>
           </div>
         </form>
       )}

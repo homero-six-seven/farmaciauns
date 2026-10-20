@@ -23,7 +23,13 @@ export const dynamic = "force-dynamic";
 
 const MENSAJES_GUARDADO: Record<string, string> = {
   franjas: "Tu disponibilidad se guardó correctamente.",
+  cerrada: "Cerraste tu agenda para lo que queda del mes.",
 };
+
+/** `"2026-10-19"` → `"19/10"`. */
+function fechaCorta(fecha: string): string {
+  return `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}`;
+}
 
 function rangoDelMes(mes: MesAgenda) {
   return { desde: primerDiaDelMes(mes), hasta: ultimoDiaDelMes(mes) };
@@ -61,18 +67,22 @@ export default async function DisponibilidadPage({
 
   // El patrón vigente sale de las franjas de hoy en adelante: si el médico
   // cerró la agenda del resto del mes, las franjas pasadas no lo reabren.
-  let patron = patronDesdeFranjas(franjasDelMes.filter((f) => f.fecha >= hoy));
-  let precargadoDe: string | null = null;
+  const filasIniciales = aFilas(
+    patronDesdeFranjas(franjasDelMes.filter((f) => f.fecha >= hoy)),
+  );
+
+  // Mes sin ninguna franja: se ofrece copiar el patrón del mes anterior.
+  let sugerencia: { etiquetaMes: string; filas: FilaFranja[] } | null = null;
   if (franjasDelMes.length === 0) {
     const mesAnterior = sumarMeses(mes, -1);
     const franjasAnteriores = await listarFranjas(medico.id, rangoDelMes(mesAnterior));
     if (franjasAnteriores.length > 0) {
-      patron = patronDesdeFranjas(franjasAnteriores);
-      precargadoDe = etiquetaMes(mesAnterior);
+      sugerencia = {
+        etiquetaMes: etiquetaMes(mesAnterior),
+        filas: aFilas(patronDesdeFranjas(franjasAnteriores)),
+      };
     }
   }
-
-  const filasIniciales = aFilas(patron);
   const mensajeGuardado =
     guardado === "duracion"
       ? `La duración de tus turnos se guardó: ${duracionActual} min.`
@@ -114,13 +124,15 @@ export default async function DisponibilidadPage({
         // Se vuelve a montar al cambiar de mes o al guardar, para partir de lo guardado.
         key={`${formatearMes(mes)}|${duracionActual}|${JSON.stringify(filasIniciales)}`}
         mes={formatearMes(mes)}
+        etiquetaMesActual={etiquetaMes(mes)}
+        aplicaDesde={hoy > primerDiaDelMes(mes) ? fechaCorta(hoy) : null}
         meses={mesesHabilitados(hoy).map((m) => ({
           valor: formatearMes(m),
           etiqueta: etiquetaMes(m),
         }))}
         duracionTurnoMin={duracionActual}
         filasIniciales={filasIniciales}
-        precargadoDe={precargadoDe}
+        sugerencia={sugerencia}
       />
     </div>
   );

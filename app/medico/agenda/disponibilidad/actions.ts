@@ -168,6 +168,7 @@ export async function guardarDisponibilidad(
   // Desde hoy si el mes ya empezó; si no, desde el día 1.
   const primerDia = primerDiaDelMes(mes);
   const rango = { desde: hoy > primerDia ? hoy : primerDia, hasta: ultimoDiaDelMes(mes) };
+  let agendaCerrada: boolean;
 
   try {
     const duracionTurnoMin = await obtenerDuracionTurno(medico.id);
@@ -183,6 +184,8 @@ export async function guardarDisponibilidad(
       };
     }
 
+    // Sin franjas, el reemplazo cierra la agenda por lo que queda del mes (US-28).
+    agendaCerrada = resultado.franjas.length === 0;
     await reemplazarFranjas(
       medico.id,
       rango,
@@ -197,5 +200,5 @@ export async function guardarDisponibilidad(
   }
 
   revalidatePath("/medico/agenda", "layout");
-  redirect(urlDisponibilidad(mesIngresado, "franjas"));
+  redirect(urlDisponibilidad(mesIngresado, agendaCerrada ? "cerrada" : "franjas"));
 }

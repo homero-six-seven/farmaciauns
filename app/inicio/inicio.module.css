@@ -197,6 +197,7 @@
   border-radius: 0.625rem;
   background: var(--surface-low);
   color: var(--on-surface);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .cardIcon svg {
@@ -207,6 +208,7 @@
 .card h2 {
   margin: 1rem 0 0.5rem;
   font-size: 1.125rem;
+  transition: color 0.15s ease;
 }
 
 .card p {
@@ -230,15 +232,28 @@
 .cardLink {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   color: var(--on-surface);
   text-decoration: none;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease,
+    border-color 0.15s ease;
 }
 
+/* Mismo feedback de hover que las cards del panel de administración:
+   fondo tintado, elevación con sombra e ícono/título invertidos. */
 .cardLink:hover {
+  background: var(--surface-low);
+  border-color: var(--outline);
   box-shadow: 0 8px 24px rgb(21 28 39 / 12%);
   transform: translateY(-2px);
+}
+
+.cardLink:hover .cardIcon {
+  background: var(--primary);
+  color: var(--surface-white);
+}
+
+.cardLink:hover h2 {
+  color: var(--primary);
 }
 
 .cardLinkArrow {

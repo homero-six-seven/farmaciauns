@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Syringe } from "lucide-react";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { requireRole, roles } from "@/lib/authorization";
@@ -56,7 +57,7 @@ export default async function InicioPage() {
         <section aria-label="Accesos del portal" className={styles.cards}>
           {esMedico ? (
             <>
-              <Link href="/medico/agenda" className={styles.card}>
+              <Link href="/medico/agenda" className={`${styles.card} ${styles.cardLink}`}>
                 <div className={styles.cardIcon}>
                   <CalendarIcon />
                 </div>
@@ -65,9 +66,8 @@ export default async function InicioPage() {
                   Configurá tu disponibilidad y consultá los turnos
                   habilitados de cada mes.
                 </p>
-                <span className={styles.status}>Disponible</span>
               </Link>
-              <Link href="/coberturas" className={styles.card}>
+              <Link href="/coberturas" className={`${styles.card} ${styles.cardLink}`}>
                 <div className={styles.cardIcon}>
                   <ShieldIcon />
                 </div>
@@ -76,32 +76,29 @@ export default async function InicioPage() {
                   Administrá las obras sociales y coberturas médicas que
                   aceptás.
                 </p>
-                <span className={styles.status}>Disponible</span>
               </Link>
-              <Link href="/pacientes" className={styles.card}>
+              <Link href="/pacientes" className={`${styles.card} ${styles.cardLink}`}>
                 <div className={styles.cardIcon}>
                   <SearchIcon />
                 </div>
                 <h2>Búsqueda de pacientes</h2>
                 <p>Consultá las fichas y la cobertura de los pacientes.</p>
-                <span className={styles.status}>Disponible</span>
               </Link>
             </>
           ) : esEnfermera ? (
-            <Link href="/stock" className={styles.card}>
+            <Link href="/stock" className={`${styles.card} ${styles.cardLink}`}>
               <div className={styles.cardIcon}>
-                <SyringeIcon />
+                <Syringe aria-hidden="true" />
               </div>
               <h2>Stock de vacunas</h2>
               <p>
                 Consultá las unidades disponibles y registrá ingresos y
                 egresos.
               </p>
-              <span className={styles.status}>Disponible</span>
             </Link>
           ) : (
             <>
-              <Link href="/cobertura" className={styles.card}>
+              <Link href="/cobertura" className={`${styles.card} ${styles.cardLink}`}>
                 <div className={styles.cardIcon}>
                   <ShieldIcon />
                 </div>
@@ -110,7 +107,6 @@ export default async function InicioPage() {
                   Consultá y registrá tu cobertura médica y tu número de
                   afiliado.
                 </p>
-                <span className={styles.status}>Disponible</span>
               </Link>
 
               <article className={styles.card}>
@@ -183,20 +179,6 @@ function ShieldIcon() {
       />
       <path
         d="M9 12l2 2 4-4"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.7"
-      />
-    </svg>
-  );
-}
-
-function SyringeIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-      <path
-        d="M18 2l4 4M17 4l3 3M19 9l-8 8-4-4 8-8 4 4ZM12 15l-3-3M9 18l-3-3 2-2 4 4-3 1Z"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"

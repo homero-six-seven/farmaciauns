@@ -7,7 +7,8 @@ import {
 import type { FranjaGuardada } from "@/lib/agenda-repository";
 
 /**
- * Detalle de un día de "Mi agenda" (US-27): franjas del día y sus turnos.
+ * Detalle del día seleccionado en "Mi agenda" (US-27, CA2): franjas del día y
+ * sus turnos con horario de inicio y fin.
  * Mientras no existan reservas, todos los turnos de hoy en adelante están
  * "Disponible"; los de días pasados se muestran atenuados y sin estado.
  */
@@ -39,7 +40,7 @@ export function TurnosDelDia({
     <section
       id={`dia-${fecha}`}
       aria-labelledby={`titulo-${fecha}`}
-      className={`scroll-mt-16 overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm ${
+      className={`overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm ${
         pasado ? "opacity-60" : ""
       }`}
     >
@@ -76,23 +77,22 @@ export function TurnosDelDia({
         </span>
       </header>
 
-      <ul className="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="flex flex-col gap-2 p-4">
         {turnos.map((turno) => (
           <li
             key={turno.inicioMin}
-            className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-outline-variant px-3 py-2"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-outline-variant px-4 py-2.5"
           >
-            <div className="flex items-center gap-3">
-              <span className="flex flex-col text-center">
-                <span className="font-mono text-sm font-semibold tabular-nums">
-                  {formatearHora(turno.inicioMin)}
-                </span>
-                <span className="text-[10px] text-on-surface-variant">
-                  {turno.duracionTurnoMin} min
-                </span>
+            <div className="flex items-center gap-4">
+              {/* US-27: horario de inicio y fin de cada turno. */}
+              <span className="font-mono text-sm font-semibold tabular-nums">
+                {formatearHora(turno.inicioMin)} – {formatearHora(turno.finMin)}
               </span>
-              <span className="text-xs italic text-on-surface-variant">
-                {pasado ? "Turno de un día pasado" : "Turno disponible para reserva"}
+              <span className="text-xs text-on-surface-variant">
+                {turno.duracionTurnoMin} min ·{" "}
+                <span className="italic">
+                  {pasado ? "Turno de un día pasado" : "Turno disponible para reserva"}
+                </span>
               </span>
             </div>
             {!pasado && (

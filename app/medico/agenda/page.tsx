@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarX2, Settings } from "lucide-react";
 import {
+  elegirDiaVisible,
   esMesHabilitado,
   etiquetaMes,
   formatearMes,
@@ -22,15 +23,16 @@ export const dynamic = "force-dynamic";
 
 /**
  * US-27 (RF-01) — "Mi agenda": calendario del mes con los días habilitados y
- * el detalle de turnos de cada día, en estado "Disponible" (`?mes=YYYY-MM`).
+ * la lista de turnos del día seleccionado, en estado "Disponible"
+ * (`?mes=YYYY-MM&dia=YYYY-MM-DD`).
  */
 export default async function MiAgendaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mes?: string }>;
+  searchParams: Promise<{ mes?: string; dia?: string }>;
 }) {
   const medico = await requireMedico();
-  const { mes: mesParam } = await searchParams;
+  const { mes: mesParam, dia: diaParam } = await searchParams;
 
   const hoy = hoyEnArgentina(new Date());
   const mesPedido = mesParam ? parsearMes(mesParam) : null;
@@ -47,6 +49,7 @@ export default async function MiAgendaPage({
     .filter((f) => f.fecha >= hoy)
     .reduce((total, f) => total + generarTurnos(f, f.duracionTurnoMin).turnos.length, 0);
   const diasDisponibles = [...franjasPorDia.keys()].filter((fecha) => fecha >= hoy).length;
+  const diaVisible = elegirDiaVisible([...franjasPorDia.keys()], hoy, diaParam);
   const urlDisponibilidad = `/medico/agenda/disponibilidad?mes=${formatearMes(mes)}`;
 
   return (
@@ -68,7 +71,8 @@ export default async function MiAgendaPage({
           className="inline-flex h-10 items-center gap-2 rounded bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-secondary"
         >
           <Settings className="h-4 w-4" aria-hidden="true" />
-          Configurar disponibilidad
+          {/* US-28: desde un mes con disponibilidad cargada se "modifica". */}
+          {franjas.length > 0 ? "Modificar disponibilidad" : "Cargar disponibilidad"}
         </Link>
       </div>
 
@@ -99,17 +103,16 @@ export default async function MiAgendaPage({
           <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant">
             <CalendarX2 className="h-6 w-6" aria-hidden="true" />
           </span>
-          <h2 className="text-lg font-semibold">
-            No hay turnos registrados para {etiquetaMes(mes)}
-          </h2>
+          {/* Texto y botón exactos del CA3 de US-27. */}
+          <h2 className="text-lg font-semibold">No cargaste disponibilidad para este mes</h2>
           <p className="mt-1 max-w-md text-sm text-on-surface-variant">
-            Cargá tu disponibilidad para habilitar la agenda de este mes.
+            {etiquetaMes(mes)} todavía no tiene turnos habilitados.
           </p>
           <Link
             href={urlDisponibilidad}
             className="mt-5 inline-flex h-10 items-center rounded bg-surface-container-low px-5 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container"
           >
-            Cargar disponibilidad para {etiquetaMes(mes)}
+            Cargar disponibilidad
           </Link>
         </div>
       ) : (
@@ -120,12 +123,17 @@ export default async function MiAgendaPage({
               mes={mes}
               hoy={hoy}
               diasConTurnos={new Set(franjasPorDia.keys())}
+              seleccionado={diaVisible}
             />
           </aside>
-          <div className="flex min-w-0 flex-col gap-4">
-            {[...franjasPorDia.entries()].map(([fecha, franjasDelDia]) => (
-              <TurnosDelDia key={fecha} fecha={fecha} hoy={hoy} franjas={franjasDelDia} />
-            ))}
+          <div className="min-w-0">
+            {diaVisible && (
+              <TurnosDelDia
+                fecha={diaVisible}
+                hoy={hoy}
+                franjas={franjasPorDia.get(diaVisible) ?? []}
+              />
+            )}
           </div>
         </div>
       )}

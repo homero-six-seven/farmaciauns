@@ -9,7 +9,7 @@ import {
   PASO_MINUTOS,
 } from "@/lib/domain/agenda";
 import { ESTADO_INICIAL } from "@/lib/form-state";
-import { guardarDuracionTurno } from "./actions";
+import { guardarDuracionTurno, type EstadoDuracion } from "./actions";
 
 /** Valor inicial del stepper cuando el médico todavía no definió su duración. */
 const DURACION_SUGERIDA = 20;
@@ -18,14 +18,8 @@ const DURACION_SUGERIDA = 20;
  * Tarjeta "Duración de tus turnos" (US-25), según el wireframe de US-25/26/28:
  * stepper de a 5 minutos, accesos rápidos y botón Guardar.
  */
-export function DuracionForm({
-  duracionActual,
-  mes,
-}: {
-  duracionActual: number | null;
-  mes: string;
-}) {
-  const [state, formAction, pending] = useActionState(
+export function DuracionForm({ duracionActual }: { duracionActual: number | null }) {
+  const [state, formAction, pending] = useActionState<EstadoDuracion, FormData>(
     guardarDuracionTurno,
     ESTADO_INICIAL,
   );
@@ -34,6 +28,8 @@ export function DuracionForm({
   );
   const error = state.errors.duracionTurnoMin;
   const sinCambios = duracion === duracionActual;
+  // El aviso de guardado se oculta en cuanto el médico vuelve a cambiar el valor.
+  const guardadoReciente = state.guardadaMin !== undefined && state.guardadaMin === duracion;
 
   return (
     <section
@@ -68,7 +64,6 @@ export function DuracionForm({
 
       <form action={formAction} className="mt-5 flex flex-col gap-3">
         <input type="hidden" name="duracionTurnoMin" value={duracion} />
-        <input type="hidden" name="mes" value={mes} />
 
         {state.errors._form && (
           <div
@@ -143,6 +138,11 @@ export function DuracionForm({
         {error && (
           <span role="alert" className="text-xs font-medium text-error">
             {error}
+          </span>
+        )}
+        {!error && guardadoReciente && (
+          <span role="status" className="text-xs font-medium text-on-surface-variant">
+            La duración de tus turnos se guardó: {state.guardadaMin} min.
           </span>
         )}
       </form>

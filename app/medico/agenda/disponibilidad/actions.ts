@@ -44,22 +44,27 @@ function urlDisponibilidad(mes: string, guardado: string): string {
   return `${RUTA_DISPONIBILIDAD}?${params.toString()}`;
 }
 
+/** Estado del formulario de duración: `guardadaMin` indica un guardado exitoso. */
+export type EstadoDuracion = FormState & { guardadaMin?: number };
+
 /**
  * US-25 (RF-01) — Definir la duración de los turnos.
  *
  * Guarda la duración y la aplica a las franjas de hoy en adelante; las fechas
  * pasadas conservan la que tenían. Si alguna franja futura deja de admitir un
  * turno completo con la nueva duración, rechaza el cambio y las lista.
+ *
+ * No redirige: la página se refresca en el lugar para que el editor de franjas
+ * conserve lo que el médico cargó y todavía no guardó (defecto 10).
  */
 export async function guardarDuracionTurno(
-  _prevState: FormState,
+  _prevState: EstadoDuracion,
   formData: FormData,
-): Promise<FormState> {
+): Promise<EstadoDuracion> {
   // Autorización real (las server actions son alcanzables por POST directo).
   const medico = await requireMedico();
 
   const valorIngresado = leerString(formData, "duracionTurnoMin");
-  const mes = leerString(formData, "mes");
   const duracionTurnoMin = Number(valorIngresado);
 
   const errorDuracion = validarDuracion(duracionTurnoMin);
@@ -107,7 +112,7 @@ export async function guardarDuracionTurno(
   }
 
   revalidatePath("/medico/agenda", "layout");
-  redirect(urlDisponibilidad(mes, "duracion"));
+  return { errors: {}, guardadaMin: duracionTurnoMin };
 }
 
 /** Lee el JSON de franjas del editor. `null` si no tiene la forma esperada. */

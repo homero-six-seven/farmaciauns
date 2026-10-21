@@ -16,6 +16,7 @@ import {
   MSG_HORA_MULTIPLO,
   diaSemanaDe,
   diasDelMes,
+  elegirDiaVisible,
   esMesHabilitado,
   etiquetaFechaLarga,
   etiquetaMes,
@@ -212,6 +213,19 @@ describe("fechas y meses", () => {
   test("arma el rango del mes y la fecha larga", () => {
     assert.deepEqual(rangoDelMes({ anio: 2027, mes: 2 }), { desde: "2027-02-01", hasta: "2027-02-28" });
     assert.equal(etiquetaFechaLarga("2026-11-02"), "Lunes 2 de Noviembre de 2026");
+  });
+
+  test("elige el día visible de la agenda", () => {
+    const dias = ["2026-11-16", "2026-11-02", "2026-11-09"];
+    // Pedido válido: se respeta.
+    assert.equal(elegirDiaVisible(dias, "2026-11-01", "2026-11-09"), "2026-11-09");
+    // Pedido sin turnos o ausente: hoy o el próximo con turnos.
+    assert.equal(elegirDiaVisible(dias, "2026-11-01", "2026-11-05"), "2026-11-02");
+    assert.equal(elegirDiaVisible(dias, "2026-11-09", null), "2026-11-09");
+    assert.equal(elegirDiaVisible(dias, "2026-11-10", undefined), "2026-11-16");
+    // Todos pasados: el último. Sin turnos: null.
+    assert.equal(elegirDiaVisible(dias, "2026-11-20", null), "2026-11-16");
+    assert.equal(elegirDiaVisible([], "2026-11-20", null), null);
   });
 
   test("hoy se calcula en hora de Argentina, no en UTC", () => {

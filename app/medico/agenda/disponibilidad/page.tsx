@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import {
   esMesHabilitado,
   etiquetaMes,
@@ -78,26 +80,30 @@ export default async function DisponibilidadPage({
       };
     }
   }
-  const mensajeGuardado =
-    guardado === "duracion"
-      ? `La duración de tus turnos se guardó: ${duracionActual} min.`
-      : guardado
-        ? MENSAJES_GUARDADO[guardado]
-        : undefined;
+  const mensajeGuardado = guardado ? MENSAJES_GUARDADO[guardado] : undefined;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
-      <div>
-        <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-          <span>Módulo de agenda</span>
-          <span className="text-outline">/</span>
-          <span className="text-on-surface">Configuración de cupos</span>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+            <span>Módulo de agenda</span>
+            <span className="text-outline">/</span>
+            <span className="text-on-surface">Configuración de cupos</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Cargar disponibilidad</h1>
+          <p className="mt-1 text-on-surface-variant">
+            Establecé la duración de tus consultas y diagramá los bloques
+            horarios del consultorio.
+          </p>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">Cargar disponibilidad</h1>
-        <p className="mt-1 text-on-surface-variant">
-          Establecé la duración de tus consultas y diagramá los bloques
-          horarios del consultorio.
-        </p>
+        <Link
+          href={`/medico/agenda?mes=${formatearMes(mes)}`}
+          className="inline-flex h-10 items-center gap-2 rounded bg-surface-container-lowest px-4 text-sm font-semibold text-on-surface shadow-sm transition-colors hover:bg-surface-container"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Volver a Mi agenda
+        </Link>
       </div>
 
       {mensajeGuardado && (
@@ -109,15 +115,13 @@ export default async function DisponibilidadPage({
         </div>
       )}
 
-      <DuracionForm
-        key={duracionActual ?? "sin-duracion"}
-        duracionActual={duracionActual}
-        mes={formatearMes(mes)}
-      />
+      <DuracionForm duracionActual={duracionActual} />
 
       <FranjasEditor
-        // Se vuelve a montar al cambiar de mes o al guardar, para partir de lo guardado.
-        key={`${formatearMes(mes)}|${duracionActual}|${JSON.stringify(filasIniciales)}`}
+        // Se vuelve a montar al cambiar de mes o al guardar franjas, para partir
+        // de lo guardado. NO depende de la duración: cambiarla no debe borrar
+        // las filas sin guardar (defecto 10).
+        key={`${formatearMes(mes)}|${JSON.stringify(filasIniciales)}`}
         mes={formatearMes(mes)}
         etiquetaMesActual={etiquetaMes(mes)}
         aplicaDesde={hoy > primerDiaDelMes(mes) ? fechaCorta(hoy) : null}

@@ -382,6 +382,23 @@ export function etiquetaFechaLarga(fecha: FechaISO): string {
   return `${etiquetaDia(diaSemanaDe(fecha))} ${dia} de ${NOMBRES_MES[mes - 1]} de ${anio}`;
 }
 
+/**
+ * Día que muestra "Mi agenda" (US-27): el pedido si tiene turnos; si no, hoy,
+ * el próximo día con turnos o, si todos ya pasaron, el último. `null` si el mes
+ * no tiene turnos.
+ */
+export function elegirDiaVisible(
+  diasConTurnos: FechaISO[],
+  hoy: FechaISO,
+  pedido: string | null | undefined,
+): FechaISO | null {
+  const dias = [...diasConTurnos].sort();
+  if (pedido && dias.includes(pedido)) {
+    return pedido;
+  }
+  return dias.find((fecha) => fecha >= hoy) ?? dias.at(-1) ?? null;
+}
+
 export function diasDelMes(mes: MesAgenda): FechaISO[] {
   const cantidad = Number(ultimoDiaDelMes(mes).slice(8));
   return Array.from({ length: cantidad }, (_, i) =>

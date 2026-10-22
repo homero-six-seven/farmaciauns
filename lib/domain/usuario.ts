@@ -110,6 +110,10 @@ export const MSG_DNI_MIN = "El DNI debe tener al menos 7 dígitos";
 export const MSG_EMAIL_FORMATO = "El email no tiene un formato válido";
 export const MSG_NOMBRE_FORMATO = "El nombre solo puede contener letras";
 export const MSG_APELLIDO_FORMATO = "El apellido solo puede contener letras";
+export const MSG_NOMBRE_LONGITUD = "El nombre no puede superar los 50 caracteres";
+export const MSG_APELLIDO_LONGITUD =
+  "El apellido no puede superar los 50 caracteres";
+export const MSG_DNI_MAX = "El DNI no puede superar los 8 dígitos";
 export const MSG_TELEFONO_FORMATO =
   "El teléfono debe contener solo números y separadores válidos";
 export const MSG_MATRICULA_FORMATO =
@@ -160,6 +164,10 @@ export function validarEmailFormato(email: string): boolean {
 /** True si el nombre contiene letras y separadores habituales entre palabras. */
 export function validarNombreFormato(nombre: string): boolean {
   return /^\p{L}+(?:[ '\u2019-]\p{L}+)*$/u.test(nombre.trim());
+}
+
+function validarNombreEnfermeraFormato(nombre: string): boolean {
+  return /^\p{L}+(?:[ '\u2019]\p{L}+)*$/u.test(nombre.trim());
 }
 
 /** True si la contraseña cumple el mínimo de 8 caracteres. */
@@ -313,7 +321,27 @@ export function validarDatosPersonalAdministrativo(
  * NO valida unicidad de DNI/email: eso requiere el repositorio (I/O).
  */
 export function validarDatosEnfermera(d: DatosEnfermera): CampoError {
-  return validarDatosAltaStaffComun(d);
+  const errores = validarDatosAltaStaffComun(d);
+
+  if (!esVacio(d.firstName) && !validarNombreEnfermeraFormato(d.firstName)) {
+    errores.firstName = MSG_NOMBRE_FORMATO;
+  }
+  if (!esVacio(d.lastName) && !validarNombreEnfermeraFormato(d.lastName)) {
+    errores.lastName = MSG_APELLIDO_FORMATO;
+  }
+
+  if (d.firstName.trim().length > 50) {
+    errores.firstName = MSG_NOMBRE_LONGITUD;
+  }
+  if (d.lastName.trim().length > 50) {
+    errores.lastName = MSG_APELLIDO_LONGITUD;
+  }
+
+  if (validarDniFormato(d.dni) && normalizarDni(d.dni).length > 8) {
+    errores.dni = MSG_DNI_MAX;
+  }
+
+  return errores;
 }
 
 /**

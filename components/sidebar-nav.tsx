@@ -95,7 +95,7 @@ export function SidebarNav({ role }: { role?: string | null }) {
         return (
           <Link
             key={item.href}
-            href={item.href}
+            href={item.href === "/inicio" ? homeHref : item.href}
             aria-label={item.label}
             aria-current={isActive ? "page" : undefined}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors max-[760px]:w-11 max-[760px]:justify-center max-[760px]:overflow-hidden ${

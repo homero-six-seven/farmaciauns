@@ -1,6 +1,6 @@
 "use client";
 
-import type { InputHTMLAttributes, KeyboardEvent } from "react";
+import { useState, type InputHTMLAttributes, type KeyboardEvent } from "react";
 
 type FormInputType = "text" | "email" | "tel" | "password" | "date";
 
@@ -18,6 +18,7 @@ type FormInputProps = {
   defaultValue?: string;
   pattern?: string;
   maxLength?: number;
+  allowedCharacters?: RegExp;
   /** Si es true, bloquea el ingreso de letras y fuerza `inputMode="numeric"`. */
   numeric?: boolean;
 };
@@ -45,8 +46,11 @@ export function FormInput({
   defaultValue,
   pattern,
   maxLength,
+  allowedCharacters,
   numeric,
 }: FormInputProps) {
+  const [filteredValue, setFilteredValue] = useState(defaultValue ?? "");
+
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (!numeric) return;
     if (event.ctrlKey || event.metaKey || event.altKey) return;
@@ -87,6 +91,17 @@ export function FormInput({
         defaultValue={defaultValue}
         pattern={pattern}
         maxLength={maxLength}
+        value={allowedCharacters ? filteredValue : undefined}
+        onChange={
+          allowedCharacters
+            ? (event) => {
+                const characters = Array.from(event.target.value)
+                  .filter((character) => allowedCharacters.test(character))
+                  .slice(0, maxLength);
+                setFilteredValue(characters.join(""));
+              }
+            : undefined
+        }
         aria-invalid={Boolean(error)}
         onKeyDown={handleKeyDown}
         className="h-10 w-full rounded border-0 bg-surface-container-low px-3 text-sm text-on-surface placeholder:text-outline focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40"

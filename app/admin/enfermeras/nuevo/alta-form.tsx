@@ -31,31 +31,45 @@ export function AltaEnfermeraForm() {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormInput
+          key={`firstName-${state.values?.firstName ?? ""}`}
           label="Nombre"
           name="firstName"
           required
           error={errores.firstName}
+          hint="Máximo 50 caracteres"
           placeholder="Ej. Laura Beatriz"
+          pattern="[\\p{L} '\\u2019]+"
+          allowedCharacters={/[\p{L} '\u2019]/u}
+          maxLength={50}
           autoComplete="given-name"
           defaultValue={state.values?.firstName}
         />
         <FormInput
+          key={`lastName-${state.values?.lastName ?? ""}`}
           label="Apellido"
           name="lastName"
           required
           error={errores.lastName}
+          hint="Máximo 50 caracteres"
           placeholder="Ej. Giménez"
+          pattern="[\\p{L} '\\u2019]+"
+          allowedCharacters={/[\p{L} '\u2019]/u}
+          maxLength={50}
           autoComplete="family-name"
           defaultValue={state.values?.lastName}
         />
         <FormInput
+          key={`dni-${state.values?.dni ?? ""}`}
           label="DNI"
           name="dni"
           required
           numeric
           error={errores.dni}
-          hint="Solo números · mínimo 7 dígitos"
+          hint="Solo números · 7 u 8 dígitos"
           placeholder="Ej. 31145780"
+          pattern="[0-9]{7,8}"
+          maxLength={8}
+          allowedCharacters={/[0-9]/}
           defaultValue={state.values?.dni}
         />
         <FormInput

@@ -49,6 +49,7 @@ export function EditarMedicoForm({
           error={state.errors.firstName}
           defaultValue={values?.firstName ?? doctor.firstName}
           autoComplete="given-name"
+          pattern="\p{L}+(?:[ '\u2019-]\p{L}+)*"
         />
         <Field
           label="Apellido"
@@ -57,6 +58,7 @@ export function EditarMedicoForm({
           error={state.errors.lastName}
           defaultValue={values?.lastName ?? doctor.lastName}
           autoComplete="family-name"
+          pattern="\p{L}+(?:[ '\u2019-]\p{L}+)*"
         />
 
         <div className="flex flex-col gap-1.5">

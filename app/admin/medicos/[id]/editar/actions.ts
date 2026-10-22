@@ -9,9 +9,11 @@ import {
   MSG_CAMPO_OBLIGATORIO,
   MSG_EMAIL_DUPLICADO,
   MSG_MATRICULA_FORMATO,
+  MSG_NOMBRE_FORMATO,
   MSG_TELEFONO_FORMATO,
   validarEmailFormato,
   validarMatriculaFormato,
+  validarNombreFormato,
   validarTelefonoFormato,
 } from "@/lib/domain/usuario";
 import { getSignUpRedirectUrl } from "@/lib/clerk-urls";
@@ -82,6 +84,12 @@ export async function actualizarMedico(
   }
   if (datos.phone && !validarTelefonoFormato(datos.phone)) {
     errors.phone = MSG_TELEFONO_FORMATO;
+  }
+  if (datos.firstName && !validarNombreFormato(datos.firstName)) {
+    errors.firstName = MSG_NOMBRE_FORMATO;
+  }
+  if (datos.lastName && !validarNombreFormato(datos.lastName)) {
+    errors.lastName = MSG_NOMBRE_FORMATO;
   }
   if (
     datos.especialidad &&

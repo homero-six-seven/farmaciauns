@@ -108,6 +108,7 @@ export const MSG_PASSWORDS_NO_COINCIDEN = "Las contraseñas no coinciden";
 export const MSG_DNI_FORMATO = "El DNI debe contener solo números";
 export const MSG_DNI_MIN = "El DNI debe tener al menos 7 dígitos";
 export const MSG_EMAIL_FORMATO = "El email no tiene un formato válido";
+export const MSG_NOMBRE_FORMATO = "El nombre solo puede contener letras";
 export const MSG_TELEFONO_FORMATO =
   "El teléfono debe contener solo números y separadores válidos";
 export const MSG_MATRICULA_FORMATO =
@@ -153,6 +154,11 @@ export function validarMatriculaFormato(matricula: string): boolean {
 /** True si el email tiene un formato básico válido. */
 export function validarEmailFormato(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+/** True si el nombre contiene letras y separadores habituales entre palabras. */
+export function validarNombreFormato(nombre: string): boolean {
+  return /^\p{L}+(?:[ '\u2019-]\p{L}+)*$/u.test(nombre.trim());
 }
 
 /** True si la contraseña cumple el mínimo de 8 caracteres. */
@@ -319,6 +325,8 @@ export function validarDatosMedico(d: DatosMedico): CampoError {
 
   validarObligatorio(d.firstName, "firstName", errores);
   validarObligatorio(d.lastName, "lastName", errores);
+  validarNombre(d.firstName, "firstName", errores);
+  validarNombre(d.lastName, "lastName", errores);
   validarTelefono(d.phone, errores);
 
   validarObligatorio(d.especialidad, "especialidad", errores);
@@ -343,6 +351,16 @@ export function validarDatosMedico(d: DatosMedico): CampoError {
   validarPasswordUnica(d.password, errores);
 
   return errores;
+}
+
+function validarNombre(
+  valor: string | null | undefined,
+  campo: string,
+  errores: CampoError,
+): void {
+  if (typeof valor === "string" && !esVacio(valor) && !validarNombreFormato(valor)) {
+    errores[campo] = MSG_NOMBRE_FORMATO;
+  }
 }
 
 /** Etiqueta legible de un rol para las pantallas de resumen. */

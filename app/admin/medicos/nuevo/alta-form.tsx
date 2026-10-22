@@ -40,6 +40,7 @@ export function AltaMedicoForm() {
           placeholder="Ej. Juan Carlos"
           autoComplete="given-name"
           defaultValue={state.values?.firstName}
+          pattern="\p{L}+(?:[ '\u2019-]\p{L}+)*"
         />
         <FormInput
           label="Apellido"
@@ -49,6 +50,7 @@ export function AltaMedicoForm() {
           placeholder="Ej. Pérez"
           autoComplete="family-name"
           defaultValue={state.values?.lastName}
+          pattern="\p{L}+(?:[ '\u2019-]\p{L}+)*"
         />
         <FormInput
           label="DNI"

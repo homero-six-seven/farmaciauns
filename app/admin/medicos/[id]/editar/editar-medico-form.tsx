@@ -171,6 +171,7 @@ function Field({
   pattern,
   minLength,
   maxLength,
+  minLength,
   placeholder,
 }: {
   label: string;
@@ -183,6 +184,7 @@ function Field({
   pattern?: string;
   minLength?: number;
   maxLength?: number;
+  minLength?: number;
   placeholder?: string;
 }) {
   return (
@@ -201,6 +203,7 @@ function Field({
         pattern={pattern}
         minLength={minLength}
         maxLength={maxLength}
+        minLength={minLength}
         placeholder={placeholder}
         aria-invalid={Boolean(error)}
         className={`h-10 w-full rounded border-0 px-3 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 ${

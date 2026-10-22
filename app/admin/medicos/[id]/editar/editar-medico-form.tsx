@@ -170,6 +170,7 @@ function Field({
   autoComplete,
   pattern,
   maxLength,
+  minLength,
   placeholder,
 }: {
   label: string;
@@ -181,6 +182,7 @@ function Field({
   autoComplete?: "given-name" | "family-name" | "email" | "tel";
   pattern?: string;
   maxLength?: number;
+  minLength?: number;
   placeholder?: string;
 }) {
   return (
@@ -198,6 +200,7 @@ function Field({
         defaultValue={defaultValue}
         pattern={pattern}
         maxLength={maxLength}
+        minLength={minLength}
         placeholder={placeholder}
         aria-invalid={Boolean(error)}
         className={`h-10 w-full rounded border-0 px-3 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 ${

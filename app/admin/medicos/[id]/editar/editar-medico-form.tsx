@@ -169,6 +169,7 @@ function Field({
   defaultValue,
   autoComplete,
   pattern,
+  minLength,
   maxLength,
   placeholder,
 }: {
@@ -180,6 +181,7 @@ function Field({
   defaultValue: string;
   autoComplete?: "given-name" | "family-name" | "email" | "tel";
   pattern?: string;
+  minLength?: number;
   maxLength?: number;
   placeholder?: string;
 }) {
@@ -197,6 +199,7 @@ function Field({
         autoComplete={autoComplete}
         defaultValue={defaultValue}
         pattern={pattern}
+        minLength={minLength}
         maxLength={maxLength}
         placeholder={placeholder}
         aria-invalid={Boolean(error)}

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/authorization";
 import {
   ESPECIALIDADES,
+  MSG_APELLIDO_FORMATO,
   MSG_CAMPO_OBLIGATORIO,
   MSG_EMAIL_DUPLICADO,
   MSG_MATRICULA_FORMATO,
@@ -89,7 +90,7 @@ export async function actualizarMedico(
     errors.firstName = MSG_NOMBRE_FORMATO;
   }
   if (datos.lastName && !validarNombreFormato(datos.lastName)) {
-    errors.lastName = MSG_NOMBRE_FORMATO;
+    errors.lastName = MSG_APELLIDO_FORMATO;
   }
   if (
     datos.especialidad &&

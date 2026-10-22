@@ -109,6 +109,7 @@ export const MSG_DNI_FORMATO = "El DNI debe contener solo números";
 export const MSG_DNI_MIN = "El DNI debe tener al menos 7 dígitos";
 export const MSG_EMAIL_FORMATO = "El email no tiene un formato válido";
 export const MSG_NOMBRE_FORMATO = "El nombre solo puede contener letras";
+export const MSG_APELLIDO_FORMATO = "El apellido solo puede contener letras";
 export const MSG_TELEFONO_FORMATO =
   "El teléfono debe contener solo números y separadores válidos";
 export const MSG_MATRICULA_FORMATO =
@@ -325,8 +326,8 @@ export function validarDatosMedico(d: DatosMedico): CampoError {
 
   validarObligatorio(d.firstName, "firstName", errores);
   validarObligatorio(d.lastName, "lastName", errores);
-  validarNombre(d.firstName, "firstName", errores);
-  validarNombre(d.lastName, "lastName", errores);
+  validarNombre(d.firstName, "firstName", MSG_NOMBRE_FORMATO, errores);
+  validarNombre(d.lastName, "lastName", MSG_APELLIDO_FORMATO, errores);
   validarTelefono(d.phone, errores);
 
   validarObligatorio(d.especialidad, "especialidad", errores);
@@ -356,10 +357,11 @@ export function validarDatosMedico(d: DatosMedico): CampoError {
 function validarNombre(
   valor: string | null | undefined,
   campo: string,
+  mensaje: string,
   errores: CampoError,
 ): void {
   if (typeof valor === "string" && !esVacio(valor) && !validarNombreFormato(valor)) {
-    errores[campo] = MSG_NOMBRE_FORMATO;
+    errores[campo] = mensaje;
   }
 }
 

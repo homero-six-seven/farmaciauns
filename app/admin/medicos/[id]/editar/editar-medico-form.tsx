@@ -137,6 +137,7 @@ export function EditarMedicoForm({
           defaultValue={values?.phone ?? doctor.phone}
           autoComplete="tel"
           pattern="[0-9+ ()-]+"
+          minLength={12}
         />
       </div>
 

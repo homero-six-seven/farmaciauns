@@ -116,6 +116,7 @@ export const MSG_APELLIDO_LONGITUD =
 export const MSG_DNI_MAX = "El DNI no puede superar los 8 dígitos";
 export const MSG_TELEFONO_FORMATO =
   "El teléfono debe contener solo números y separadores válidos";
+export const MSG_TELEFONO_MIN = "El teléfono debe tener al menos 12 dígitos";
 export const MSG_MATRICULA_FORMATO =
   "La matrícula debe tener el formato MN seguido de un espacio y 6 números";
 
@@ -150,6 +151,10 @@ export function validarDniLongitud(dni: string): boolean {
 export function validarTelefonoFormato(phone: string): boolean {
   const limpio = phone.replace(/[+\s()-]/g, "");
   return limpio.length > 0 && /^\d+$/.test(limpio);
+}
+
+export function validarTelefonoLongitud(phone: string): boolean {
+  return phone.replace(/[+\s()-]/g, "").length >= 12;
 }
 
 export function validarMatriculaFormato(matricula: string): boolean {
@@ -249,6 +254,8 @@ function validarTelefono(phone: string, errores: CampoError): void {
     errores.phone = MSG_CAMPO_OBLIGATORIO;
   } else if (!validarTelefonoFormato(phone)) {
     errores.phone = MSG_TELEFONO_FORMATO;
+  } else if (!validarTelefonoLongitud(phone)) {
+    errores.phone = MSG_TELEFONO_MIN;
   }
 }
 

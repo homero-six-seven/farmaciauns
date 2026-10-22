@@ -89,6 +89,7 @@ export function AltaMedicoForm() {
           numeric
           error={errores.phone}
           pattern="[0-9+ ()-]+"
+          minLength={12}
           placeholder="+54 11 4890-3321"
           autoComplete="tel"
           defaultValue={state.values?.phone}

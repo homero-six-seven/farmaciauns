@@ -12,10 +12,12 @@ import {
   MSG_MATRICULA_FORMATO,
   MSG_NOMBRE_FORMATO,
   MSG_TELEFONO_FORMATO,
+  MSG_TELEFONO_MIN,
   validarEmailFormato,
   validarMatriculaFormato,
   validarNombreFormato,
   validarTelefonoFormato,
+  validarTelefonoLongitud,
 } from "@/lib/domain/usuario";
 import { getSignUpRedirectUrl } from "@/lib/clerk-urls";
 import type { FormState } from "@/lib/form-state";
@@ -85,6 +87,8 @@ export async function actualizarMedico(
   }
   if (datos.phone && !validarTelefonoFormato(datos.phone)) {
     errors.phone = MSG_TELEFONO_FORMATO;
+  } else if (datos.phone && !validarTelefonoLongitud(datos.phone)) {
+    errors.phone = MSG_TELEFONO_MIN;
   }
   if (datos.firstName && !validarNombreFormato(datos.firstName)) {
     errors.firstName = MSG_NOMBRE_FORMATO;

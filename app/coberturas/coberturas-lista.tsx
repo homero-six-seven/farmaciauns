@@ -108,7 +108,10 @@ export function CoberturasLista({
                 >
                   Cancelar
                 </button>
-                <form action={quitarCobertura}>
+                <form
+                  action={quitarCobertura}
+                  onSubmit={() => setConfirmar(null)}
+                >
                   <input
                     type="hidden"
                     name="coberturaId"
@@ -116,7 +119,6 @@ export function CoberturasLista({
                   />
                   <button
                     type="submit"
-                    onClick={() => setConfirmar(null)}
                     className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-inverse-surface"
                   >
                     <span className="material-symbols-outlined text-[16px]">

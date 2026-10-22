@@ -132,8 +132,14 @@ export async function registrarPaciente(
     active: true,
   });
 
-  if (usaCoberturas && coberturaId) {
-    await asignarCoberturaAPaciente(usuario.id, coberturaId, numeroAfiliado);
+  if (usaCoberturas) {
+    if (coberturaId) {
+      await asignarCoberturaAPaciente(usuario.id, coberturaId, numeroAfiliado);
+    } else {
+      // "Particular": marca esParticular para que "Mi cobertura" lo muestre
+      // como registrado y no vuelva a pedir el formulario (defecto 09).
+      await asignarCoberturaAPaciente(usuario.id, null);
+    }
   }
 
   revalidatePath("/pacientes");

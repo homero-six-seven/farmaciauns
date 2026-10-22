@@ -1,6 +1,7 @@
 import { loadEnvConfig } from "@next/env";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "../generated/prisma/client";
+import { normalizarNombreCobertura } from "../lib/domain/cobertura";
 
 loadEnvConfig(process.cwd());
 
@@ -188,11 +189,11 @@ async function main() {
   const coberturasCreadas: { id: string; nombre: string }[] = [];
   for (const nombre of coberturas) {
     const c = await prisma.cobertura.upsert({
-      where: { nombreNormalizado: nombre.trim().toLowerCase() },
+      where: { nombreNormalizado: normalizarNombreCobertura(nombre) },
       update: {},
       create: {
         nombre: nombre.trim(),
-        nombreNormalizado: nombre.trim().toLowerCase(),
+        nombreNormalizado: normalizarNombreCobertura(nombre),
       },
     });
     coberturasCreadas.push({ id: c.id, nombre: c.nombre });

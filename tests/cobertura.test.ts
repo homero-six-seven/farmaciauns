@@ -19,6 +19,33 @@ test("dos nombres que difieren solo en mayúsculas normalizan igual (evita dupli
   );
 });
 
+test("variantes con puntos o espacios en las siglas normalizan igual (defecto 07)", () => {
+  assert.equal(
+    normalizarNombreCobertura("OSDE"),
+    normalizarNombreCobertura("O.S.D.E"),
+  );
+  assert.equal(
+    normalizarNombreCobertura("O. S. D. E"),
+    normalizarNombreCobertura("osde"),
+  );
+  assert.equal(
+    normalizarNombreCobertura("PAMI"),
+    normalizarNombreCobertura("P.A.M.I"),
+  );
+  assert.equal(normalizarNombreCobertura("O.S.D.E"), "osde");
+});
+
+test("normalizador de cobertura: límites (solo quita puntos y espacios)", () => {
+  assert.equal(normalizarNombreCobertura("P.A.M.I"), "pami");
+  assert.equal(
+    normalizarNombreCobertura("swissmedical"),
+    normalizarNombreCobertura("Swiss Medical"),
+  );
+  assert.equal(normalizarNombreCobertura("Medifé"), "medifé");
+  assert.equal(normalizarNombreCobertura("P-A-M-I"), "p-a-m-i");
+  assert.equal(normalizarNombreCobertura("123.45"), "12345");
+});
+
 test("esNombreCoberturaVacio detecta vacío, espacios y null", () => {
   assert.equal(esNombreCoberturaVacio(""), true);
   assert.equal(esNombreCoberturaVacio("   "), true);

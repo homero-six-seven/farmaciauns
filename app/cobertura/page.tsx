@@ -27,7 +27,8 @@ export default async function MiCoberturaPage() {
     listarCoberturasDisponibles(),
   ]);
 
-  const tieneCobertura = cobertura.coberturaId != null;
+  const tieneCobertura =
+    cobertura.coberturaId != null || cobertura.esParticular;
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col">

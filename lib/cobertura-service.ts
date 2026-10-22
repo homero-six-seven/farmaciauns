@@ -141,6 +141,7 @@ export async function obtenerCoberturaDePaciente(pacienteId: string) {
       role: true,
       cobertura: { select: { id: true, nombre: true } },
       numeroAfiliado: true,
+      esParticular: true,
     },
   });
 
@@ -152,13 +153,15 @@ export async function obtenerCoberturaDePaciente(pacienteId: string) {
     coberturaId: paciente.cobertura?.id ?? null,
     nombre: paciente.cobertura?.nombre ?? null,
     numeroAfiliado: paciente.numeroAfiliado ?? null,
+    esParticular: paciente.esParticular,
   };
 }
 
 /**
  * Asigna (o cambia) la cobertura de un paciente.
  *
- * - `coberturaId = null` → "Particular": se descarta el nº de afiliado.
+ * - `coberturaId = null` → "Particular": se descarta el nº de afiliado y se
+ *   marca `esParticular` para distinguirlo de "nunca registró".
  * - `coberturaId` no null → la cobertura debe existir y estar disponible, y el
  *   nº de afiliado es obligatorio.
  */
@@ -180,9 +183,14 @@ export async function asignarCoberturaAPaciente(
   if (!coberturaId) {
     await prisma.user.update({
       where: { id: pacienteId },
-      data: { coberturaId: null, numeroAfiliado: null },
+      data: { coberturaId: null, numeroAfiliado: null, esParticular: true },
     });
-    return { coberturaId: null, nombre: null, numeroAfiliado: null };
+    return {
+      coberturaId: null,
+      nombre: null,
+      numeroAfiliado: null,
+      esParticular: true,
+    };
   }
 
   const cobertura = await prisma.cobertura.findUnique({
@@ -204,13 +212,14 @@ export async function asignarCoberturaAPaciente(
 
   await prisma.user.update({
     where: { id: pacienteId },
-    data: { coberturaId, numeroAfiliado: afiliado },
+    data: { coberturaId, numeroAfiliado: afiliado, esParticular: false },
   });
 
   return {
     coberturaId,
     nombre: cobertura.nombre,
     numeroAfiliado: afiliado,
+    esParticular: false,
   };
 }
 

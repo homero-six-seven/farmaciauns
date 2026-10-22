@@ -51,6 +51,10 @@ model User {
   passwordHash   String?
   coberturaId    String?
   numeroAfiliado String?
+  // US-21: true si el paciente registró su cobertura como "Particular"
+  // (permite distinguirlo de "nunca registró", ya que coberturaId es null en
+  // ambos casos).
+  esParticular   Boolean  @default(false)
 
   cobertura           Cobertura?         @relation(fields: [coberturaId], references: [id], onDelete: SetNull)
   coberturasAceptadas MedicoCobertura[]

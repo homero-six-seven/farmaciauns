@@ -9,9 +9,13 @@
  * de `User`).
  */
 
-/** Normaliza el nombre de una cobertura para comparación case-insensitive. */
+/**
+ * Normaliza el nombre de una cobertura para comparación case-insensitive.
+ * Además de trim + lowercase, elimina puntos y espacios: "O.S.D.E", "O. S.
+ * D. E" y "OSDE" normalizan igual para no duplicar siglas (defecto 07).
+ */
 export function normalizarNombreCobertura(nombre: string): string {
-  return nombre.trim().toLowerCase();
+  return nombre.trim().toLowerCase().replace(/[\s.]+/g, "");
 }
 
 export function esNombreCoberturaVacio(

@@ -7,8 +7,10 @@ import { getSignUpRedirectUrl } from "@/lib/clerk-urls";
 import {
   MSG_MATRICULA_FORMATO,
   MSG_TELEFONO_FORMATO,
+  MSG_TELEFONO_MIN,
   validarMatriculaFormato,
   validarTelefonoFormato,
+  validarTelefonoLongitud,
 } from "@/lib/domain/usuario";
 
 export interface CreateMedicoState {
@@ -95,6 +97,8 @@ async function createMedico(
   }
   if (telefono && !validarTelefonoFormato(telefono)) {
     errors.telefono = MSG_TELEFONO_FORMATO;
+  } else if (telefono && !validarTelefonoLongitud(telefono)) {
+    errors.telefono = MSG_TELEFONO_MIN;
   }
 
   // Validación de DNI numérico (CA6)

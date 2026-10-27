@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import {
   MOTIVOS_EGRESO,
   esMotivoEgreso,
+  msgStockMaximo,
   normalizarDetalleMotivo,
+  puedeRegistrarIngreso,
   validarCantidad,
 } from "../lib/domain/vacuna";
 
@@ -18,6 +20,15 @@ test("validarCantidad rechaza 0, negativos, decimales y NaN", () => {
   assert.equal(validarCantidad(-1), false);
   assert.equal(validarCantidad(1.5), false);
   assert.equal(validarCantidad(NaN), false);
+});
+
+test("US-22 rechaza ingresos que superan el máximo de 50 unidades", () => {
+  assert.equal(puedeRegistrarIngreso(45, 5), true);
+  assert.equal(puedeRegistrarIngreso(45, 10), false);
+  assert.equal(
+    msgStockMaximo(5),
+    "El stock máximo por vacuna es de 50 unidades (disponibles para ingresar: 5)",
+  );
 });
 
 test("el catálogo de motivos es exactamente los 4 requeridos", () => {

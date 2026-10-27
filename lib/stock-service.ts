@@ -14,7 +14,9 @@ import {
   MSG_MOTIVO_INVALIDO,
   MSG_MOTIVO_OBLIGATORIO,
   MSG_VACUNA_NO_ENCONTRADA,
+  MAX_STOCK_VACUNA,
   esMotivoEgreso,
+  msgStockMaximo,
   msgStockInsuficiente,
   normalizarDetalleMotivo,
   validarCantidad,
@@ -36,7 +38,7 @@ export async function listarVacunas(): Promise<VacunaConStock[]> {
   });
 }
 
-/** Registra un ingreso de stock (US-22). Suma `cantidad` al stock actual. */
+/** Registra un ingreso de stock (US-22), sin superar 50 unidades por vacuna. */
 export async function registrarIngreso(
   vacunaId: string,
   cantidad: number,
@@ -48,17 +50,30 @@ export async function registrarIngreso(
 
   const prisma = getPrisma();
   return prisma.$transaction(async (tx) => {
-    const vacuna = await tx.vacuna.findUnique({
-      where: { id: vacunaId },
-      select: { id: true },
+    const resultado = await tx.vacuna.updateMany({
+      where: {
+        id: vacunaId,
+        stockActual: { lte: MAX_STOCK_VACUNA - cantidad },
+      },
+      data: { stockActual: { increment: cantidad } },
     });
-    if (!vacuna) {
-      throw new ApiError(404, MSG_VACUNA_NO_ENCONTRADA);
+
+    if (resultado.count === 0) {
+      const vacuna = await tx.vacuna.findUnique({
+        where: { id: vacunaId },
+        select: { id: true, stockActual: true },
+      });
+      if (!vacuna) {
+        throw new ApiError(404, MSG_VACUNA_NO_ENCONTRADA);
+      }
+      throw new ApiError(
+        409,
+        msgStockMaximo(Math.max(0, MAX_STOCK_VACUNA - vacuna.stockActual)),
+      );
     }
 
-    const actualizada = await tx.vacuna.update({
+    const actualizada = await tx.vacuna.findUniqueOrThrow({
       where: { id: vacunaId },
-      data: { stockActual: { increment: cantidad } },
       select: { id: true, nombre: true, stockActual: true },
     });
 

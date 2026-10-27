@@ -44,11 +44,18 @@ export const MSG_MOTIVO_INVALIDO = "Motivo inválido";
 export const MSG_DETALLE_OBLIGATORIO =
   "El detalle es obligatorio cuando el motivo es Otro";
 export const MSG_STOCK_INSUFICIENTE = "No hay suficientes unidades";
+export const MSG_STOCK_MAXIMO = "El stock máximo por vacuna";
 export const MSG_VACUNA_NO_ENCONTRADA = "Vacuna no encontrada";
+export const MAX_STOCK_VACUNA = 50;
 
 /** Mensaje de stock insuficiente con las unidades disponibles (wireframe US-22/23). */
 export function msgStockInsuficiente(disponible: number): string {
   return `${MSG_STOCK_INSUFICIENTE} (disponibles: ${disponible})`;
+}
+
+/** Mensaje cuando un ingreso supera el máximo físico permitido (US-22). */
+export function msgStockMaximo(disponibles: number): string {
+  return `${MSG_STOCK_MAXIMO} es de ${MAX_STOCK_VACUNA} unidades (disponibles para ingresar: ${disponibles})`;
 }
 
 // ---------------------------------------------------------------------------
@@ -58,6 +65,14 @@ export function msgStockInsuficiente(disponible: number): string {
 /** True si `cantidad` es un entero mayor a 0 (US-22 / US-23). */
 export function validarCantidad(cantidad: number): boolean {
   return Number.isInteger(cantidad) && cantidad > 0;
+}
+
+/** Indica si el ingreso mantiene el stock dentro del máximo permitido. */
+export function puedeRegistrarIngreso(
+  stockActual: number,
+  cantidad: number,
+): boolean {
+  return stockActual + cantidad <= MAX_STOCK_VACUNA;
 }
 
 /** Normaliza el detalle de motivo (trim); `null` si está vacío. */

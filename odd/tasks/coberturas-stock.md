@@ -13,7 +13,7 @@
 - **S4 (US-21):** La cobertura registrada debe ser visible en el perfil/detalle del paciente accedido por médicos o administradores.
 - **S5 (US-24, RF-04a):** Acceso exclusivo para el rol "Enfermera". La pantalla principal muestra un listado/tabla con las unidades disponibles de cada vacuna.
 - **S6 (RF-04a):** Solo 3 tipos de vacunas precargadas fijas: "Vacuna contra la Hepatitis B", "Vacuna antipoliomielítica (Polio)" y "Vacuna contra el VPH (Virus del Papiloma Humano)". No se permite crear ni eliminar tipos. El stock inicial del sistema arranca en 0.
-- **S7 (US-22):** Registrar ingreso de cantidades recibidas (entero mayor a 0). Suma al stock actual.
+- **S7 (US-22):** Registrar ingreso de cantidades recibidas (entero mayor a 0). Suma al stock actual sin superar 50 unidades por vacuna; si lo supera, informa las unidades disponibles para ingresar y no modifica el stock.
 - **S8 (US-23):** Permite descontar unidades seleccionando la vacuna, la cantidad y un motivo obligatorio (*Vencimiento*, *Rotura o pérdida*, *Corrección de carga*, u *Otro*). El stock nunca puede quedar negativo.
 
 ## Tasks

@@ -38,6 +38,7 @@ import {
   MSG_DETALLE_OBLIGATORIO,
   MSG_MOTIVO_INVALIDO,
   MSG_MOTIVO_OBLIGATORIO,
+  MSG_STOCK_MAXIMO,
   MSG_STOCK_INSUFICIENTE,
 } from "@/lib/domain/vacuna";
 
@@ -660,7 +661,8 @@ function errorStock(err: unknown, valores: Record<string, string>): FormState {
   if (err instanceof ApiError) {
     const campo =
       err.message === MSG_CANTIDAD_INVALIDA ||
-      err.message.startsWith(MSG_STOCK_INSUFICIENTE)
+      err.message.startsWith(MSG_STOCK_INSUFICIENTE) ||
+      err.message.startsWith(MSG_STOCK_MAXIMO)
         ? "cantidad"
         : err.message === MSG_MOTIVO_OBLIGATORIO ||
             err.message === MSG_MOTIVO_INVALIDO

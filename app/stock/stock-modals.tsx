@@ -107,17 +107,22 @@ function ModalIngreso({
   );
   const [vacunaId, setVacunaId] = useState("");
 
-  const seleccionada = vacunas.find((v) => v.id === vacunaId);
+  const vacunaSeleccionadaId = vacunaId || state.values?.vacunaId || "";
+  const seleccionada = vacunas.find((v) => v.id === vacunaSeleccionadaId);
 
   return (
     <Overlay titulo="Registrar ingreso" icono="add_circle" onClose={onClose}>
-      <form action={formAction} className="flex flex-col gap-4 p-5">
+      <form
+        key={state.values?.vacunaId ?? "ingreso-inicial"}
+        action={formAction}
+        className="flex flex-col gap-4 p-5"
+      >
         {state.errors._form && <Alerta texto={state.errors._form} />}
 
         <CampoVacuna
           name="vacunaId"
           vacunas={vacunas}
-          defaultValue={state.values?.vacunaId}
+          value={vacunaSeleccionadaId}
           onChange={setVacunaId}
           hint={
             seleccionada
@@ -163,7 +168,7 @@ function ModalEgreso({
         <CampoVacuna
           name="vacunaId"
           vacunas={vacunas}
-          defaultValue={state.values?.vacunaId}
+          value={vacunaId}
           onChange={setVacunaId}
           hint={seleccionada ? `Disponible: ${seleccionada.stockActual} u.` : undefined}
         />
@@ -242,13 +247,13 @@ function ModalEgreso({
 function CampoVacuna({
   name,
   vacunas,
-  defaultValue,
+  value,
   onChange,
   hint,
 }: {
   name: string;
   vacunas: VacunaConStock[];
-  defaultValue?: string;
+  value: string;
   onChange: (id: string) => void;
   hint?: string;
 }) {
@@ -261,7 +266,7 @@ function CampoVacuna({
         id={name}
         name={name}
         required
-        defaultValue={defaultValue}
+        value={value}
         onChange={(e) => onChange(e.target.value)}
         className="h-10 w-full rounded bg-surface-container-low px-3 text-sm text-on-surface focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40"
       >

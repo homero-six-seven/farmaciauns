@@ -1,5 +1,7 @@
 /** Emails de la aplicación; los flujos heredados de restablecimiento y bienvenida siguen siendo stubs. */
 
+import nodemailer from "nodemailer";
+
 interface AppointmentReminderEmail {
   email: string;
   nombre: string;
@@ -13,10 +15,10 @@ export async function sendAppointmentReminderEmail({
   fechaHora,
   tipo,
 }: AppointmentReminderEmail): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim();
-  if (!apiKey || !from) {
-    throw new Error("RESEND_API_KEY and EMAIL_FROM must be set to send appointment reminders.");
+  const user = process.env.GMAIL_USER?.trim();
+  const appPassword = process.env.GMAIL_APP_PASSWORD?.replace(/\s/g, "");
+  if (!user || !appPassword) {
+    throw new Error("GMAIL_USER and GMAIL_APP_PASSWORD must be set to send appointment reminders.");
   }
 
   const fechaFormateada = new Intl.DateTimeFormat("es-AR", {
@@ -30,31 +32,28 @@ export async function sendAppointmentReminderEmail({
   }).format(fechaHora);
   const descripcion = tipo === "CONSULTA" ? "consulta médica" : "vacunación";
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [email],
-      subject: "Recordatorio de tu turno - Farmacia UNS",
-      text: [
-        `Hola ${nombre || "paciente"},`,
-        "",
-        `Te recordamos que tenés un turno de ${descripcion} el ${fechaFormateada}.`,
-        "",
-        "Te esperamos. Si necesitás gestionar tu turno, ingresá a Farmacia UNS.",
-      ].join("\n"),
-    }),
-    cache: "no-store",
-    signal: AbortSignal.timeout(10_000),
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: { user, pass: appPassword },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 10_000,
   });
 
-  if (!response.ok) {
-    throw new Error(`Resend returned HTTP ${response.status} while sending an appointment reminder.`);
-  }
+  await transporter.sendMail({
+    from: { name: "Farmacia UNS", address: user },
+    to: email,
+    subject: "Recordatorio de tu turno - Farmacia UNS",
+    text: [
+      `Hola ${nombre || "paciente"},`,
+      "",
+      `Te recordamos que tenés un turno de ${descripcion} el ${fechaFormateada}.`,
+      "",
+      "Te esperamos. Si necesitás gestionar tu turno, ingresá a Farmacia UNS.",
+    ].join("\n"),
+  });
 }
 
 export async function sendPasswordResetEmail(email: string): Promise<void> {

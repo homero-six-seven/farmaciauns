@@ -1,0 +1,21 @@
+name: Appointment reminders
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reminder endpoint
+        env:
+          VERCEL_APP_URL: ${{ vars.VERCEL_APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$VERCEL_APP_URL"
+          test -n "$CRON_SECRET"
+          curl --fail --silent --show-error --max-time 60 \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            "${VERCEL_APP_URL%/}/api/cron/turno-reminders"

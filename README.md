@@ -56,20 +56,30 @@ Clerk. La enfermera define su contraseña al aceptar la invitación.
 ## Recordatorios de turnos (US-32)
 
 Los turnos reservados reciben un recordatorio por email dentro de las 24 horas
-previas al horario. La tarea programada consulta la ruta
-`GET /api/cron/turno-reminders` cada 15 minutos; requiere configurar en el
-entorno de despliegue:
+previas al horario. El envío usa SMTP de Gmail; no requiere comprar un dominio.
+La cuenta de Gmail del proyecto debe tener habilitada la verificación en dos
+pasos y una contraseña de aplicación. GitHub Actions consulta la ruta
+`GET /api/cron/turno-reminders` cada 15 minutos desde
+`.github/workflows/turno-reminders.yml`.
 
-- `RESEND_API_KEY`: clave de API de Resend.
-- `EMAIL_FROM`: remitente verificado en Resend, por ejemplo
-  `Farmacia UNS <turnos@tu-dominio-verificado>`.
-- `CRON_SECRET`: secreto usado para autenticar la tarea programada mediante
-  `Authorization: Bearer <CRON_SECRET>`.
+- En **Vercel → Project → Settings → Environment Variables** configurá
+  `GMAIL_USER` (la dirección de Gmail), `GMAIL_APP_PASSWORD` (su contraseña de
+  aplicación) y `CRON_SECRET`.
+- En **GitHub → Settings → Secrets and variables → Actions** agregá la variable
+  `VERCEL_APP_URL` con la URL desplegada, por ejemplo
+  `https://tu-proyecto.vercel.app`, y el secret `CRON_SECRET` con el mismo
+  valor configurado en Vercel.
 
-El calendario está definido en `vercel.json`. Si se usa otro proveedor de
-despliegue, hay que programar la misma ruta con ese intervalo y enviar el
-encabezado de autorización. Luego de desplegar el nuevo schema, aplicar los
-cambios en la base de datos con `pnpm exec prisma db push`.
+En Google, se genera la contraseña desde la sección **Seguridad → Verificación
+en dos pasos → Contraseñas de aplicaciones**. Si esta opción no aparece, la
+cuenta no permite contraseñas de aplicación y se necesitará otra cuenta o un
+proveedor SMTP disponible para el equipo. No uses la contraseña habitual de
+Gmail ni subas credenciales al repositorio.
+
+El workflow programado debe estar en la rama predeterminada del repositorio;
+también se puede ejecutar manualmente desde la pestaña **Actions**. Luego de
+desplegar el nuevo schema, aplicar los cambios en la base de datos con
+`pnpm exec prisma db push`.
 
 ## 🔐 Usuarios y Credenciales de Prueba
 

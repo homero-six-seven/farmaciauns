@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   BriefcaseMedical,
+  ChartColumn,
   IdCard,
   Search,
   Stethoscope,
@@ -44,7 +45,12 @@ export default function AdminDashboardPage() {
     {
       title: "Alta de enfermera",
       href: "/admin/enfermeras/nuevo",
-      icon: UserPlus,
+      icon: BriefcaseMedical,
+    },
+    {
+      title: "Reportes",
+      href: "/reportes",
+      icon: ChartColumn,
     },
   ];
 

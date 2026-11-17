@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reportes | Sala Médica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      font-family: Inter, Arial, sans-serif;
+      color: #111827;
+      background: #f8f9ff;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --ink: #10131b;
+      --muted: #555f70;
+      --line: #dce1ec;
+      --pale: #eff2ff;
+      --pale-strong: #e2e8fa;
+      --surface: #fff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 760px;
+      min-height: 100vh;
+      margin: 0;
+      background: #f8f9ff;
+      font-size: 15px;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 3;
+      display: flex;
+      width: 320px;
+      flex-direction: column;
+      background: var(--surface);
+      border-right: 1px solid #bfc2cc;
+    }
+
+    .brand {
+      height: 80px;
+      padding: 18px 20px 12px;
+      border-bottom: 1px solid #bfc2cc;
+    }
+
+    .brand-name {
+      margin: 0 0 3px;
+      color: #0c0d10;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+    }
+
+    .nav-heading {
+      margin: 16px 20px 10px;
+      color: #666a74;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: .4px;
+    }
+
+    .navigation {
+      display: grid;
+      gap: 1px;
+      padding: 0 12px;
+    }
+
+    .navigation a {
+      display: flex;
+      min-height: 50px;
+      align-items: center;
+      gap: 13px;
+      padding: 0 5px;
+      color: #333741;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .navigation a:hover { background: #f4f6fd; }
+    .navigation svg { width: 20px; height: 20px; flex: 0 0 20px; }
+
+    .sidebar-status {
+      display: flex;
+      min-height: 60px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding: 0 20px;
+      background: var(--pale);
+      border-top: 1px solid #bfc2cc;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
+
+    .workspace {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      margin-left: 320px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      height: 80px;
+      flex: 0 0 80px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      background: var(--surface);
+      border-bottom: 1px solid #bfc2cc;
+    }
+
+    .system-title {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1.1px;
+    }
+
+    .account {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .role {
+      padding: 3px 11px;
+      border: 1px solid #17191f;
+      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .4px;
+      white-space: nowrap;
+    }
+
+    .account-name {
+      display: grid;
+      gap: 1px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .account-name strong { font-size: 14px; font-weight: 500; }
+    .account-name span { font-size: 13px; letter-spacing: .4px; }
+
+    .avatar {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      color: #fff;
+      background: #050505;
+      border-radius: 50%;
+    }
+
+    .avatar svg { width: 21px; height: 21px; }
+    .account-divider { width: 1px; height: 30px; margin: 0 8px; background: #c4c7d0; }
+
+    .logout {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 0;
+      color: #17191f;
+      background: none;
+      border: 0;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .5px;
+      white-space: nowrap;
+    }
+
+    .logout svg { width: 19px; height: 19px; }
+
+    main {
+      width: 100%;
+      flex: 1;
+      padding: 0 40px 32px;
+    }
+
+    .page-heading {
+      position: relative;
+      padding-top: 2px;
+    }
+
+    .module-label {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 6px 13px;
+      background: var(--pale-strong);
+      border-radius: 0 0 3px 3px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .5px;
+    }
+
+    h1 {
+      margin: 0;
+      padding-top: 2px;
+      color: #11131a;
+      font-size: 29px;
+      font-weight: 600;
+      letter-spacing: -.8px;
+      line-height: 1.35;
+    }
+
+    .description {
+      margin: 4px 0 30px;
+      color: #252934;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .report-tabs {
+      display: flex;
+      width: max-content;
+      max-width: 100%;
+      gap: 7px;
+      margin-bottom: 30px;
+      padding: 5px;
+      overflow-x: auto;
+      background: var(--pale);
+      border-radius: 11px;
+    }
+
+    .tab {
+      display: flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      padding: 0 17px;
+      color: #465166;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .tab svg { width: 19px; height: 19px; }
+
+    .tab[aria-selected="true"] {
+      color: #fff;
+      background: #111522;
+      box-shadow: 0 2px 5px #11152235;
+    }
+
+    .filters {
+      display: flex;
+      min-height: 120px;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 30px;
+      padding: 20px 25px;
+      background: var(--surface);
+      border-radius: 11px;
+      box-shadow: 0 1px 2px #17203312;
+    }
+
+    .date-field {
+      display: grid;
+      width: 300px;
+      gap: 8px;
+    }
+
+    .date-field label {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .8px;
+    }
+
+    .date-input {
+      display: flex;
+      height: 45px;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      color: #171a22;
+      background: var(--pale);
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .date-input svg { width: 20px; height: 20px; color: #536074; }
+    .date-input input {
+      width: 100%;
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color-scheme: light;
+    }
+
+    .generate {
+      display: flex;
+      min-width: 156px;
+      height: 45px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 21px;
+      padding: 0 18px;
+      color: #fff;
+      background: #050505;
+      border: 0;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .generate:hover { background: #282a30; }
+    .generate svg { width: 18px; height: 18px; }
+
+    .report-card {
+      overflow: hidden;
+      background: var(--surface);
+      border-radius: 11px;
+      box-shadow: 0 1px 2px #17203312;
+    }
+
+    .report-meta {
+      display: flex;
+      min-height: 65px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 30px;
+      background: var(--pale);
+      border-bottom: 1px solid #dfe4f1;
+      color: #344055;
+      font-size: 14px;
+    }
+
+    .report-meta-main {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      min-width: 0;
+    }
+
+    .report-meta strong {
+      color: #12151d;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: .7px;
+      white-space: nowrap;
+    }
+
+    .meta-dot { color: #777b85; font-size: 23px; line-height: 1; }
+    .period { white-space: nowrap; }
+    .issued { white-space: nowrap; }
+
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+    }
+
+    thead { background: var(--pale-strong); }
+
+    th {
+      height: 47px;
+      padding: 0 30px;
+      color: #4a5364;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .6px;
+      white-space: nowrap;
+    }
+
+    th:first-child, td:first-child {
+      width: 28%;
+      padding-left: 30px;
+      text-align: left;
+    }
+
+    th:last-child, td:last-child { padding-right: 30px; }
+
+    td {
+      height: 61px;
+      padding: 0 30px;
+      border-bottom: 1px solid #dbe1ee;
+      color: #344055;
+      font-size: 16px;
+    }
+
+    td:first-child { color: #11131a; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .total-row { background: var(--pale); }
+    .total-row td {
+      height: 59px;
+      color: #10131b;
+      font-weight: 600;
+    }
+
+    .total-row td:first-child {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: .6px;
+    }
+
+    .report-footer {
+      display: flex;
+      min-height: 51px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 30px;
+      color: #526075;
+      font-size: 14px;
+    }
+
+    .record-count { display: flex; align-items: center; gap: 9px; }
+    .record-count svg { width: 17px; height: 17px; }
+    .record-count strong { color: #11131a; }
+
+    .status {
+      color: #696c76;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .7px;
+      white-space: nowrap;
+    }
+
+    .footer {
+      display: flex;
+      min-height: 60px;
+      align-items: center;
+      gap: 40px;
+      padding: 0 40px;
+      background: var(--surface);
+      border-top: 1px solid #bfc2cc;
+      color: #16191f;
+      font-size: 14px;
+    }
+
+    .workspace { position: relative; }
+
+    @media (max-width: 1100px) {
+      .sidebar { width: 260px; }
+      .workspace { margin-left: 260px; }
+      .topbar { padding: 0 24px; }
+      main { padding-right: 24px; padding-left: 24px; }
+      .filters { gap: 18px; }
+      .date-field { width: min(27vw, 260px); }
+      .footer { padding-left: 24px; }
+      .account { gap: 8px; }
+      .account-name { display: none; }
+    }
+
+    @media (max-width: 800px) {
+      body { min-width: 0; }
+      .sidebar { width: 72px; }
+      .brand { display: grid; place-items: center; padding: 8px; }
+      .brand-name { font-size: 0; }
+      .brand-name::after { content: "SM"; font-size: 18px; }
+      .brand-subtitle, .nav-heading, .navigation a span, .sidebar-status { display: none; }
+      .navigation { padding: 10px 8px; }
+      .navigation a { justify-content: center; padding: 0; }
+      .navigation svg { width: 21px; height: 21px; }
+      .workspace { margin-left: 72px; }
+      .topbar { padding: 0 16px; }
+      .system-title { font-size: 11px; }
+      .role { display: none; }
+      .logout { font-size: 0; }
+      main { padding-right: 16px; padding-left: 16px; }
+      .module-label { position: static; display: inline-block; margin: 0 0 4px; }
+      h1 { font-size: 25px; }
+      .description { font-size: 15px; }
+      .filters { flex-wrap: wrap; padding: 18px; }
+      .date-field { width: calc(50% - 10px); }
+      .generate { margin-top: 2px; }
+      .report-meta { align-items: flex-start; flex-direction: column; padding: 14px 18px; }
+      .report-meta-main { flex-wrap: wrap; gap: 8px; }
+      th, td { padding-right: 16px; padding-left: 16px; }
+      th:first-child, td:first-child { padding-left: 18px; }
+      th:last-child, td:last-child { padding-right: 18px; }
+      .report-footer { padding: 0 18px; }
+      .footer { gap: 10px; padding: 0 16px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" aria-label="Navegación principal">
+    <div class="brand">
+      <p class="brand-name">SALA MÉDICA</p>
+      <div class="brand-subtitle">GESTIÓN CLÍNICA</div>
+    </div>
+    <div class="nav-heading">PANEL ADMINISTRADOR</div>
+    <nav class="navigation">
+      <a href="#" aria-label="Inicio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Inicio</span>
+      </a>
+      <a href="#" aria-label="Alta de médico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2H2Zm17-14v8m-4-4h8"/></svg><span>Alta de médico</span>
+      </a>
+      <a href="#" aria-label="Alta de personal administrativo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="17" rx="1"/><path d="M9 4V2h6v2m-6 6h6m-6 4h6m-6 3h3"/><circle cx="12" cy="8" r="1"/></svg><span>Alta de personal administrativo</span>
+      </a>
+      <a href="#" aria-label="Listado de médicos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v5a6 6 0 0 0 12 0V3m-15 0h6m6 0h6M12 14v7m-4 0h8"/><circle cx="6" cy="3" r="2"/><circle cx="18" cy="3" r="2"/></svg><span>Listado de médicos</span>
+      </a>
+      <a href="#" aria-label="Listado de personal administrativo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20v-1a7 7 0 0 1 14 0v1H2Zm14-6a5 5 0 0 1 6 5v1h-4"/></svg><span>Listado de personal administrativo</span>
+      </a>
+      <a href="#" aria-label="Listado de enfermeras">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5v5a7 7 0 0 0 14 0V3h-4M7 3v4m10-4v4"/><path d="M12 12v8m-4 0h8"/><path d="M10 15h4"/></svg><span>Listado de enfermeras</span>
+      </a>
+      <a href="#" aria-label="Búsqueda de pacientes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h8M4 10h5m-5 5h8m-8 4h8"/><circle cx="16" cy="11" r="4"/><path d="m19 14 3 3"/></svg><span>Búsqueda de pacientes</span>
+      </a>
+      <a href="#" aria-label="Reportes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V13m6 8V9m6 12V5m6 16V3"/><path d="m3 10 6-5 6 1 6-5"/></svg><span>Reportes</span>
+      </a>
+    </nav>
+    <div class="sidebar-status">
+      <span>ESTADO SISTEMA</span>
+      <span>EN LÍNEA</span>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="system-title">TERMINAL DE CONTROL CLÍNICO</div>
+      <div class="account">
+        <span class="role">ADMINISTRADOR</span>
+        <div class="account-name"><strong>Admin General</strong><span>ID: ADM-0012</span></div>
+        <div class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M6 19c0-3 2.5-5 6-5s6 2 6 5v1H6z"/></svg>
+        </div>
+        <span class="account-divider" aria-hidden="true"></span>
+        <button class="logout" type="button" aria-label="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 17l5-5-5-5m5 5H3"/><path d="M13 3h7v18h-7"/></svg>CERRAR SESIÓN
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-heading" aria-labelledby="page-title">
+        <span class="module-label">MÓDULO US-43</span>
+        <h1 id="page-title">Reportes</h1>
+        <p class="description">Métricas y reportes de gestión clínica y operativa.</p>
+      </section>
+
+      <div class="report-tabs" role="tablist" aria-label="Tipo de reporte">
+        <button class="tab" type="button" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="16" rx="1"/><path d="M8 3v4m8-4v4M4 10h16"/></svg>Turnos por especialidad
+        </button>
+        <button class="tab" type="button" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h6v18H7zM4 6h3m-3 4h3m-3 4h3m-3 4h3m9-14h4v14h-4z"/><path d="M17 3v4m-2-2h4"/></svg>Stock de vacunas
+        </button>
+        <button class="tab" type="button" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="3.5"/><path d="M6 9h.01M18 16h.01"/></svg>Pagos
+        </button>
+        <button class="tab" type="button" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><path d="M3 20v-2a6 6 0 0 1 10-4.5M16 17l2 2 4-5"/></svg>Asistencia
+        </button>
+      </div>
+
+      <form class="filters" id="report-form">
+        <div class="date-field">
+          <label for="date-from">DESDE</label>
+          <div class="date-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18"/></svg>
+            <input id="date-from" type="text" value="01/11/2026" aria-label="Fecha desde">
+          </div>
+        </div>
+        <div class="date-field">
+          <label for="date-to">HASTA</label>
+          <div class="date-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18"/></svg>
+            <input id="date-to" type="text" value="30/11/2026" aria-label="Fecha hasta">
+          </div>
+        </div>
+        <button class="generate" type="submit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7V3m0 0h-4m4 0-5 5a7 7 0 0 0-11 5m0 4v4m0 0h4m-4 0 5-5a7 7 0 0 0 11-5"/></svg>GENERAR
+        </button>
+      </form>
+
+      <section class="report-card" aria-label="Reporte de turnos por especialidad">
+        <div class="report-meta">
+          <div class="report-meta-main">
+            <strong>REPORTE DE TURNOS POR ESPECIALIDAD</strong>
+            <span class="meta-dot" aria-hidden="true">•</span>
+            <span class="period">Período: 01/11/2026 al 30/11/2026</span>
+          </div>
+          <span class="issued">EMITIDO: 30/11/2026 19:42</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">ESPECIALIDAD</th>
+                <th scope="col">RESERVADOS</th>
+                <th scope="col">ATENDIDOS</th>
+                <th scope="col">AUSENTES</th>
+                <th scope="col">CANCELADOS</th>
+                <th scope="col">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Clínica médica</td><td>3</td><td>8</td><td>2</td><td>1</td><td><strong>14</strong></td></tr>
+              <tr><td>Pediatría</td><td>2</td><td>5</td><td>0</td><td>1</td><td><strong>8</strong></td></tr>
+              <tr><td>Traumatología</td><td>1</td><td>0</td><td>0</td><td>0</td><td><strong>1</strong></td></tr>
+              <tr class="total-row"><td>TOTAL GENERAL</td><td>6</td><td>13</td><td>2</td><td>2</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="report-footer">
+          <div class="record-count">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 11v6m0-10h.01"/></svg>
+            <span>Total de especialidades consultadas: <strong>3</strong></span>
+          </div>
+          <span class="status">ESTADO: CONSOLIDADO</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>© 2026 Sala Médica. Sistema de Gestión Clínica.</span>
+      <span class="status" style="margin-left:auto">Estación de Trabajo Segura • Modo Auditoría Activo</span>
+    </footer>
+  </div>
+  <script>
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((item) => item.setAttribute('aria-selected', 'false'));
+        tab.setAttribute('aria-selected', 'true');
+      });
+    });
+
+    document.getElementById('report-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+    });
+  </script>
+</body>
+</html>

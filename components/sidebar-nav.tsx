@@ -7,6 +7,7 @@ import {
   CalendarCheck,
   CalendarDays,
   CalendarPlus,
+  ChartColumn,
   ClipboardList,
   FileHeart,
   IdCard,
@@ -40,11 +41,13 @@ const NAV_BY_ROLE: Record<SidebarRole, NavItem[]> = {
     { href: "/admin/enfermeras", label: "Listado de enfermeras", icon: BriefcaseMedical },
     { href: "/admin/enfermeras/nuevo", label: "Alta de enfermeras", icon: UserPlus },
     { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
+    { href: "/reportes", label: "Reportes", icon: ChartColumn },
   ],
   ADMINISTRATIVO: [
     { href: "/inicio", label: "Inicio", icon: LayoutDashboard },
     { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
     { href: "/pagos", label: "Registrar pago", icon: BriefcaseMedical },
+    { href: "/reportes", label: "Reportes", icon: ChartColumn },
   ],
   MEDICO: [
     { href: "/inicio", label: "Inicio", icon: LayoutDashboard },

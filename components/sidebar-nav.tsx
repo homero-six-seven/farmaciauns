@@ -22,7 +22,7 @@ import type { LucideIcon } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
 
-type SidebarRole = "ADMINISTRADOR" | "MEDICO" | "ENFERMERA" | "PACIENTE";
+type SidebarRole = "ADMINISTRADOR" | "ADMINISTRATIVO" | "MEDICO" | "ENFERMERA" | "PACIENTE";
 
 /**
  * Navegación del panel izquierdo, una lista por rol. Es la ÚNICA fuente de
@@ -40,6 +40,11 @@ const NAV_BY_ROLE: Record<SidebarRole, NavItem[]> = {
     { href: "/admin/enfermeras", label: "Listado de enfermeras", icon: BriefcaseMedical },
     { href: "/admin/enfermeras/nuevo", label: "Alta de enfermeras", icon: UserPlus },
     { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
+  ],
+  ADMINISTRATIVO: [
+    { href: "/inicio", label: "Inicio", icon: LayoutDashboard },
+    { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
+    { href: "/pagos", label: "Registrar pago", icon: BriefcaseMedical },
   ],
   MEDICO: [
     { href: "/inicio", label: "Inicio", icon: LayoutDashboard },
@@ -64,9 +69,10 @@ const NAV_BY_ROLE: Record<SidebarRole, NavItem[]> = {
 
 function resolveRole(role: string | null | undefined): SidebarRole {
   if (role === "MEDICO") return "MEDICO";
+  if (role === "ADMINISTRATIVO") return "ADMINISTRATIVO";
   if (role === "ENFERMERA") return "ENFERMERA";
   if (role === "PACIENTE") return "PACIENTE";
-  // ADMINISTRADOR y ADMINISTRATIVO comparten el panel de gestión.
+  // Un rol desconocido queda en el panel de gestión para no dejar navegación vacía.
   return "ADMINISTRADOR";
 }
 

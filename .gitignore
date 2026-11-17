@@ -30,6 +30,7 @@
 
 # documentation (local-only)
 /docs/
+/requerimientos/
 
 # debug
 npm-debug.log*

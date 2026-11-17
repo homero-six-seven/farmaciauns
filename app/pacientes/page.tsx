@@ -12,14 +12,14 @@ import { reactivarPaciente } from "@/app/actions";
  *
  * La búsqueda se hace con un `<form method="GET">` (progressive enhancement):
  * navega a `/pacientes?q=...` y el server component filtra. No requiere JS.
- * Pacientes y personal administrativo quedan bloqueados (acceso denegado).
+ * Pacientes quedan bloqueados (acceso denegado).
  */
 export default async function PacientesPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; reactivado?: string }>;
 }) {
-  const role = await requireRole(["admin", "medico"]);
+  const role = await requireRole(["admin", "medico", "administrativo"]);
 
   const { q, reactivado } = await searchParams;
   const query = (q ?? "").trim();

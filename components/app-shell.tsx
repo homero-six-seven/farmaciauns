@@ -15,6 +15,8 @@ function sidebarLabel(role: string | null | undefined): string {
       return "Enfermería";
     case "PACIENTE":
       return "Portal Paciente";
+    case "ADMINISTRATIVO":
+      return "Personal administrativo";
     default:
       return "Gestión Clínica";
   }

@@ -3,14 +3,14 @@ import { redirect } from "next/navigation";
 import { getPrisma } from "./prisma";
 import { getCurrentDbUser } from "./auth";
 
-export const roles = ["admin", "enfermera", "medico", "paciente"] as const;
+export const roles = ["admin", "administrativo", "enfermera", "medico", "paciente"] as const;
 
 export type Role = (typeof roles)[number];
 
 const roleAliases: Record<string, Role> = {
   admin: "admin",
   administrador: "admin",
-  administrativo: "admin",
+  administrativo: "administrativo",
   enfermera: "enfermera",
   medico: "medico",
   paciente: "paciente",

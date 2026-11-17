@@ -48,6 +48,18 @@ enum EstadoTurno {
   CANCELADO
 }
 
+enum EstadoCobro {
+  PENDIENTE_DE_PAGO
+  PAGADO
+}
+
+enum MedioPago {
+  EFECTIVO
+  DEBITO
+  CREDITO
+  TRANSFERENCIA
+}
+
 model User {
   id             String        @id @default(cuid())
   clerkId        String?       @unique
@@ -84,6 +96,8 @@ model User {
   turnosComoMedico      Turno[]           @relation("TurnoMedico")
   registrosComoPaciente RegistroClinico[] @relation("RegistroPaciente")
   registrosComoMedico   RegistroClinico[] @relation("RegistroMedico")
+  pagosComoPaciente     Pago[]            @relation("PagoPaciente")
+  pagosRegistrados      Pago[]            @relation("PagoRegistradoPor")
 
   @@index([coberturaId])
 }
@@ -195,36 +209,56 @@ model MovimientoStock {
 
 /// Turno de un paciente: consulta con un médico o aplicación de una vacuna.
 model Turno {
-  id           String        @id @default(cuid())
-  tipo         TipoTurno
-  estado       EstadoTurno   @default(RESERVADO)
-  pacienteId   String
+  id                       String        @id @default(cuid())
+  tipo                     TipoTurno
+  estado                   EstadoTurno   @default(RESERVADO)
+  estadoCobro              EstadoCobro   @default(PENDIENTE_DE_PAGO)
+  pacienteId               String
   /// Solo en turnos de CONSULTA.
-  medicoId     String?
+  medicoId                 String?
   /// Copia de la especialidad del médico al reservar (US-17 puede cambiarla).
-  especialidad Especialidad?
+  especialidad             Especialidad?
   /// Solo en turnos de VACUNACION.
-  vacunaId     String?
+  vacunaId                 String?
   /// Día calendario, sin hora.
-  fecha        DateTime      @db.Date
+  fecha                    DateTime      @db.Date
   /// Minutos desde las 00:00, hora de Argentina.
-  inicioMin    Int
-  finMin       Int
-  slotMedico   String?       @unique
-  slotPaciente String?       @unique
-  recordatorioEnviadoAt     DateTime?
-  recordatorioProcesandoAt  DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  inicioMin                Int
+  finMin                   Int
+  slotMedico               String?       @unique
+  slotPaciente             String?       @unique
+  recordatorioEnviadoAt    DateTime?
+  recordatorioProcesandoAt DateTime?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
 
   paciente        User             @relation("TurnoPaciente", fields: [pacienteId], references: [id], onDelete: Restrict)
   medico          User?            @relation("TurnoMedico", fields: [medicoId], references: [id], onDelete: Restrict)
   vacuna          Vacuna?          @relation(fields: [vacunaId], references: [id], onDelete: Restrict)
   registroClinico RegistroClinico?
+  pago            Pago?
 
   @@index([medicoId, fecha])
   @@index([pacienteId, fecha])
   @@index([vacunaId, fecha])
+}
+
+model Pago {
+  id                String    @id @default(cuid())
+  numeroComprobante Int       @unique @default(autoincrement())
+  turnoId           String    @unique
+  pacienteId        String
+  registradoPorId   String
+  importe           Decimal   @db.Decimal(12, 2)
+  medioPago         MedioPago
+  createdAt         DateTime  @default(now())
+
+  turno         Turno @relation(fields: [turnoId], references: [id], onDelete: Restrict)
+  paciente      User  @relation("PagoPaciente", fields: [pacienteId], references: [id], onDelete: Restrict)
+  registradoPor User  @relation("PagoRegistradoPor", fields: [registradoPorId], references: [id], onDelete: Restrict)
+
+  @@index([pacienteId, createdAt])
+  @@index([registradoPorId, createdAt])
 }
 
 /// Registro de la historia clínica (US-40): uno por turno atendido, inmutable.

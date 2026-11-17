@@ -3,6 +3,7 @@ import { errorResponse, requireApiRole, toErrorResponse } from "@/lib/api";
 import {
   MEDIOS_PAGO,
   registrarPagoPresencial,
+  obtenerComprobantePorPagoId,
   type MedioPagoLabel,
 } from "@/lib/pago-service";
 
@@ -36,7 +37,8 @@ export async function POST(request: Request) {
       medioPago: body.medio_pago as MedioPagoLabel,
       registradoPorId: dbUserId,
     });
-    return NextResponse.json({ mensaje: "Pago registrado correctamente", pago }, { status: 201 });
+    const comprobante = await obtenerComprobantePorPagoId(pago.id);
+    return NextResponse.json({ mensaje: "Pago registrado correctamente", pago, comprobante }, { status: 201 });
   } catch (error) {
     return toErrorResponse(error);
   }

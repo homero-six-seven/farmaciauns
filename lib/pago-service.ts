@@ -22,6 +22,74 @@ function hora(minutos: number) {
   return `${String(Math.floor(minutos / 60)).padStart(2, "0")}:${String(minutos % 60).padStart(2, "0")}`;
 }
 
+function fecha(fechaPago: Date) {
+  return new Intl.DateTimeFormat("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(fechaPago);
+}
+
+function horaPago(fechaPago: Date) {
+  return new Intl.DateTimeFormat("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(fechaPago);
+}
+
+function medioPagoLabel(medio: $Enums.MedioPago): MedioPagoLabel {
+  const labels: Record<$Enums.MedioPago, MedioPagoLabel> = {
+    EFECTIVO: "Efectivo",
+    DEBITO: "Débito",
+    CREDITO: "Crédito",
+    TRANSFERENCIA: "Transferencia",
+  };
+  return labels[medio];
+}
+
+export async function obtenerComprobantePorPagoId(id: string) {
+  const pago = await getPrisma().pago.findUnique({
+    where: { id },
+    include: {
+      paciente: { select: { firstName: true, lastName: true, dni: true, numeroAfiliado: true, esParticular: true, cobertura: { select: { nombre: true } } } },
+      turno: {
+        select: {
+          fecha: true,
+          inicioMin: true,
+          especialidad: true,
+          medico: { select: { firstName: true, lastName: true, especialidad: true } },
+        },
+      },
+    },
+  });
+  if (!pago) throw new ApiError(404, "Comprobante no encontrado");
+
+  return {
+    id: pago.id,
+    correlativo: `0001-${String(pago.numeroComprobante).padStart(8, "0")}`,
+    numeroComprobante: pago.numeroComprobante,
+    fechaPago: fecha(pago.createdAt),
+    horaPago: horaPago(pago.createdAt),
+    importe: pago.importe.toString(),
+    medioPago: medioPagoLabel(pago.medioPago),
+    paciente: {
+      nombre: nombreCompleto(pago.paciente),
+      dni: pago.paciente.dni,
+      cobertura: pago.paciente.cobertura?.nombre ?? (pago.paciente.esParticular ? "Particular" : null),
+      numeroAfiliado: pago.paciente.numeroAfiliado,
+    },
+    consulta: {
+      medico: pago.turno.medico ? nombreCompleto(pago.turno.medico) : "Sin profesional",
+      especialidad: especialidadFromEnum(pago.turno.especialidad ?? pago.turno.medico?.especialidad ?? null),
+      fecha: aFechaISO(pago.turno.fecha),
+      hora: hora(pago.turno.inicioMin),
+    },
+  };
+}
+
 export async function buscarPacientesParaPago(query: string) {
   const termino = query.trim();
   if (!termino) return [];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 const MEDIOS_PAGO = ["Efectivo", "Débito", "Crédito", "Transferencia"] as const;
@@ -29,6 +30,17 @@ type DetallePaciente = {
   consultas: Consulta[];
 };
 
+type Comprobante = {
+  id: string;
+  correlativo: string;
+  fechaPago: string;
+  horaPago: string;
+  importe: string;
+  medioPago: MedioPagoLabel;
+  paciente: { nombre: string; dni: string | null; cobertura: string | null };
+  consulta: { medico: string; especialidad: string | null; fecha: string; hora: string };
+};
+
 export function PagoForm({
   pacientes,
   initialQuery,
@@ -49,6 +61,7 @@ export function PagoForm({
   const [cargando, setCargando] = useState(false);
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [comprobante, setComprobante] = useState<Comprobante | null>(null);
 
   const buscarPacientes = useCallback(async (termino: string, signal?: AbortSignal) => {
     const texto = termino.trim();
@@ -136,6 +149,7 @@ export function PagoForm({
       const data = (await response.json()) as {
         mensaje?: string;
         pago?: { numeroComprobante: number };
+        comprobante?: Comprobante;
         error?: string;
       };
       if (!response.ok) {
@@ -145,9 +159,9 @@ export function PagoForm({
       setMensaje(
         `${data.mensaje} Comprobante correlativo N.º ${data.pago?.numeroComprobante ?? "—"}.`,
       );
+      setComprobante(data.comprobante ?? null);
       await seleccionarPaciente(paciente);
       setImporte("");
-      router.refresh();
     } catch {
       setError("No se pudo conectar con el servidor.");
     } finally {
@@ -156,7 +170,58 @@ export function PagoForm({
   }
 
   return (
-    <form onSubmit={registrarPago} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+    <form onSubmit={registrarPago} className="space-y-6">
+      {comprobante && (
+        <section className="mx-auto max-w-3xl rounded-xl bg-surface-container-lowest p-6 shadow-sm" aria-label="Comprobante de pago">
+          <div className="flex items-start justify-between gap-4 border-b border-outline-variant pb-4">
+            <div>
+              <h2 className="text-xl font-bold">✓ Pago registrado correctamente</h2>
+              <p className="mt-1 text-sm text-on-surface-variant">Comprobante de pago · DOCUMENTO NO FISCAL</p>
+            </div>
+            <p className="text-sm font-semibold">Comprobante N° {comprobante.correlativo}</p>
+          </div>
+          <div className="mt-5 rounded bg-primary-fixed p-4 text-right">
+            <span className="float-left pt-1 text-xs font-semibold uppercase tracking-wider">Total abonado</span>
+            <strong className="text-2xl">$ {comprobante.importe}</strong>
+          </div>
+          <ReceiptSection title="Datos del pago">
+            <ReceiptItem label="Número de comprobante" value={comprobante.correlativo} />
+            <ReceiptItem label="Fecha de pago" value={comprobante.fechaPago} />
+            <ReceiptItem label="Hora de pago" value={comprobante.horaPago} />
+            <ReceiptItem label="Importe" value={`$ ${comprobante.importe}`} />
+            <ReceiptItem label="Medio de pago" value={comprobante.medioPago} />
+          </ReceiptSection>
+          <ReceiptSection title="Datos del paciente">
+            <ReceiptItem label="Nombre" value={comprobante.paciente.nombre} />
+            <ReceiptItem label="DNI" value={comprobante.paciente.dni ?? "—"} />
+            <ReceiptItem label="Cobertura" value={comprobante.paciente.cobertura ?? "Particular"} />
+          </ReceiptSection>
+          <ReceiptSection title="Datos de la consulta">
+            <ReceiptItem label="Médico" value={comprobante.consulta.medico} />
+            <ReceiptItem label="Especialidad" value={comprobante.consulta.especialidad ?? "—"} />
+            <ReceiptItem label="Fecha de consulta" value={comprobante.consulta.fecha} />
+            <ReceiptItem label="Hora de consulta" value={comprobante.consulta.hora} />
+          </ReceiptSection>
+          <button
+            type="button"
+            className="mt-5 w-full rounded bg-primary px-4 py-3 text-sm font-semibold text-on-primary"
+            onClick={async () => {
+              const response = await fetch(`/api/v1/pagos/${comprobante.id}/comprobante/pdf`);
+              if (!response.ok) return;
+              const blob = await response.blob();
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = `comprobante-${comprobante.correlativo}.pdf`;
+              link.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
+            ⇩ Descargar comprobante
+          </button>
+        </section>
+      )}
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
       <div className="space-y-6">
       <section className="rounded-xl bg-surface-container-lowest p-5 shadow-sm">
         <SectionTitle number="1" title="Paciente" />
@@ -314,8 +379,17 @@ export function PagoForm({
         </dl>
       </aside>
       </div>
+      </div>
     </form>
   );
+}
+
+function ReceiptSection({ title, children }: { title: string; children: ReactNode }) {
+  return <div className="mt-5 border-t border-outline-variant pt-4"><h3 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{title}</h3><div className="mt-3 grid gap-3 sm:grid-cols-2">{children}</div></div>;
+}
+
+function ReceiptItem({ label, value }: { label: string; value: string }) {
+  return <div><dt className="text-xs text-on-surface-variant">{label}</dt><dd className="text-sm font-semibold">{value}</dd></div>;
 }
 
 function SectionTitle({ number, title }: { number: string; title: string }) {

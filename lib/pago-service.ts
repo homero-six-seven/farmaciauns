@@ -90,6 +90,63 @@ export async function obtenerComprobantePorPagoId(id: string) {
   };
 }
 
+export async function listarPagosDePaciente(pacienteId: string) {
+  const paciente = await getPrisma().user.findFirst({
+    where: { id: pacienteId, role: "PACIENTE", isActive: true },
+    select: {
+      id: true,
+      dni: true,
+      cobertura: { select: { nombre: true } },
+      esParticular: true,
+      pagosComoPaciente: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          importe: true,
+          medioPago: true,
+          createdAt: true,
+          turno: {
+            select: {
+              fecha: true,
+              inicioMin: true,
+              medico: { select: { firstName: true, lastName: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!paciente) throw new ApiError(404, "Paciente no encontrado");
+
+  return {
+    paciente: {
+      dni: paciente.dni,
+      cobertura: paciente.cobertura?.nombre ?? (paciente.esParticular ? "Particular" : null),
+    },
+    pagos: paciente.pagosComoPaciente.map((pago) => ({
+      id: pago.id,
+      fechaPago: fecha(pago.createdAt),
+      horaPago: horaPago(pago.createdAt),
+      importe: pago.importe.toString(),
+      medioPago: medioPagoLabel(pago.medioPago),
+      consulta: {
+        medico: pago.turno.medico ? nombreCompleto(pago.turno.medico) : "Sin profesional",
+        fecha: aFechaISO(pago.turno.fecha),
+        hora: hora(pago.turno.inicioMin),
+      },
+    })),
+  };
+}
+
+export async function pagoPerteneceAPaciente(pagoId: string, pacienteId: string) {
+  const pago = await getPrisma().pago.findUnique({
+    where: { id: pagoId },
+    select: { pacienteId: true },
+  });
+  return pago?.pacienteId === pacienteId;
+}
+
 export async function buscarPacientesParaPago(query: string) {
   const termino = query.trim();
   if (!termino) return [];

@@ -64,6 +64,7 @@ const NAV_BY_ROLE: Record<SidebarRole, NavItem[]> = {
     { href: "/turnos", label: "Mis turnos", icon: CalendarCheck },
     { href: "/historia-clinica", label: "Mi historia clínica", icon: FileHeart },
     { href: "/cobertura", label: "Mis datos", icon: ShieldCheck },
+    { href: "/mis-pagos", label: "Mis pagos", icon: BriefcaseMedical },
   ],
 };
 

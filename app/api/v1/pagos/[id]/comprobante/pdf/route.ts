@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
-import { requireApiRole, toErrorResponse } from "@/lib/api";
+import { ApiError, requireApiRole, toErrorResponse } from "@/lib/api";
 import { generarComprobantePdf } from "@/lib/comprobante-pdf";
-import { obtenerComprobantePorPagoId } from "@/lib/pago-service";
+import { obtenerComprobantePorPagoId, pagoPerteneceAPaciente } from "@/lib/pago-service";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireApiRole(["administrativo"]);
-    const comprobante = await obtenerComprobantePorPagoId((await params).id);
+    const { dbUserId, role } = await requireApiRole(["administrativo", "paciente"]);
+    const pagoId = (await params).id;
+    if (role === "paciente" && !(await pagoPerteneceAPaciente(pagoId, dbUserId))) {
+      throw new ApiError(404, "Comprobante no encontrado");
+    }
+    const comprobante = await obtenerComprobantePorPagoId(pagoId);
     const pdf = await generarComprobantePdf(comprobante);
     return new NextResponse(new Uint8Array(pdf), {
       headers: {

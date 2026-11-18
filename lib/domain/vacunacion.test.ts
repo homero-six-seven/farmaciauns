@@ -4,13 +4,16 @@ import {
   DURACION_TURNO_VACUNACION_MIN,
   FIN_VACUNATORIO_MIN,
   INICIO_VACUNATORIO_MIN,
+  MSG_SIN_TURNOS_VACUNACION,
   esDiaHabilVacunacion,
+  esFechaISO,
   grillaVacunacion,
   horariosVacunacionLibres,
   motivoTurnoVacunacionNoCancelable,
   puedeRegistrarAplicacionOAusencia,
   stockTrasDevolverDosis,
   stockTrasReservarDosis,
+  sumarDias,
 } from "./vacunacion";
 import { MSG_TURNO_NO_CANCELABLE } from "./turno";
 
@@ -77,8 +80,18 @@ test("horariosVacunacionLibres de un día futuro muestra toda la grilla sin ocup
 test("motivoTurnoVacunacionNoCancelable: solo turnos futuros reservados se cancelan", () => {
   // Miércoles 12:00 hora de Argentina.
   const ahora = new Date("2026-11-18T15:00:00Z");
-  const futuro = { tipo: "VACUNACION", estado: "RESERVADO", fecha: MIERCOLES, inicioMin: 750 };
-  const pasado = { tipo: "VACUNACION", estado: "RESERVADO", fecha: MIERCOLES, inicioMin: 600 };
+  const futuro = {
+    tipo: "VACUNACION",
+    estado: "RESERVADO",
+    fecha: MIERCOLES,
+    inicioMin: 750,
+  } as const;
+  const pasado = {
+    tipo: "VACUNACION",
+    estado: "RESERVADO",
+    fecha: MIERCOLES,
+    inicioMin: 600,
+  } as const;
   assert.equal(motivoTurnoVacunacionNoCancelable(futuro, ahora), null);
   assert.equal(
     motivoTurnoVacunacionNoCancelable(pasado, ahora),
@@ -86,14 +99,14 @@ test("motivoTurnoVacunacionNoCancelable: solo turnos futuros reservados se cance
   );
   assert.equal(
     motivoTurnoVacunacionNoCancelable(
-      { tipo: "CONSULTA", estado: "RESERVADO", fecha: JUEVES, inicioMin: 480 },
+      { tipo: "CONSULTA", estado: "RESERVADO", fecha: JUEVES, inicioMin: 480 } as const,
       ahora,
     ),
     MSG_TURNO_NO_CANCELABLE,
   );
   assert.equal(
     motivoTurnoVacunacionNoCancelable(
-      { tipo: "VACUNACION", estado: "CANCELADO", fecha: JUEVES, inicioMin: 480 },
+      { tipo: "VACUNACION", estado: "CANCELADO", fecha: JUEVES, inicioMin: 480 } as const,
       ahora,
     ),
     MSG_TURNO_NO_CANCELABLE,
@@ -149,4 +162,27 @@ test("stockTrasDevolverDosis suma 1 unidad sin tope (US-35 CA4 / US-60 CA2)", ()
   assert.equal(stockTrasDevolverDosis(20), 21);
   assert.equal(stockTrasDevolverDosis(8), 9);
   assert.equal(stockTrasDevolverDosis(50), 51);
+});
+
+test("esFechaISO acepta solo fechas YYYY-MM-DD bien formadas", () => {
+  assert.equal(esFechaISO("2026-11-18"), true);
+  assert.equal(esFechaISO("2026-1-18"), false);
+  assert.equal(esFechaISO("18/11/2026"), false);
+  assert.equal(esFechaISO(""), false);
+  assert.equal(esFechaISO("hola"), false);
+  assert.equal(esFechaISO("2026-13-01"), false);
+  assert.equal(esFechaISO("2026-11-31"), false);
+});
+
+test("sumarDias suma y resta días calendario cruzando meses y años", () => {
+  assert.equal(sumarDias("2026-11-18", 1), "2026-11-19");
+  assert.equal(sumarDias("2026-11-18", -1), "2026-11-17");
+  assert.equal(sumarDias("2026-11-18", 3), "2026-11-21");
+  assert.equal(sumarDias("2026-11-30", 1), "2026-12-01");
+  assert.equal(sumarDias("2026-12-31", 1), "2027-01-01");
+  assert.equal(sumarDias("2026-03-01", -1), "2026-02-28");
+});
+
+test("el mensaje de día sin turnos de vacunación es el del CA2 de US-34", () => {
+  assert.equal(MSG_SIN_TURNOS_VACUNACION, "No hay turnos de vacunación para este día");
 });

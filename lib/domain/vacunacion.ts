@@ -31,6 +31,35 @@ export const DURACION_TURNO_VACUNACION_MIN = 15;
 export const INICIO_VACUNATORIO_MIN = 480; // 08:00
 export const FIN_VACUNATORIO_MIN = 1080; // 18:00
 
+/** US-34 CA2: mensaje cuando un día no tiene turnos de vacunación. */
+export const MSG_SIN_TURNOS_VACUNACION = "No hay turnos de vacunación para este día";
+
+/** True si `valor` es una fecha "YYYY-MM-DD" válida de calendario. */
+export function esFechaISO(valor: string): valor is FechaISO {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    return false;
+  }
+  const [anio, mes, dia] = valor.split("-").map(Number);
+  if (mes < 1 || mes > 12) {
+    return false;
+  }
+  const fecha = new Date(Date.UTC(anio, mes - 1, dia));
+  return (
+    fecha.getUTCFullYear() === anio &&
+    fecha.getUTCMonth() === mes - 1 &&
+    fecha.getUTCDate() === dia
+  );
+}
+
+/** `fecha` desplazada `cantidad` días calendario (para la navegación de día). */
+export function sumarDias(fecha: FechaISO, cantidad: number): FechaISO {
+  const [anio, mes, dia] = fecha.split("-").map(Number);
+  const fechaNueva = new Date(Date.UTC(anio, mes - 1, dia + cantidad));
+  const mesNuevo = String(fechaNueva.getUTCMonth() + 1).padStart(2, "0");
+  const diaNuevo = String(fechaNueva.getUTCDate()).padStart(2, "0");
+  return `${fechaNueva.getUTCFullYear()}-${mesNuevo}-${diaNuevo}`;
+}
+
 /** True si la fecha es un día hábil (lunes a viernes). */
 export function esDiaHabilVacunacion(fecha: FechaISO): boolean {
   const dia = new Date(`${fecha}T00:00:00Z`).getUTCDay();

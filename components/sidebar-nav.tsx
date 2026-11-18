@@ -58,6 +58,7 @@ const NAV_BY_ROLE: Record<SidebarRole, NavItem[]> = {
   ],
   ENFERMERA: [
     { href: "/inicio", label: "Inicio", icon: LayoutDashboard },
+    { href: "/pacientes", label: "Búsqueda de pacientes", icon: UserSearch },
     { href: "/stock", label: "Stock de vacunas", icon: Syringe },
     { href: "/turnos-vacunacion", label: "Turnos de vacunación", icon: CalendarClock },
     { href: "/dosis", label: "Administración de dosis", icon: Pill },

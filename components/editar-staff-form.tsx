@@ -189,53 +189,6 @@ export function EditarStaffForm({
         </div>
       </div>
 
-      {mostrarAsignacionOperativa && (
-        <section className="rounded-xl bg-primary-fixed p-5">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-on-surface">
-            <span aria-hidden="true" className="material-symbols-outlined">domain</span>
-            Asignación operativa de planta (solo lectura)
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="min-w-0 rounded bg-surface-container-lowest p-3">
-              <span className="block text-xs uppercase text-on-surface-variant">Sector de asignación</span>
-              <span className="break-words font-semibold text-on-surface">Vacunatorio General / Inmunizaciones</span>
-            </div>
-            <div className="min-w-0 rounded bg-surface-container-lowest p-3">
-              <span className="block text-xs uppercase text-on-surface-variant">Turno horario</span>
-              <span className="break-words font-semibold text-on-surface">Matutino (07:00 - 15:00 hs)</span>
-            </div>
-          </div>
-        </section>
-      )}
-      {panelAdministrativo && (
-        <section className="rounded-xl bg-primary-fixed p-5">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-on-surface">
-            <span aria-hidden="true" className="material-symbols-outlined">
-              domain
-            </span>
-            Asignación operativa de planta (solo lectura)
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="min-w-0 rounded bg-surface-container-lowest p-3">
-              <span className="block text-xs uppercase text-on-surface-variant">
-                Área y puesto
-              </span>
-              <span className="break-words font-semibold text-on-surface">
-                Admisión Central - Box 02
-              </span>
-            </div>
-            <div className="min-w-0 rounded bg-surface-container-lowest p-3">
-              <span className="block text-xs uppercase text-on-surface-variant">
-                Turno horario
-              </span>
-              <span className="break-words font-semibold text-on-surface">
-                Matutino (07:00 - 15:00 hs)
-              </span>
-            </div>
-          </div>
-        </section>
-      )}
-
       <div className="flex flex-col-reverse justify-between gap-3 border-t border-surface-container-high pt-5 sm:flex-row">
         {enPanel ? (
           <button

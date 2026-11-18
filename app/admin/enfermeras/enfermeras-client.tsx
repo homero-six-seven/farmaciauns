@@ -474,37 +474,7 @@ export function EnfermerasClient({ enfermeras }: EnfermerasClientProps) {
                 </div>
               </div>
 
-              {/* Operative Assignment Block */}
-              <div className="p-space-lg flex flex-col gap-space-sm bg-surface-container-lowest mt-auto">
-                <div className="flex items-center justify-between gap-space-sm">
-                  <span className="font-label-sm text-label-sm font-mono text-on-surface-variant uppercase tracking-wider font-semibold">
-                    Sector de asignación en servicio
-                  </span>
-                </div>
-                <div className="grid gap-space-sm sm:grid-cols-2">
-                  <div className="min-w-0 rounded-xl bg-surface-container-low p-space-md">
-                    <span
-                      aria-hidden="true"
-                      className="material-symbols-outlined text-[24px] text-primary"
-                    >
-                      domain
-                    </span>
-                    <span className="block text-xs uppercase text-on-surface-variant">
-                      Sector de asignación
-                    </span>
-                    <span className="break-words font-semibold text-on-surface">
-                      Vacunatorio General / Inmunizaciones
-                    </span>
-                  </div>
-                  <div className="min-w-0 rounded-xl bg-surface-container-low p-space-md">
-                    <span className="block text-xs uppercase text-on-surface-variant">
-                      Turno horario
-                    </span>
-                    <span className="break-words font-semibold text-on-surface">
-                      Matutino (07:00 - 15:00 hs)
-                    </span>
-                  </div>
-                </div>
+              <div className="mt-auto p-space-lg">
                 {confirmStatusChange ? (
                   <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 p-4 backdrop-blur-sm"

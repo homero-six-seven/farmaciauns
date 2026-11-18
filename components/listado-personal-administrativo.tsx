@@ -469,16 +469,6 @@ function PanelDetalle({
         <CampoDetalle label="Teléfono de contacto" value={usuario.phone || "—"} full />
       </div>
       <div className="mt-auto flex flex-col gap-3 p-5">
-        <div className="grid gap-3 rounded-lg bg-primary-fixed p-3 sm:grid-cols-2">
-          <div className="min-w-0 rounded bg-surface-container-lowest p-3">
-            <span className="block text-[10px] uppercase text-on-surface-variant">Área y puesto</span>
-            <span className="break-words text-sm font-semibold text-on-surface">Admisión Central - Box 02</span>
-          </div>
-          <div className="min-w-0 rounded bg-surface-container-lowest p-3">
-            <span className="block text-[10px] uppercase text-on-surface-variant">Turno horario</span>
-            <span className="break-words text-sm font-semibold text-on-surface">Matutino (07:00 - 15:00 hs)</span>
-          </div>
-        </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="button"

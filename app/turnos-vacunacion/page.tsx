@@ -11,6 +11,7 @@ import {
   MSG_SIN_TURNOS_VACUNACION,
   esFechaISO,
   motivoTurnoVacunacionNoCancelable,
+  puedeRegistrarAplicacionOAusencia,
   sumarDias,
 } from "@/lib/domain/vacunacion";
 import { listarTurnosVacunacion } from "@/lib/vacunacion-service";
@@ -240,6 +241,10 @@ export default async function TurnosVacunacionPage({
                             ahora,
                           ) === null
                         }
+                        puedeCerrar={puedeRegistrarAplicacionOAusencia(
+                          { tipo: "VACUNACION", estado: t.estado, fecha: t.fecha },
+                          hoy,
+                        )}
                       />
                     </td>
                   </tr>

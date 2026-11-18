@@ -71,7 +71,7 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - T3 — US-34: ruta `/turnos-vacunacion` con lista del día, chips, navegación de día, botón "+ Asignar turno", guard enfermera y item de sidebar · S2 · inline · ✅ tests 92/92 + eslint + tsc limpios
 - T4 — US-33: flujo de asignación `/turnos-vacunacion/asignar` (paciente activo → vacuna con unidades → grilla de horarios → confirmar) con transacción atómica de reserva y descuento · S1 · inline · ✅ tests 95/95 + eslint + tsc limpios
 - T5 — US-35: botón "Cancelar" en turnos futuros con modal de confirmación y devolución de dosis sin tope · S3 · inline · ✅ eslint + tsc + tests 95/95
-- T6 — US-60: botones "Vacuna aplicada"/"Ausente" para turnos de hoy o anteriores con modales y devolución solo en ausencia · S5 · inline · pendiente
+- T6 — US-60: botones "Vacuna aplicada"/"Ausente" para turnos de hoy o anteriores con modales y devolución solo en ausencia · S5 · inline · ✅ eslint + tsc + tests 95/95
 - T7 — KI-05: verificación del fix (test + reproducción 45+10), confirmar CA en doc de stock, suite completa y cierre · S6 · inline · pendiente
 
 ## Log
@@ -82,3 +82,4 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - L4 (2026-11-18): T1 commiteado como `19952ab`; assess nativo sobre `bc980da..19952ab`: `medium` (executable_change en `lib/domain/vacuna.ts`), `review_due: false`, `under_budget` (el slice sigue acumulando contra el límite `bc980da`). Limitación ambiental: en este checkout no hay `.env`/`DATABASE_URL`, así que `prisma generate`, `next build` y `next dev` no corren localmente (QA visual queda en la máquina del usuario); se compensa con lint + suite de dominio.
 - L5 (2026-11-18, instrucción del usuario): "no comitees nada" y luego la aclaración "Si comitea pero no pushees" → los commits locales están permitidos; queda PROHIBIDO pushear (no `git push` a ningún remoto). T2 quedó commiteado como `7aa5055` justo antes de la instrucción; no se revierte.
 - L6 (2026-11-18): T3 commiteado como `86650b2`, T4 como `fe2753a`, T5 pendiente de commit. Assess del slice `bc980da..7aa5055`: `medium` (executable_change en `app/inicio/page.tsx`), `review_due: false`, `under_budget` (sigue acumulando contra `bc980da`).
+- L7 (2026-11-18): T5 commiteado como `036cba9`.

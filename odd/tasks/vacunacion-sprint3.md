@@ -72,7 +72,7 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - T4 — US-33: flujo de asignación `/turnos-vacunacion/asignar` (paciente activo → vacuna con unidades → grilla de horarios → confirmar) con transacción atómica de reserva y descuento · S1 · inline · ✅ tests 95/95 + eslint + tsc limpios
 - T5 — US-35: botón "Cancelar" en turnos futuros con modal de confirmación y devolución de dosis sin tope · S3 · inline · ✅ eslint + tsc + tests 95/95
 - T6 — US-60: botones "Vacuna aplicada"/"Ausente" para turnos de hoy o anteriores con modales y devolución solo en ausencia · S5 · inline · ✅ eslint + tsc + tests 95/95
-- T7 — KI-05: verificación del fix (test + reproducción 45+10), confirmar CA en doc de stock, suite completa y cierre · S6 · inline · pendiente
+- T7 — KI-05: verificación del fix (test + reproducción 45+10), confirmar CA en doc de stock, suite completa y cierre · S6 · inline · ✅ test "US-22 rechaza ingresos que superan el máximo" en verde; guard verificado en `registrarIngreso`; CA ya en `coberturas-stock.md` S7; repro manual pendiente de QA en máquina con DB
 
 ## Log
 
@@ -83,3 +83,4 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - L5 (2026-11-18, instrucción del usuario): "no comitees nada" y luego la aclaración "Si comitea pero no pushees" → los commits locales están permitidos; queda PROHIBIDO pushear (no `git push` a ningún remoto). T2 quedó commiteado como `7aa5055` justo antes de la instrucción; no se revierte.
 - L6 (2026-11-18): T3 commiteado como `86650b2`, T4 como `fe2753a`, T5 pendiente de commit. Assess del slice `bc980da..7aa5055`: `medium` (executable_change en `app/inicio/page.tsx`), `review_due: false`, `under_budget` (sigue acumulando contra `bc980da`).
 - L7 (2026-11-18): T5 commiteado como `036cba9`.
+- L8 (2026-11-18, cierre): T6 commiteado como `b86ef7c`. Suite final 95/95 verde (incluye el test de KI-05). Lint global 0 errores (3 warnings preexistentes en `app/layout.tsx`). `tsc --noEmit` limpio. Assess final del slice `bc980da..b86ef7c`: `medium` (executable_change), `review_due: false`, `under_budget` → sin review nativa debida; el límite queda en `bc980da`. Slice: 18 archivos, 2.430 líneas autoradas (incluye tests y doc). Queda pendiente el QA funcional manual en la máquina con `.env`/DB (este checkout no puede correr `next dev` ni `next build`). Sin push por instrucción del usuario (L5).

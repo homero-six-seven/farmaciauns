@@ -1,0 +1,125 @@
+/**
+ * Dominio de "Turnos de vacunación" (Sprint 3: US-33, US-34, US-35 y US-60) —
+ * tipos y reglas PURAS, sin I/O, igual que `agenda.ts` y `turno.ts`.
+ *
+ * Convenciones compartidas: fechas como `FechaISO` ("YYYY-MM-DD") y horas como
+ * minutos desde las 00:00, en hora de Argentina.
+ *
+ * El vacunatorio es un recurso GLOBAL (no hay una enfermera dueña del horario):
+ * los slots son de 15 minutos, de lunes a viernes de 08:00 a 18:00. No se
+ * persisten: los horarios libres se calculan restando los turnos no cancelados,
+ * igual que la agenda médica calcula los suyos desde las franjas.
+ */
+
+import type { FechaISO } from "./agenda";
+import {
+  MSG_TURNO_NO_CANCELABLE,
+  esFuturo,
+  puedeCerrarse,
+  seSuperponen,
+  type EstadoTurno,
+  type Horario,
+  type TipoTurno,
+} from "./turno";
+
+// ---------------------------------------------------------------------------
+// Constantes del vacunatorio (US-33: "turnos de 15 minutos, de lunes a
+// viernes de 8:00 a 18:00").
+// ---------------------------------------------------------------------------
+
+export const DURACION_TURNO_VACUNACION_MIN = 15;
+export const INICIO_VACUNATORIO_MIN = 480; // 08:00
+export const FIN_VACUNATORIO_MIN = 1080; // 18:00
+
+/** True si la fecha es un día hábil (lunes a viernes). */
+export function esDiaHabilVacunacion(fecha: FechaISO): boolean {
+  const dia = new Date(`${fecha}T00:00:00Z`).getUTCDay();
+  return dia >= 1 && dia <= 5;
+}
+
+/**
+ * Todos los slots de vacunación de un día hábil; `[]` los fines de semana.
+ * Cada slot dura exactamente 15 minutos y el último termina a las 18:00.
+ */
+export function grillaVacunacion(fecha: FechaISO): Horario[] {
+  if (!esDiaHabilVacunacion(fecha)) {
+    return [];
+  }
+  const horarios: Horario[] = [];
+  for (
+    let inicio = INICIO_VACUNATORIO_MIN;
+    inicio + DURACION_TURNO_VACUNACION_MIN <= FIN_VACUNATORIO_MIN;
+    inicio += DURACION_TURNO_VACUNACION_MIN
+  ) {
+    horarios.push({ fecha, inicioMin: inicio, finMin: inicio + DURACION_TURNO_VACUNACION_MIN });
+  }
+  return horarios;
+}
+
+/**
+ * Horarios libres de un día (US-33 CA3): la grilla menos los que se superponen
+ * con un turno ocupado (no cancelado) y menos los que ya empezaron.
+ */
+export function horariosVacunacionLibres(
+  fecha: FechaISO,
+  ocupados: Horario[],
+  ahora: Date,
+): Horario[] {
+  return grillaVacunacion(fecha)
+    .filter((h) => esFuturo(h, ahora))
+    .filter((h) => !ocupados.some((o) => seSuperponen(h, o)));
+}
+
+// ---------------------------------------------------------------------------
+// US-35 — Cancelación por la enfermera
+// ---------------------------------------------------------------------------
+
+/**
+ * Motivo por el que la enfermera no puede cancelar el turno, o `null` si
+ * puede. Solo turnos de vacunación reservados que todavía no empezaron
+ * ("cada turno futuro tiene el botón Cancelar").
+ */
+export function motivoTurnoVacunacionNoCancelable(
+  turno: { tipo: TipoTurno; estado: EstadoTurno; fecha: FechaISO; inicioMin: number },
+  ahora: Date,
+): string | null {
+  if (turno.tipo !== "VACUNACION" || turno.estado !== "RESERVADO" || !esFuturo(turno, ahora)) {
+    return MSG_TURNO_NO_CANCELABLE;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// US-60 — Registrar aplicación o ausencia
+// ---------------------------------------------------------------------------
+
+/**
+ * "Vacuna aplicada" y "Ausente" solo se ofrecen en turnos de vacunación
+ * reservados de hoy o de días anteriores (misma regla de cierre que US-40/41).
+ */
+export function puedeRegistrarAplicacionOAusencia(
+  turno: { tipo: TipoTurno; estado: EstadoTurno; fecha: FechaISO },
+  hoy: FechaISO,
+): boolean {
+  return turno.tipo === "VACUNACION" && puedeCerrarse({ estado: turno.estado, fecha: turno.fecha }, hoy);
+}
+
+// ---------------------------------------------------------------------------
+// Movimientos de dosis (stock), sin tope en las devoluciones
+// ---------------------------------------------------------------------------
+
+/**
+ * Stock tras reservar un turno (US-33): se descuenta 1 unidad si hay stock;
+ * `null` si no hay dosis disponibles (CA2: opción "Sin stock").
+ */
+export function stockTrasReservarDosis(stock: number): number | null {
+  return stock > 0 ? stock - 1 : null;
+}
+
+/**
+ * Stock tras devolver una dosis (US-35 CA4 y US-60 CA2): suma 1 SIN tope de
+ * 50, porque el máximo solo se controla al registrar ingresos (US-22).
+ */
+export function stockTrasDevolverDosis(stock: number): number {
+  return stock + 1;
+}

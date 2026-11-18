@@ -34,6 +34,7 @@ import {
 } from "./domain/vacunacion";
 import { ApiError } from "./api";
 import { aFechaDb, aFechaISO } from "./fecha-db";
+import type { Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "./prisma";
 import { getUserRepository } from "./repository";
 import { columnaUnicaViolada, nombreCompleto } from "./turno-service";
@@ -377,4 +378,58 @@ export async function obtenerTurnoVacunacionPorId(
     },
     vacuna: fila.vacuna?.nombre ?? "—",
   };
+}
+
+// ---------------------------------------------------------------------------
+// Administración de dosis (S7) — dosis aplicadas por paciente
+// ---------------------------------------------------------------------------
+
+/** Dosis aplicada tal como se muestra en "Administración de dosis" (/dosis). */
+export interface DosisAplicada {
+  id: string;
+  fecha: FechaISO;
+  inicioMin: number;
+  paciente: { nombreCompleto: string; dni: string | null };
+  vacuna: string;
+}
+
+/**
+ * Dosis aplicadas (turnos de vacunación ATENDIDO, US-60), de la más reciente a
+ * la más antigua. Con `q` (nombre o DNI) se filtran por paciente.
+ */
+export async function listarDosisAplicadas(q?: string): Promise<DosisAplicada[]> {
+  const filtro = q?.trim().toLowerCase();
+  const where: Prisma.TurnoWhereInput = { tipo: "VACUNACION", estado: "ATENDIDO" };
+  if (filtro) {
+    where.paciente = {
+      OR: [
+        { firstName: { contains: filtro, mode: "insensitive" } },
+        { lastName: { contains: filtro, mode: "insensitive" } },
+        { dni: { contains: filtro } },
+      ],
+    };
+  }
+
+  const filas = await getPrisma().turno.findMany({
+    where,
+    orderBy: [{ fecha: "desc" }, { inicioMin: "desc" }],
+    select: {
+      id: true,
+      fecha: true,
+      inicioMin: true,
+      paciente: { select: { firstName: true, lastName: true, dni: true } },
+      vacuna: { select: { nombre: true } },
+    },
+  });
+
+  return filas.map((f) => ({
+    id: f.id,
+    fecha: aFechaISO(f.fecha),
+    inicioMin: f.inicioMin,
+    paciente: {
+      nombreCompleto: nombreCompleto(f.paciente),
+      dni: f.paciente.dni,
+    },
+    vacuna: f.vacuna?.nombre ?? "—",
+  }));
 }

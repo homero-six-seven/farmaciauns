@@ -57,8 +57,13 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - Estado actual: ya implementado (commit `f5c71c0` en `develop`; guard en `lib/stock-service.ts` `registrarIngreso`, mensaje en `lib/domain/vacuna.ts`, tests en `tests/vacuna.test.ts`, CA reflejado en `odd/tasks/coberturas-stock.md` S7).
 - Alcance: verificación end-to-end (test + reproducción manual) y confirmación del criterio en el doc existente; no se reimplementa.
 
-### Invariantes transversales
-- La dosis se descuenta al reservar (S1); vuelve al cancelar (S3) o marcar ausente (S5); "aplicada" no mueve stock (S5).
+### S7 (pedido de QA) — Administración de dosis
+Completar el sector "Administración de dosis" (`/dosis`, menú de la enfermera, hoy placeholder "Falta conectar") con las dosis aplicadas a cada paciente.
+- Fuente: turnos de vacunación en estado "Atendido" (los que cierra "Vacuna aplicada" de US-60).
+- Listado cronológico (más reciente primero) con fecha, hora, paciente, DNI y vacuna; búsqueda por nombre o DNI.
+- Solo enfermera (CA3 de US-34 aplica por analogía).
+
+### Invariantes transversales- La dosis se descuenta al reservar (S1); vuelve al cancelar (S3) o marcar ausente (S5); "aplicada" no mueve stock (S5).
 - Las devoluciones suman aunque se superen 50 (solo los ingresos tienen tope).
 - Stock bajo = stockActual ≤ 10, siempre derivado (sin columna nueva).
 - Reservas, cancelaciones y ausencias mueven `stockActual` pero NO crean filas de `MovimientoStock` (consistente con US-44 ya entregada, que cuenta turnos y movimientos por separado).
@@ -73,6 +78,7 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - T5 — US-35: botón "Cancelar" en turnos futuros con modal de confirmación y devolución de dosis sin tope · S3 · inline · ✅ eslint + tsc + tests 95/95
 - T6 — US-60: botones "Vacuna aplicada"/"Ausente" para turnos de hoy o anteriores con modales y devolución solo en ausencia · S5 · inline · ✅ eslint + tsc + tests 95/95
 - T7 — KI-05: verificación del fix (test + reproducción 45+10), confirmar CA en doc de stock, suite completa y cierre · S6 · inline · ✅ test "US-22 rechaza ingresos que superan el máximo" en verde; guard verificado en `registrarIngreso`; CA ya en `coberturas-stock.md` S7; repro manual pendiente de QA en máquina con DB
+- T8 — `/dosis`: registro cronológico de dosis aplicadas (turnos VACUNACION Atendido) con búsqueda por paciente · S7 · inline · ✅ eslint + tsc + tests 95/95
 
 ## Log
 
@@ -86,3 +92,5 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - L8 (2026-11-18, cierre): T6 commiteado como `b86ef7c`. Suite final 95/95 verde (incluye el test de KI-05). Lint global 0 errores (3 warnings preexistentes en `app/layout.tsx`). `tsc --noEmit` limpio. Assess final del slice `bc980da..b86ef7c`: `medium` (executable_change), `review_due: false`, `under_budget` → sin review nativa debida; el límite queda en `bc980da`. Slice: 18 archivos, 2.430 líneas autoradas (incluye tests y doc). Queda pendiente el QA funcional manual en la máquina con `.env`/DB (este checkout no puede correr `next dev` ni `next build`). Sin push por instrucción del usuario (L5).
 - L9 (2026-11-18, QA del usuario): "Ahora si se ve bien, pero se perdieron un par de funcionalidades como la busqueda de pacientes". Diagnóstico: la sesión era de médico; como enfermera el menú ya mostraba la feature. Corrección pedida: sumar "Búsqueda de pacientes" al menú de la enfermera y habilitar el rol en `/pacientes` (cambio del Sprint 3 sobre US-12).
 - L10 (2026-11-18): El usuario pidió "Crea una rama que se llame features-grupo1 y pushea todos nuestros cambios ahi". Creada `features-grupo1` en `e69b2e3` y pusheada a `origin` (8 commits sobre `develop`/`bc980da`). `CosasNuevas/` (insumos) queda local y fuera del repo. La prohibición de push de L5 queda acotada a otros destinos (develop/main siguen siendo decisión del usuario).
+- L11 (2026-11-18, pedido del usuario): "Completa el sector de administracion de dosis con las dosis aplicadas a cada paciente". Agrega S7 y T8. La fuente de las dosis aplicadas son los turnos VACUNACION en estado Atendido (US-60).
+- L12 (2026-11-18): T8 terminado: `/dosis` muestra el registro cronológico (más reciente primero) con fecha, hora, paciente, DNI y vacuna + búsqueda por nombre/DNI; métrica de dosis aplicadas; estados vacíos. Solo enfermera.

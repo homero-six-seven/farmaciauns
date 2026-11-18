@@ -10,9 +10,11 @@ import { etiquetaEstado, formatearFecha } from "@/lib/domain/turno";
 import {
   MSG_SIN_TURNOS_VACUNACION,
   esFechaISO,
+  motivoTurnoVacunacionNoCancelable,
   sumarDias,
 } from "@/lib/domain/vacunacion";
 import { listarTurnosVacunacion } from "@/lib/vacunacion-service";
+import { AccionesTurnoVacunacion } from "./turno-acciones";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +47,7 @@ export default async function TurnosVacunacionPage({
   const atendidos = turnos.filter((t) => t.estado === "ATENDIDO").length;
   const pendientes = turnos.filter((t) => t.estado === "RESERVADO").length;
   const etiquetaFecha = `${etiquetaDia(diaSemanaDe(fechaSeleccionada))} ${formatearFecha(fechaSeleccionada)}`;
+  const ahora = new Date();
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col">
@@ -191,6 +194,9 @@ export default async function TurnosVacunacionPage({
                   <th className="px-4 py-2.5" scope="col">
                     Estado
                   </th>
+                  <th className="px-4 py-2.5" scope="col">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -215,6 +221,26 @@ export default async function TurnosVacunacionPage({
                       >
                         {etiquetaEstado(t.estado)}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <AccionesTurnoVacunacion
+                        turnoId={t.id}
+                        nombrePaciente={t.paciente.nombreCompleto}
+                        dni={t.paciente.dni}
+                        vacuna={t.vacuna}
+                        fechaEtiqueta={`${etiquetaDia(diaSemanaDe(t.fecha))} ${formatearFecha(t.fecha)} · ${formatearHora(t.inicioMin)} hs`}
+                        cancelable={
+                          motivoTurnoVacunacionNoCancelable(
+                            {
+                              tipo: "VACUNACION",
+                              estado: t.estado,
+                              fecha: t.fecha,
+                              inicioMin: t.inicioMin,
+                            },
+                            ahora,
+                          ) === null
+                        }
+                      />
                     </td>
                   </tr>
                 ))}

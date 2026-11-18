@@ -67,7 +67,7 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 ## Tasks
 
 - T1 — Dominio puro de vacunación y stock bajo con tests RED→GREEN (grilla 15 min lun–vie 8–18, horarios libres, reglas de cancelación/cierre, umbral stock bajo, devolución sin tope) · S1,S3,S4,S5 · inline · ✅ RED→GREEN (89 tests) + eslint limpio
-- T2 — US-36: banner y badge "Stock bajo" en `/stock` + aviso en Inicio de la enfermera · S4 · inline · pendiente
+- T2 — US-36: banner y badge "Stock bajo" en `/stock` + aviso en Inicio de la enfermera · S4 · inline · ✅ lint + suite (89 tests)
 - T3 — US-34: ruta `/turnos-vacunacion` con lista del día, chips, navegación de día, botón "+ Asignar turno", guard enfermera y item de sidebar · S2 · inline · pendiente
 - T4 — US-33: flujo de asignación `/turnos-vacunacion/asignar` (paciente activo → vacuna con unidades → grilla de horarios → confirmar) con transacción atómica de reserva y descuento · S1 · inline · pendiente
 - T5 — US-35: botón "Cancelar" en turnos futuros con modal de confirmación y devolución de dosis sin tope · S3 · inline · pendiente
@@ -79,3 +79,4 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - L1 (2026-11-18, pedido original): "En la carpeta cosasNuevas te deje los nuevos archivos que tienes que ver, en ellos encontraras wireframes y documentacion detallando las us a implentar, tenemos que implementar las siguientes US:33,34,35,36,60, known issue, genera un plan y presentamelo"
 - L2 (2026-11-18): Plan presentado y aprobado ("Dale"). Fuentes: `cosasNuevas/Analisis Requerimientos para Sprint 3.pdf` (extraído con pdfjs-dist) y `cosasNuevas/Known Issues Sprint 2.pdf`; wireframes leídos vía OCR de Windows (es-ES), modelo sin visión directa. Sin migración de esquema: `Turno` ya soporta `tipo: VACUNACION`. KI-05 ya corregido en `f5c71c0`. Estimación de forecast: ~1.300 líneas autoradas → estrategia de entrega a definir por el usuario (ask-on-risk).
 - L3 (2026-11-18): Estrategia de entrega elegida por el usuario: `feature-branch-chain` (slices como PRs encadenados contra `feature/vacunacion-sprint3`).
+- L4 (2026-11-18): T1 commiteado como `19952ab`; assess nativo sobre `bc980da..19952ab`: `medium` (executable_change en `lib/domain/vacuna.ts`), `review_due: false`, `under_budget` (el slice sigue acumulando contra el límite `bc980da`). Limitación ambiental: en este checkout no hay `.env`/`DATABASE_URL`, así que `prisma generate`, `next build` y `next dev` no corren localmente (QA visual queda en la máquina del usuario); se compensa con lint + suite de dominio.

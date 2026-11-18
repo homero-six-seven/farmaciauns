@@ -82,3 +82,19 @@ export function normalizarDetalleMotivo(
   const d = detalle?.trim();
   return d ? d : null;
 }
+
+// ---------------------------------------------------------------------------
+// Stock bajo (US-36)
+// ---------------------------------------------------------------------------
+
+export const UMBRAL_STOCK_BAJO = 10;
+export const MSG_STOCK_BAJO = "Stock bajo";
+export const MSG_AVISO_STOCK_BAJO =
+  "Atención: hay vacunas con stock bajo (10 unidades o menos)";
+export const MSG_AVISO_STOCK_BAJO_DETALLE =
+  "Requiere revisión y solicitud de reposición preventiva inmediata.";
+
+/** True si el stock quedó en el umbral de alerta o menos (10 unidades). */
+export function esStockBajo(stock: number): boolean {
+  return stock <= UMBRAL_STOCK_BAJO;
+}

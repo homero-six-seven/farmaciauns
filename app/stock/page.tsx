@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/authorization";
 import { listarVacunas } from "@/lib/stock-service";
+import {
+  MSG_AVISO_STOCK_BAJO,
+  MSG_AVISO_STOCK_BAJO_DETALLE,
+  MSG_STOCK_BAJO,
+  esStockBajo,
+} from "@/lib/domain/vacuna";
 import { StockModals } from "./stock-modals";
 import { StockToast } from "./stock-toast";
 
@@ -23,6 +29,8 @@ export default async function StockPage({
   const vacunas = await listarVacunas();
   const { ok } = await searchParams;
 
+  // US-36: banner de alerta cuando alguna vacuna tiene 10 unidades o menos.
+  const vacunasBajoStock = vacunas.filter((v) => esStockBajo(v.stockActual));
   const stockTotal = vacunas.reduce((sum, v) => sum + v.stockActual, 0);
 
   return (
@@ -49,6 +57,26 @@ export default async function StockPage({
             </div>
             <StockModals vacunas={vacunas} />
           </div>
+
+          {/* US-36: alerta de stock bajo */}
+          {vacunasBajoStock.length > 0 && (
+            <div
+              role="alert"
+              className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm"
+            >
+              <span className="material-symbols-outlined text-[22px] text-amber-700">
+                warning
+              </span>
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold text-amber-900">
+                  {MSG_AVISO_STOCK_BAJO}
+                </p>
+                <p className="text-xs text-amber-800">
+                  {MSG_AVISO_STOCK_BAJO_DETALLE}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Métricas */}
           <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -125,8 +153,15 @@ export default async function StockPage({
                             Sin stock
                           </span>
                         ) : (
-                          <span className="font-mono text-on-surface">
-                            {v.stockActual} unidades
+                          <span className="inline-flex items-center gap-2">
+                            <span className="font-mono text-on-surface">
+                              {v.stockActual} unidades
+                            </span>
+                            {esStockBajo(v.stockActual) && (
+                              <span className="inline-flex items-center rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-800">
+                                {MSG_STOCK_BAJO}
+                              </span>
+                            )}
                           </span>
                         )}
                       </td>

@@ -8,7 +8,9 @@ import { NuevaBusqueda } from "./nueva-busqueda";
 import { reactivarPaciente } from "@/app/actions";
 
 /**
- * US-12 (RF-24) — Búsqueda de pacientes (ADMINISTRADOR y MÉDICO).
+ * US-12 (RF-24) — Búsqueda de pacientes (ADMINISTRADOR, MÉDICO, PERSONAL
+ * ADMINISTRATIVO y ENFERMERA — cambio del Sprint 3: la enfermera la usa para
+ * asignar turnos de vacunación, US-33).
  *
  * La búsqueda se hace con un `<form method="GET">` (progressive enhancement):
  * navega a `/pacientes?q=...` y el server component filtra. No requiere JS.
@@ -19,7 +21,7 @@ export default async function PacientesPage({
 }: {
   searchParams: Promise<{ q?: string; reactivado?: string }>;
 }) {
-  const role = await requireRole(["admin", "medico", "administrativo"]);
+  const role = await requireRole(["admin", "medico", "administrativo", "enfermera"]);
 
   const { q, reactivado } = await searchParams;
   const query = (q ?? "").trim();

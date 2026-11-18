@@ -82,9 +82,10 @@ function nombreCobertura(paciente: {
 /**
  * Qué columna única se violó en un error P2002 de Prisma, o `null` si el error
  * es otro. Con el adapter de Neon el nombre de la columna puede venir en
- * `meta` o en el mensaje, así que se buscan ambos.
+ * `meta` o en el mensaje, así que se buscan ambos. Exportada para que la
+ * reserva de turnos de vacunación (US-33) reutilice el mismo mapeo.
  */
-function columnaUnicaViolada(error: unknown): "slotMedico" | "slotPaciente" | "otra" | null {
+export function columnaUnicaViolada(error: unknown): "slotMedico" | "slotPaciente" | "otra" | null {
   if (typeof error !== "object" || error === null || !("code" in error) || error.code !== "P2002") {
     return null;
   }

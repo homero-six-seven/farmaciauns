@@ -2,7 +2,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   MOTIVOS_EGRESO,
+  MSG_STOCK_BAJO,
+  UMBRAL_STOCK_BAJO,
   esMotivoEgreso,
+  esStockBajo,
   msgStockMaximo,
   normalizarDetalleMotivo,
   puedeRegistrarIngreso,
@@ -54,4 +57,16 @@ test("normalizarDetalleMotivo trimea y devuelve null si vacío", () => {
   assert.equal(normalizarDetalleMotivo("   "), null);
   assert.equal(normalizarDetalleMotivo(undefined), null);
   assert.equal(normalizarDetalleMotivo(null), null);
+});
+
+test("esStockBajo marca 10 unidades o menos (US-36)", () => {
+  assert.equal(esStockBajo(0), true);
+  assert.equal(esStockBajo(10), true);
+  assert.equal(esStockBajo(11), false);
+  assert.equal(esStockBajo(30), false);
+});
+
+test("el umbral de stock bajo es 10 unidades", () => {
+  assert.equal(UMBRAL_STOCK_BAJO, 10);
+  assert.equal(MSG_STOCK_BAJO, "Stock bajo");
 });

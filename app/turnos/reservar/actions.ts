@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ApiError } from "@/lib/api";
 import { requirePaciente } from "@/lib/authorization";
 import type { FormState } from "@/lib/form-state";
+import { enviarRecordatorioInmediato } from "@/lib/recordatorio-service";
 import { reservarTurno } from "@/lib/turno-service";
 
 function leerString(formData: FormData, campo: string): string {
@@ -47,6 +48,14 @@ export async function confirmarReserva(
     }
     console.error("Failed to book an appointment.", error);
     return { errors: { _form: "No se pudo reservar el turno. Intentá nuevamente." } };
+  }
+
+  // US-32 CA3: reserva con menos de 24h → el recordatorio sale en el momento.
+  // Si el envío falla, el cron lo reintenta; nunca bloquea la reserva.
+  try {
+    await enviarRecordatorioInmediato(turnoId, new Date());
+  } catch (error) {
+    console.error("Failed to send an immediate reminder after booking.", error);
   }
 
   revalidatePath("/turnos", "layout");

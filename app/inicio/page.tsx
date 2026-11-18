@@ -4,6 +4,13 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { requireRole, roles } from "@/lib/authorization";
 import { getPrisma } from "@/lib/prisma";
+import { listarVacunas } from "@/lib/stock-service";
+import {
+  MSG_AVISO_STOCK_BAJO,
+  MSG_AVISO_STOCK_BAJO_DETALLE,
+  MSG_STOCK_BAJO,
+  esStockBajo,
+} from "@/lib/domain/vacuna";
 import { AppShell } from "@/components/app-shell";
 import styles from "./inicio.module.css";
 
@@ -45,6 +52,11 @@ export default async function InicioPage() {
       ? "Portal Enfermería"
       : "Portal Paciente";
 
+  // US-36: aviso de stock bajo en el Inicio de la enfermera (CA2).
+  const vacunasBajoStock = esEnfermera
+    ? (await listarVacunas()).filter((v) => esStockBajo(v.stockActual))
+    : [];
+
   return (
     <AppShell>
       <div className={`${styles.page} mx-auto w-full max-w-6xl`}>
@@ -53,6 +65,48 @@ export default async function InicioPage() {
           <h1>Bienvenido{displayName ? `, ${displayName}` : ""}</h1>
           <p>Iniciaste sesión en Sala Médica.</p>
         </section>
+
+        {esEnfermera && vacunasBajoStock.length > 0 && (
+          <section
+            role="alert"
+            aria-label="Alerta de stock bajo"
+            className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm"
+          >
+            <div className="flex items-start gap-3">
+              <span className="material-symbols-outlined text-[22px] text-amber-700">
+                warning
+              </span>
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold text-amber-900">
+                  {MSG_AVISO_STOCK_BAJO}
+                </p>
+                <p className="text-xs text-amber-800">
+                  {MSG_AVISO_STOCK_BAJO_DETALLE}
+                </p>
+              </div>
+            </div>
+            <ul className="mt-3 flex flex-col gap-2">
+              {vacunasBajoStock.map((v) => (
+                <li
+                  key={v.id}
+                  className="flex flex-col gap-1 rounded-lg bg-white/70 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <span className="text-sm font-medium text-on-surface">
+                    {v.nombre}
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="font-mono text-xs text-on-surface-variant">
+                      {v.stockActual} unidades disponibles
+                    </span>
+                    <span className="inline-flex items-center rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-800">
+                      {MSG_STOCK_BAJO}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section aria-label="Accesos del portal" className={styles.cards}>
           {esMedico ? (

@@ -69,7 +69,7 @@ Al registrar un ingreso, el sistema no puede dejar una vacuna por encima de 50 u
 - T1 — Dominio puro de vacunación y stock bajo con tests RED→GREEN (grilla 15 min lun–vie 8–18, horarios libres, reglas de cancelación/cierre, umbral stock bajo, devolución sin tope) · S1,S3,S4,S5 · inline · ✅ RED→GREEN (89 tests) + eslint limpio
 - T2 — US-36: banner y badge "Stock bajo" en `/stock` + aviso en Inicio de la enfermera · S4 · inline · ✅ lint + suite (89 tests)
 - T3 — US-34: ruta `/turnos-vacunacion` con lista del día, chips, navegación de día, botón "+ Asignar turno", guard enfermera y item de sidebar · S2 · inline · ✅ tests 92/92 + eslint + tsc limpios
-- T4 — US-33: flujo de asignación `/turnos-vacunacion/asignar` (paciente activo → vacuna con unidades → grilla de horarios → confirmar) con transacción atómica de reserva y descuento · S1 · inline · pendiente
+- T4 — US-33: flujo de asignación `/turnos-vacunacion/asignar` (paciente activo → vacuna con unidades → grilla de horarios → confirmar) con transacción atómica de reserva y descuento · S1 · inline · ✅ tests 95/95 + eslint + tsc limpios
 - T5 — US-35: botón "Cancelar" en turnos futuros con modal de confirmación y devolución de dosis sin tope · S3 · inline · pendiente
 - T6 — US-60: botones "Vacuna aplicada"/"Ausente" para turnos de hoy o anteriores con modales y devolución solo en ausencia · S5 · inline · pendiente
 - T7 — KI-05: verificación del fix (test + reproducción 45+10), confirmar CA en doc de stock, suite completa y cierre · S6 · inline · pendiente

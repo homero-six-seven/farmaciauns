@@ -4,12 +4,16 @@ import {
   DURACION_TURNO_VACUNACION_MIN,
   FIN_VACUNATORIO_MIN,
   INICIO_VACUNATORIO_MIN,
+  MSG_PACIENTE_NO_ENCONTRADO,
+  MSG_SIN_STOCK,
   MSG_SIN_TURNOS_VACUNACION,
+  diaHabilAnterior,
   esDiaHabilVacunacion,
   esFechaISO,
   grillaVacunacion,
   horariosVacunacionLibres,
   motivoTurnoVacunacionNoCancelable,
+  proximoDiaHabil,
   puedeRegistrarAplicacionOAusencia,
   stockTrasDevolverDosis,
   stockTrasReservarDosis,
@@ -23,6 +27,7 @@ const VIERNES = "2026-11-20";
 const SABADO = "2026-11-21";
 const DOMINGO = "2026-11-22";
 const LUNES = "2026-11-23";
+const MARTES = "2026-11-24";
 
 test("esDiaHabilVacunacion acepta lunes a viernes y rechaza el fin de semana", () => {
   assert.equal(esDiaHabilVacunacion(MIERCOLES), true);
@@ -185,4 +190,22 @@ test("sumarDias suma y resta días calendario cruzando meses y años", () => {
 
 test("el mensaje de día sin turnos de vacunación es el del CA2 de US-34", () => {
   assert.equal(MSG_SIN_TURNOS_VACUNACION, "No hay turnos de vacunación para este día");
+});
+
+test("los mensajes de la asignación son los de US-33 CA2 y de búsqueda vacía", () => {
+  assert.equal(MSG_SIN_STOCK, "Sin stock");
+  assert.equal(MSG_PACIENTE_NO_ENCONTRADO, "No se encontraron pacientes");
+});
+
+test("proximoDiaHabil avanza hasta el próximo día hábil", () => {
+  assert.equal(proximoDiaHabil(LUNES), "2026-11-24"); // martes
+  assert.equal(proximoDiaHabil(VIERNES), LUNES); // salta el finde
+  assert.equal(proximoDiaHabil(SABADO), LUNES);
+  assert.equal(proximoDiaHabil(DOMINGO), LUNES);
+});
+
+test("diaHabilAnterior retrocede hasta el día hábil anterior", () => {
+  assert.equal(diaHabilAnterior(LUNES), VIERNES); // salta el finde
+  assert.equal(diaHabilAnterior(SABADO), VIERNES);
+  assert.equal(diaHabilAnterior(MARTES), LUNES);
 });

@@ -33,6 +33,10 @@ export const FIN_VACUNATORIO_MIN = 1080; // 18:00
 
 /** US-34 CA2: mensaje cuando un día no tiene turnos de vacunación. */
 export const MSG_SIN_TURNOS_VACUNACION = "No hay turnos de vacunación para este día";
+/** US-33 CA2: indicación de una vacuna sin unidades disponibles. */
+export const MSG_SIN_STOCK = "Sin stock";
+/** Búsqueda de pacientes de la asignación sin resultados. */
+export const MSG_PACIENTE_NO_ENCONTRADO = "No se encontraron pacientes";
 
 /** True si `valor` es una fecha "YYYY-MM-DD" válida de calendario. */
 export function esFechaISO(valor: string): valor is FechaISO {
@@ -58,6 +62,24 @@ export function sumarDias(fecha: FechaISO, cantidad: number): FechaISO {
   const mesNuevo = String(fechaNueva.getUTCMonth() + 1).padStart(2, "0");
   const diaNuevo = String(fechaNueva.getUTCDate()).padStart(2, "0");
   return `${fechaNueva.getUTCFullYear()}-${mesNuevo}-${diaNuevo}`;
+}
+
+/** El primer día hábil (lunes a viernes) posterior a `fecha`. */
+export function proximoDiaHabil(fecha: FechaISO): FechaISO {
+  let siguiente = sumarDias(fecha, 1);
+  while (!esDiaHabilVacunacion(siguiente)) {
+    siguiente = sumarDias(siguiente, 1);
+  }
+  return siguiente;
+}
+
+/** El día hábil (lunes a viernes) anterior a `fecha`. */
+export function diaHabilAnterior(fecha: FechaISO): FechaISO {
+  let anterior = sumarDias(fecha, -1);
+  while (!esDiaHabilVacunacion(anterior)) {
+    anterior = sumarDias(anterior, -1);
+  }
+  return anterior;
 }
 
 /** True si la fecha es un día hábil (lunes a viernes). */

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ApiError } from "@/lib/api";
 import { requireRole } from "@/lib/authorization";
 import type { FormState } from "@/lib/form-state";
+import { enviarRecordatorioInmediato } from "@/lib/recordatorio-service";
 import { reservarTurnoVacunacion } from "@/lib/vacunacion-service";
 
 function leerString(formData: FormData, campo: string): string {
@@ -46,6 +47,14 @@ export async function confirmarAsignacion(
     }
     console.error("Failed to book a vaccination appointment.", error);
     return { errors: { _form: "No se pudo asignar el turno. Intentá nuevamente." } };
+  }
+
+  // US-32 CA3: reserva con menos de 24h → el recordatorio sale en el momento.
+  // Si el envío falla, el cron lo reintenta; nunca bloquea la reserva.
+  try {
+    await enviarRecordatorioInmediato(turnoId, new Date());
+  } catch (error) {
+    console.error("Failed to send an immediate reminder after booking.", error);
   }
 
   revalidatePath("/turnos-vacunacion", "layout");
